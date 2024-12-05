@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=0.50">
+    <title>Model Image Display</title>
+    <style>
+        body {
+            margin: 0;
+            height: 100vh;
+            font-family: Arial, sans-serif;
+        }
+
+        /* Container to hold the menu and image side by side */
+        .container {
+            display: flex;
+            justify-content: space-between;
+            padding: 20px;
+        }
+
+        /* Menu styling */
+        .menu {
+            display: flex;
+            flex-direction: column;
+            width: 30%;
+            padding: 1rem;
+            background-color: #24bd82;
+            box-shadow: 0 0 10px rgba(218, 9, 9, 0.1);
+            /* margin-right: 20px;
+            margin-bottom: 10px; */
+            margin: 1rem;
+        }
+
+        /* Dropdowns inside the menu */
+        .menu select {
+            margin: 10px 0;
+            padding: 5px;
+            font-size: 1rem;
+        }
+
+        /* Image container styling */
+        .image-container {
+    flex-grow: 1; /* Allow the container to grow if needed */
+    display: flex;
+    justify-content: center; /* Center horizontally */
+    align-items: center; /* Center vertically */
+    padding: 20px;
+    border: 2px solid #ccc;
+    border-radius: 70px;
+    box-shadow: 0 4px 8px rgba(136, 77, 77, 0.2);
+    overflow: hidden;
+    margin: 0 auto; /* This will ensure it is centered in the parent container */
+    max-width: 100%; /* Ensure it doesn't overflow the screen */
+}
+
+        .image-container img {
+            width: 100%;
+            max-width: 600px;
+            height: 100%;
+            max-height: 600px;
+            height: auto;
+        }
+
+        .tab {
+            display: none;
+        }
+
+        .tab-button {
+            padding: 0.2rem 0.5rem;
+            font-size: 0.8rem;
+            cursor: pointer;
+            background-color: #f1f1f1;
+            display: inline-block;
+            margin: 0.3rem;
+            border: 1px dotted;
+            border-radius: 3px;
+            transition: 0.3s ease-in-out;
+        }
+        /* Button tab styles */
+        /* .tab-button {
+            padding: 0.2rem 0.5rem;
+            font-size: 1;
+            cursor: pointer;
+            background-color: #f1f1f1;
+            border: 0.1px solid #ccc;
+            margin-right: 10px;
+            align-items: center;
+            border-radius: 1px;
+            transition: background-color 0.3s;
+        } */
+
+        .tab-button:hover {
+            background-color: #655acc;
+        }
+
+        .active {
+            background-color: #960c96;
+        }
+
+        /* Styling for the header, nav, and footer */
+        header {
+            background-color: #333;
+            color: white;
+            padding: 1rem 0;
+            text-align: center;
+        }
+
+        nav {
+            text-align: center;
+            padding: 1rem;
+            background-color: #444;
+        }
+
+        nav a {
+            color: #fff;
+            margin: 0 0.5rem;
+            text-decoration: none;
+        }
+
+        footer {
+            text-align: center;
+            padding: 1rem 0;
+            font-style: italic ;
+            font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif 10;
+            background-color: #333;
+            color: #0ac93a;
+            height: 50px;
+        }
+
+    </style>
+</head>
+<body>
+    <!-- Header section -->
+    <header>
+        <h1>NWP IMAGES</h1>
+    </header>
+
+    <!-- Navigation links -->
+    <nav>
+        
+        <a href="index.html">Home</a>
+        <a href="experience.html">Experience</a>
+        <a href="education.html">Education</a>
+        <a href="experience.html">Skills</a>
+        <a href="publications.html">Publications</a>
+        <a href="Jobs.html">Jobs</a>
+        <a href="contact.html">Contact</a>
+        <a href="movies_3.html">Movies</a>
+        <a href="test_series_3.html">Series</a>
+        <a href="nwp_imd.html">NWP_IMD</a>
+        <a href="weather_map.html">weather chart</a>
+        <a href="weather_city.html">weather chart city</a>
+        <a href="https://www.tropmet.res.in/Careers">IITM career</a>
+        <a href="https://vacancies.incois.gov.in/">Incois career</a>
+    
+        
+    </nav>
+
+    <!-- Main content area -->
+    <div class="container">
+        <!-- Left side menu -->
+        <div class="menu">
+            <label for="dataType">Variable:</label>
+            <select id="dataType" onchange="updateDataType()">
+                <option value="rf_3hrly" selected>3hrs accumulated Precipitation</option>
+                <option value="rf_6hrly">6hrs accumulated Precipitation</option>
+                <option value="temp">2m Temp</option>
+                <option value="Wind850">Wind 850hPa</option>
+                <option value="Wind850c">Wind 850hPa conver.</option>
+                <option value="Wind500">Wind 500hPa</option>
+                <option value="Wind500d">Wind 500hPa divergence</option>
+                <option value="Wind850rain">Wind 850+ rain</option>
+                      
+            </select>
+
+            <!-- Tab buttons will dynamically appear here -->
+            <div id="tabContainer">
+                <!-- Tabs will be generated dynamically -->
+            </div>
+        </div>
+
+        <!-- Right side image display -->
+        <div class="image-container">
+            <img id="imageDisplay" src="https://nwp.imd.gov.in/wrf/WRF3km-03-RAIN_india_03.png" alt="3hrs Accumulated Precipitation" />
+        </div>
+    </div>
+
+    <!-- Footer section -->
+    <footer>
+        <p>&copy; 2024 ALL the products shown here are of NCMRWF / IMD property</p>
+    </footer>
+
+    <script>
+        let currentDataType = 'rf_3hrly'; // Default data type
+        let currentInterval = 3; // Default interval for 3hrly
+
+        function getCurrentDate() {
+            const date = new Date();
+            const year = date.getFullYear();
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const day = String(date.getDate()).padStart(2, '0');
+            return `${year}-${month}-${day}`;
+        }
+
+        function updateDataType() {
+            const dropdown = document.getElementById('dataType');
+            currentDataType = dropdown.value;
+            updateTabs(); // Update the tabs based on the selected data type
+            showTab(currentInterval, null); // Show the default tab after update
+        }
+
+        // Function to dynamically update tabs
+        function updateTabs() {
+            const tabContainer = document.getElementById('tabContainer');
+            tabContainer.innerHTML = ''; // Clear existing tabs
+
+            // let start = (currentDataType === 'rf_3hrly' || currentDataType === 'Wind850' || currentDataType === 'Wind500') ? 3 : 6;
+            // let end = (currentDataType === 'rf_3hrly' || currentDataType === 'Wind850' || currentDataType === 'Wind500') ? 54 : 108;
+
+
+            // currentInterval = (currentDataType === 'rf_3hrly' || currentDataType === 'Wind850' || currentDataType === 'Wind500') ? 3 : 6;
+            if (currentDataType === 'rf_3hrly' || currentDataType === 'Wind850' || currentDataType === 'Wind500') {
+        start = 3;
+        end = 54;
+        currentInterval = 3;
+    } else if (currentDataType === 'rf_6hrly' || currentDataType === 'Wind850c' || currentDataType === 'Wind500d'  ) {
+        start = 6;
+        end = 108;
+        currentInterval = 6;
+    } else if (currentDataType === 'Wind850rain') { // New condition for 24-hourly data type
+        start = 24;
+        end = 240;
+        currentInterval = 24;
+    }
+
+            // Generate tab buttons
+            for (let i = start; i <= end; i += currentInterval) {
+                const tabButton = document.createElement('div');
+                tabButton.classList.add('tab-button');
+                tabButton.innerText = String(i).padStart(2, '0');
+                tabButton.setAttribute('onclick', `showTab(${i}, event)`);
+                tabContainer.appendChild(tabButton);
+            }
+        }
+
+        function showTab(hours, event) {
+            const imageDisplay = document.getElementById('imageDisplay');
+            const currentDate = getCurrentDate();
+
+            if (currentDataType === 'rf_3hrly') {
+                const nhr = String(hours).padStart(2, '0');
+                imageDisplay.src = `https://nwp.imd.gov.in/wrf/WRF3km-03-RAIN_india_${nhr}.png`;
+            } else if (currentDataType === 'rf_6hrly') {
+                imageDisplay.src = `https://www.ncmrwf.gov.in/HomePage/Data/mihir/${currentDate}/00/6-hrs%20Accumulated%20Precipitation/pf${hours}_rain06.png`;
+            } else if (currentDataType === 'temp') {
+                imageDisplay.src = `https://www.ncmrwf.gov.in/HomePage/Data/mihir/${currentDate}/00/Temperature%20at%202m/pf${hours}_2mtemp.png`;
+            } else if (currentDataType === 'Wind850') {
+                const nhr = String(hours).padStart(2, '0');
+                imageDisplay.src = `https://nwp.imd.gov.in/wrf/WRF3km-ZWd850_india_${nhr}.png`;
+            } else if (currentDataType === 'Wind500') {
+                const nhr = String(hours).padStart(2, '0');
+                imageDisplay.src = `https://nwp.imd.gov.in/wrf/WRF3km-ZWd500_india_${nhr}.png`;
+            } else if (currentDataType === 'Wind850c') {
+                const nhr = String(hours).padStart(2, '0');
+                imageDisplay.src = `https://www.ncmrwf.gov.in/HomePage/Data/mihir/${currentDate}/00/Lower%20Level%20Convergenc/850/pf${hours}_850conv.png`;
+            } else if (currentDataType === 'Wind500d') {
+                const nhr = String(hours).padStart(2, '0');
+                imageDisplay.src = `https://www.ncmrwf.gov.in/HomePage/Data/mihir/${currentDate}/00/Upper%20Level%20Divergence%20/500/pf${hours}_500div.png`;
+            } else if (currentDataType === 'Wind850rain') {
+                const nhr = String(hours).padStart(2, '0');
+                imageDisplay.src = ` https://nwp.imd.gov.in/gfs/00/${hours}hGFS1534w850rf.gif`;
+            } 
+
+
+
+
+            https://nwp.imd.gov.in/gfs/00/24hGFS1534w850rf.gif
+
+
+
+            
+            // https://www.ncmrwf.gov.in/HomePage/Data/mihir/2024-09-26/00/
+            //     https://www.ncmrwf.gov.in/HomePage/Data/mihir/2024-09-26/00/Upper%20Level%20Divergence%20/500/pf84_500div.png
+
+            if (event) {
+                const buttons = document.getElementsByClassName('tab-button');
+                for (let i = 0; i < buttons.length; i++) {
+                    buttons[i].classList.remove('active');
+                }
+                event.target.classList.add('active');
+            }
+        }
+
+        window.onload = function() {
+            updateTabs(); // Initialize the tabs when the page loads
+            showTab(currentInterval, null); // Show the default tab when the page loads
+        };
+    </script>
+</body>
+</html>
