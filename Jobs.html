@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JOBS Viewer</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        #rssFeed {
+            margin-top: 20px;
+        }
+        .item {
+            border: 1px solid black;
+            padding: 10px;
+            width: auto;
+            margin-bottom: 10px;
+            opacity: 0.5;
+            transition: opacity 0.1s, color 0.3s;
+        }
+        .item:hover {
+            opacity: 0.8;
+            color: green;
+            border: 3px solid blue;
+        }
+        #loadMore {
+            margin-top: 20px;
+            padding: 10px 20px;
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        #loadMore:hover {
+            background-color: #0056b3;
+        }
+        #loading {
+            display: none;
+            text-align: center;
+            font-size: 18px;
+        }
+        #filter {
+            margin-bottom: 20px;
+            padding: 10px;
+            width: 100%;
+            font-size: 16px;
+        }
+        nav {
+            text-align: center;
+            padding: 1rem 0;
+            background-color: #444;
+        }
+        nav a {
+            color: #fff;
+            margin: 0 1rem;
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <a href="index.html">Home</a>
+        <a href="experience.html">Experience</a>
+        <a href="education.html">Education</a>
+        <a href="experience.html">Skills</a>
+        <a href="publications.html">Publications</a>
+        <a href="Jobs.html">Jobs</a>
+        <a href="contact.html">Contact</a>
+        <a href="movies_3.html">Movies</a>
+        <a href="test_series_3.html">Series</a>
+        <a href="nwp_imd.html">NWP_IMD</a>
+        <a href="weather_map.html">weather chart</a>
+        <a href="weather_city.html">weather chart city</a>
+        <a href="https://www.tropmet.res.in/Careers">IITM career</a>
+        <a href="https://vacancies.incois.gov.in/">Incois career</a>
+        
+
+    </nav>
+
+    <h1>Jobs Viewer</h1>
+    <input type="text" id="filter" placeholder="Filter jobs by keyword..." oninput="filterItems()">
+    <div id="rssFeed"></div>
+    <div id="loading">Loading...</div>
+    <button id="loadMore">Load More</button>
+
+    <script>
+
+
+
+// Fetch content from the URL
+function fetchContent() {
+    showLoading(true);
+
+    // Using a proxy to bypass CORS
+    const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(url)}`;
+
+    fetch(proxyUrl)
+        .then(response => response.json())
+        .then(data => {
+            const contentDiv = document.getElementById('externalContent');
+            contentDiv.innerHTML = data.contents; // Render the fetched HTML content
+            showLoading(false);
+        })
+        .catch(error => {
+            console.error('Error fetching content:', error);
+            document.getElementById('externalContent').innerHTML = '<p>Error loading content. Please try again later.</p>';
+            showLoading(false);
+        });
+}
+
+// Fetch content on page load
+window.onload = fetchContent;
+        const rssUrl = "https://maillists.reading.ac.uk/scripts/wa-READING.exe?RSS&L=MET-JOBS&v=2.0&LIMIT=100";
+        let items = [];
+        let currentIndex = 0;
+        const itemsPerPage = 10;
+
+        // Show loading indicator
+        function showLoading(isLoading) {
+            const loadingDiv = document.getElementById('loading');
+            loadingDiv.style.display = isLoading ? 'block' : 'none';
+        }
+
+        // Function to fetch RSS feed
+        function fetchRSSFeed() {
+            showLoading(true);
+            fetch(`https://api.allorigins.win/get?url=${encodeURIComponent(rssUrl)}`)
+                .then(response => response.json())
+                .then(data => {
+                    const parser = new DOMParser();
+                    const xmlDoc = parser.parseFromString(data.contents, "text/xml");
+                    items = Array.from(xmlDoc.getElementsByTagName('item'));
+                    displayItems();
+                    showLoading(false);
+                })
+                .catch(error => {
+                    console.error('Error fetching the RSS feed:', error);
+                    document.getElementById('rssFeed').innerHTML = '<p>Error fetching the RSS feed. Please check the URL.</p>';
+                    showLoading(false);
+                });
+        }
+
+
+        // Function to display items
+        function displayItems() {
+            const rssFeedDiv = document.getElementById('rssFeed');
+            rssFeedDiv.innerHTML = ""; // Clear the feed before redisplaying
+            const endIndex = Math.min(currentIndex + itemsPerPage, items.length);
+            
+            for (let i = 0; i < endIndex; i++) {
+                const title = items[i].getElementsByTagName('title')[0].textContent;
+                const link = items[i].getElementsByTagName('link')[0].textContent;
+                const pubDate = items[i].getElementsByTagName('pubDate')[0].textContent;
+
+                const itemDiv = document.createElement('div');
+                itemDiv.classList.add('item');
+                itemDiv.setAttribute('data-title', title.toLowerCase());
+                itemDiv.innerHTML = `<h3><a href="${link}" target="_blank">${title}</a></h3><p><strong>Published on:</strong> ${new Date(pubDate).toLocaleString()}</p>`;
+                rssFeedDiv.appendChild(itemDiv);
+            }
+        }
+
+        // Function to filter items by keyword
+        function filterItems() {
+            const filterInput = document.getElementById('filter').value.toLowerCase();
+            const rssFeedDiv = document.getElementById('rssFeed');
+            const itemsDiv = rssFeedDiv.getElementsByClassName('item');
+            
+            Array.from(itemsDiv).forEach(item => {
+                const title = item.getAttribute('data-title');
+                if (title.includes(filterInput)) {
+                    item.style.display = '';
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+        }
+
+        // Event listener for load more button
+        document.getElementById('loadMore').addEventListener('click', displayItems);
+
+        // Fetch RSS feed on page load
+        window.onload = fetchRSSFeed;
+    </script>
+</body>
+</html>

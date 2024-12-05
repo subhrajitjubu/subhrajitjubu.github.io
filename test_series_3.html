@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TV Series Search and Embed</title>
+    <style>
+        .container { 
+            height: 400px;
+            position: relative;
+            border: 3px solid green; 
+        }
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f4f4f4;
+        }
+        h1 {
+            color: #333;
+        }
+        #searchContainer {
+            margin: 1rem;
+        }
+        input[type="text"] {
+            padding: 5px;
+            font-size: 16px;
+            margin-right: 5px;
+            width: 20%;
+        }
+        input[type="number"] {
+            padding: 2px;
+            width: 60px; /* Use the specified width */
+            font-size: 12px; /* Use the specified font size */
+            margin-right: 2px; /* Use the specified margin */
+        }
+        #iframeContainer {
+            display: flex;
+            margin: 2rem;
+            flex-direction: column; /* Stack children vertically */
+            align-items: center; /* Center children horizontally */
+            width: 100%; /* Full width for the container */
+        }
+        .poster {
+            width: 70%; /* Set width to 70% of the screen */
+            height: 80vh; /* Set height to 80% of the viewport height */
+            background-size: 85%; /* Cover the entire div */
+            background-position: center; /* Center the background image */
+            border: 2px solid rgba(88, 46, 11, 0.11); /* Blue border for the poster */
+            margin-top: 20px;
+        }
+        .error {
+            color: red;
+            font-size: 14px;
+            margin-top: 10px;
+        }
+        #suggestions {
+            border: none;
+            max-height: 150px;
+            overflow-y: hidden;
+            background-color: #fff;
+            position: relative;
+            width: 300px;
+            z-index: 1000;
+        }
+        #suggestions div {
+            padding: 10px;
+            cursor: pointer;
+        }
+        #suggestions div:hover {
+            background-color: #eee;
+        }
+        .server-button {
+            border: 2px solid rgb(216, 10, 171);
+            padding: 5px 10px;
+            font-size: 14px;
+            color: rgb(34, 148, 44);
+            cursor: pointer;
+            margin: 0 5px; /* Add horizontal margin for spacing between buttons */
+        }
+        #serverButtons {
+            display: flex; /* Use flexbox to arrange buttons in a row */
+            justify-content: center; /* Center buttons horizontally */
+            margin-top: 1px; /* Add some space above the buttons */
+        }
+        nav {
+            text-align: center;
+            padding: 1rem 0;
+            background-color: #444;
+        }
+        nav a {
+            color: #fff;
+            margin: 0 1rem;
+            text-decoration: none;
+        }
+        
+    </style>
+</head>
+<body>
+    <nav>
+        
+        <a href="index.html">Home</a>
+        <a href="experience.html">Experience</a>
+        <a href="education.html">Education</a>
+        <a href="experience.html">Skills</a>
+        <a href="publications.html">Publications</a>
+        <a href="Jobs.html">Jobs</a>
+        <a href="contact.html">Contact</a>
+        <a href="movies_3.html">Movies</a>
+        <a href="test_series_3.html">Series</a>
+        <a href="nwp_imd.html">NWP_IMD</a>
+        <a href="weather_map.html">weather chart</a>
+        <a href="weather_city.html">weather chart city</a>
+        <a href="https://www.tropmet.res.in/Careers">IITM career</a>
+        <a href="https://vacancies.incois.gov.in/">Incois career</a>
+        
+    </nav>
+
+    <div id="searchContainer">
+        <label for="seriesTitle">TV Series Title:</label>
+        <input type="text" id="seriesTitle" placeholder="Enter TV series title..." oninput="autoSuggest()">
+        
+        <label for="seasonNumber">Season:</label>
+        <input type="number" id="seasonNumber" placeholder="Season" min="1" onchange="fetchMaxEpisodes()">
+        
+        <label for="episodeNumber">Episode:</label>
+        <input type="number" id="episodeNumber" placeholder="Episode" min="1" onchange="searchSeries()">
+        
+        <div id="suggestions"></div>
+    </div>
+    <div class="error" id="errorMessage"></div>
+
+    <!-- Div to display the poster -->
+    <div id="iframeContainer">
+        <!-- <div id="myPoster" class="poster" style="background-image: url('');"></div> -->
+        <iframe id="myIframe" src="" style="width: 90%; height: 600px;" frameborder="2" referrerpolicy="origin" allowfullscreen></iframe>
+        <ul>
+            <div id="serverButtons">
+            <button class="server-button" id="server1Button" onclick="selectServer('server1')">2Embed</button>
+            <button class="server-button" id="server2Button" onclick="selectServer('server2')">Vidsrc</button>
+            <button class="server-button" id="server3Button" onclick="selectServer('server3')">autoembed</button>
+            <button class="server-button" id="server4Button" onclick="selectServer('server4')">vidsrcicu</button>
+            <button class="server-button" id="server5Button" onclick="selectServer('server5')">Superembed</button>
+        </div>
+        </ul>
+    </div>
+    
+    <script>
+        // Your OMDb API key
+        const apiKey = "6829d8f4";
+        let selectedServer = 'server1'; // Default server
+        let suggestionTimeout; // Variable to hold the timeout ID
+        // const episodeNumber = 1
+
+        // Function to fetch TV series suggestions based on partial input
+        function autoSuggest() {
+    clearTimeout(suggestionTimeout); // Clear the previous timeout
+
+    suggestionTimeout = setTimeout(() => {
+        const title = document.getElementById("seriesTitle").value.trim();
+        const suggestionsBox = document.getElementById("suggestions");
+
+        if (title.length < 3) {
+            suggestionsBox.innerHTML = ""; // Clear suggestions if input is too short
+            return;
+        }
+
+        const url = `https://www.omdbapi.com/?s=${encodeURIComponent(title)}&type=series&apikey=${apiKey}`;
+
+        fetch(url)
+            .then(response => response.json())
+            .then(data => {
+                if (data.Response === "True") {
+                    suggestionsBox.innerHTML = ""; // Clear previous suggestions
+                    data.Search.forEach(series => {
+                        if (series.Title.toLowerCase().includes(title.toLowerCase())) {
+                            const suggestion = document.createElement("div");
+                            suggestion.style.display = "flex"; // Use flexbox for layout
+                            suggestion.style.alignItems = "center"; // Center items vertically
+                            suggestion.style.cursor = "pointer"; // Change cursor on hover
+
+                            // Create an image element for the poster
+                            const posterImg = document.createElement("img");
+                            posterImg.src = series.Poster; // Get the poster URL
+                            posterImg.alt = series.Title; // Set alt text
+                            posterImg.style.width = "50px"; // Set width for poster
+                            posterImg.style.height = "auto"; // Maintain aspect ratio
+                            posterImg.style.marginRight = "10px"; // Add some space between image and text
+
+                            // Create a text element for the suggestion
+                            const suggestionText = document.createElement("span");
+                            suggestionText.textContent = `${series.Title} (${series.Year})`;
+
+                            // Append poster and text to the suggestion div
+                            suggestion.appendChild(posterImg);
+                            suggestion.appendChild(suggestionText);
+
+                            // Set the click event for the suggestion
+                            suggestion.onclick = () => selectSuggestion(series);
+                            suggestionsBox.appendChild(suggestion);
+                        }
+                    });
+                    if (suggestionsBox.innerHTML === "") {
+                        suggestionsBox.innerHTML = "<div>No suggestions found.</div>";
+                    }
+                } else {
+                    suggestionsBox.innerHTML = "<div>No suggestions found.</div>";
+                }
+            })
+            .catch(error => {
+                console.error("Error fetching suggestions from OMDb API:", error);
+            });
+    }, 1000); // 1000 ms timeout
+}
+        // Function to select a suggestion and fill the input box
+        function selectSuggestion(series) {
+            if (typeof series === 'object' && series !== null && series.Title && series.Poster) {
+                document.getElementById("seriesTitle").value = series.Title;
+                document.getElementById("suggestions").innerHTML = ""; // Clear suggestions
+                document.getElementById("myPoster").style.backgroundImage = `url(${series.Poster})`; // Set the background image
+                fetchMaxSeasons(series.Title); // Fetch the maximum number of seasons for the selected series
+            } else {
+                console.error("Invalid series object:", series);
+            }
+        }
+
+        // Function to fetch IMDb ID, set the maximum season number, and fetch maximum episodes for the season
+        function fetchMaxSeasons(title) {
+            const url = `https://www.omdbapi.com/?t=${encodeURIComponent(title)}&apikey=${apiKey}`;
+
+            fetch(url)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.Response === "True") {
+                        const maxSeasons = data.totalSeasons;
+                        document.getElementById("seasonNumber").max = maxSeasons;
+                        document.getElementById("seasonNumber").placeholder = `Season (1-${maxSeasons})`;
+                        document.getElementById("seasonNumber").value = ""; // Reset season input
+                        document.getElementById("episodeNumber").value = ""; // Reset episode input
+                    } else {
+                        document.getElementById("seasonNumber").placeholder = "Season";
+                        console.error("Could not retrieve max seasons: ", data.Error);
+                    }
+                })
+                .catch(error => {
+                    console.error("Error fetching data from OMDb API:", error);
+                });
+        }
+
+        // Function to fetch the maximum number of episodes for the selected season
+        function fetchMaxEpisodes() {
+            const title = document.getElementById("seriesTitle").value;
+            const season = document.getElementById("seasonNumber").value;
+
+            if (!title || !season) {
+                return;
+            }
+
+            const url = `https://www.omdbapi.com/?t=${encodeURIComponent(title)}&Season=${season}&apikey=${apiKey}`;
+
+            fetch(url)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.Response === "True") {
+                        const maxEpisodes = data.Episodes.length;
+                        document.getElementById("episodeNumber").max = maxEpisodes;
+                        document.getElementById("episodeNumber").placeholder = `Episode (1-${maxEpisodes})`;
+                    } else {
+                        console.error("Could not retrieve max episodes: ", data.Error);
+                    }
+                })
+                .catch(error => {
+                    console.error("Error fetching max episodes from OMDb API:", error);
+                });
+        }
+
+        // Function to fetch IMDb ID based on the selected TV series title, season, and episode
+        function searchSeries() {
+            const title = document.getElementById("seriesTitle").value;
+            const season = document.getElementById("seasonNumber").value;
+            const episode = document.getElementById("episodeNumber").value;
+            const errorMessage = document.getElementById("errorMessage");
+
+            if (title === "" || season === "" || episode === "") {
+                errorMessage.textContent = "Enter a TV series title, season, and episode.";
+                return;
+            }
+
+            const url = `https://www.omdbapi.com/?t=${encodeURIComponent(title)}&apikey=${apiKey}`;
+
+            fetch(url)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.Response === "True") {
+                        const imdbId = data.imdbID;
+                        const iframe = document.getElementById("myIframe");
+
+                        // Embed based on the selected server
+                        if (selectedServer === "server1") {
+                            iframe.src = `https://vidsrc.xyz/embed/tv?imdb=${imdbId}&season=${season}&episode=${episode}`;
+                        } else if (selectedServer === "server2") {
+                            iframe.src = 'https://vidsrc.cc/v2/embed/tv/${imdbId}/${season}/${episode}'
+                            // `https://vidsrc.me/embed/${imdbId}/${season}/${episode}`;
+                        } else if (selectedServer === "server3") {
+                            iframe.src = `https://autoembed.co/tv/imdb/${imdbId}-${season}-${episode}`; 
+                        } else if (selectedServer === "server4") {
+                            iframe.src = `https://vidsrc.icu/embed/tv/${imdbId}/${season}/${episode}`; 
+                        } else if (selectedServer === "server5") {
+                            iframe.src = `https://multiembed.mov/?video_id=${imdbId}&s=${season}&e=${episode}`; 
+                        }
+
+                        
+                        errorMessage.textContent = ""; // Clear any previous error message
+                    } else {
+                        document.getElementById("myIframe").src = "about:blank"; // Clear the iframe if there's an error
+                        errorMessage.textContent = "TV series not found: " + data.Error;
+                    }
+                })
+                .catch(error => {
+                    console.error("Error fetching data from OMDb API:", error);
+                    errorMessage.textContent = "An error occurred. Please try again.";
+                });
+        }
+
+        // Function to select the server and trigger search
+        function selectServer(server) {
+            selectedServer = server; // Set the selected server
+            searchSeries(); // Trigger the search
+        }
+
+        // Automatically load server1 on page load
+        window.onload = function() {
+            selectServer('server4');
+        };
+    </script>
+
+</body>
+</html>
