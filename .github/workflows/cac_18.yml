@@ -39,7 +39,7 @@ jobs:
         run: |
           source venv/bin/activate
           rm *.json
-          ipython -c "%run singlelevel-Updated.ipynb"
+          ipython -c "%run src/singlelevel-Updated.ipynb"
           rm atms.grib2*
       - name: Commit and push changes
         run: |
