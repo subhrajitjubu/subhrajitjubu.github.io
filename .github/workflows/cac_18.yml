@@ -40,7 +40,7 @@ jobs:
           source venv/bin/activate
           rm src/*.json
           ipython -c "%run src/singlelevel-Updated.ipynb"
-          rm src/atms.grib2*
+          rm atms.grib2*
       - name: Commit and push changes
         run: |
           git config --global user.name "subhrajitjubu"
