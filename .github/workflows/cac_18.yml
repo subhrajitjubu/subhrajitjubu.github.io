@@ -38,13 +38,13 @@ jobs:
       - name: Run Jupyter Notebook
         run: |
           source venv/bin/activate
-          rm *.json
+          rm src/*.json
           ipython -c "%run src/singlelevel-Updated.ipynb"
-          rm atms.grib2*
+          rm src/atms.grib2*
       - name: Commit and push changes
         run: |
           git config --global user.name "subhrajitjubu"
           git config --global user.email "66462700+subhrajitjubu@users.noreply.github.com"
-          git add *.json
+          git add src/*.json
           git commit -m "Update files created by Jupyter Notebook"
           git push origin main
