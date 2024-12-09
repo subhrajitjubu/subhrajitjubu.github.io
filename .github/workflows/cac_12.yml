@@ -44,12 +44,13 @@ jobs:
           source venv/bin/activate
           rm src/*.json
           ipython -c "%run src/singlelevel_12.ipynb"
-          rm src/atms.grib2*
+          rm  atms.grib2*
       - name: Commit and push changes
         run: |
           git config --global user.name "subhrajitjubu"
           git config --global user.email "66462700+subhrajitjubu@users.noreply.github.com"
           git pull origin main
+          mv *.json src/
           git add src/*.json
           if [ -n "$(git status --porcelain)" ]; then
             git commit -m "Update files created by Jupyter Notebook"
