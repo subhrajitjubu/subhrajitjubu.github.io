@@ -38,7 +38,7 @@ jobs:
       - name: Run Jupyter Notebook
         run: |
           source venv/bin/activate
-          rm src/*.json
+          
           ipython -c "%run src/singlelevel-Updated.ipynb"
           rm atms.grib2*
       - name: Commit and push changes
