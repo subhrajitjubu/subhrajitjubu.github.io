@@ -45,6 +45,7 @@ jobs:
         run: |
           git config --global user.name "subhrajitjubu"
           git config --global user.email "66462700+subhrajitjubu@users.noreply.github.com"
+          mv -r *.json src/
           git add src/*.json
           git commit -m "Update files created by Jupyter Notebook"
           git push origin main
