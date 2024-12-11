@@ -109,10 +109,10 @@ function fetchContent() {
 
 // Fetch content on page load
 window.onload = fetchContent;
-        const rssUrl = "https://maillists.reading.ac.uk/scripts/wa-READING.exe?RSS&L=MET-JOBS&v=2.0&LIMIT=10000";
+        const rssUrl = "https://maillists.reading.ac.uk/scripts/wa-READING.exe?RSS&L=MET-JOBS&v=2.0&LIMIT=1000";
         let items = [];
         let currentIndex = 0;
-        const itemsPerPage = 10;
+        const itemsPerPage = 30;
 
         // Show loading indicator
         function showLoading(isLoading) {
