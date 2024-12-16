@@ -44,10 +44,14 @@ jobs:
           ipython -c "%run src/nasa_download_06.ipynb"
       - name: Commit and push changes
         run: |
+          git lfs install
+          git add .gitattributes
+          git commit -m "Track large file with Git LFS"
           git config --global user.name "subhrajitjubu"
           git config --global user.email "66462700+subhrajitjubu@users.noreply.github.com"
           git pull origin main
           mv *nasa*.json src/
+          git lfs track "src/*nasa*.json"
           git add src/*.json
           if [ -n "$(git status --porcelain)" ]; then
             git commit -m "Update files created by Jupyter Notebook"
