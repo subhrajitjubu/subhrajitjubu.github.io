@@ -41,7 +41,6 @@ jobs:
       - name: Run Jupyter Notebook
         run: |
           source venv/bin/activate
-          
           ipython -c "%run src/nasa_download_06.ipynb"
       - name: Commit and push changes
         run: |
