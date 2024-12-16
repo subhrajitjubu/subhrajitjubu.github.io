@@ -642,7 +642,11 @@ Promise.all([
 .then(([tempData, rainData,msldata,clouddata]) => {
   // Extracting time, temperatures, and rainfall
   const time = tempData.labels; // Extracted time
-  const temperatures = tempData.var; // Extracted temperatures
+  const temperatures = tempData.var; // Extracted temperatures in Kelvin
+const temperaturesInCelsius = temperatures.map(temp => temp - 273.15);
+
+console.log(temperaturesInCelsius);
+
   const rainfall = rainData.var; // Extracted rainfall
   const mslp = msldata.var; // Extracted rainfall
   const cloud  = clouddata.var; // Extracted rainfall
@@ -758,7 +762,7 @@ Promise.all([
               series: [
               {
                 name: 'Temperature',
-                data: temperatures-273.15,
+                data: temperaturesInCelsius,
                 color: ' #ff531a',
                 marker: {
                     enabled: false // Disable markers for this series
@@ -891,6 +895,8 @@ Promise.all([
   // Extracting time, temperatures, and rainfall
   const time = tempData.labels; // Extracted time
   const temperatures = tempData.temperatures; // Extracted temperatures
+  const temperaturesInCelsius = temperatures.map(temp => temp - 273.15);
+
   const rainfall = rainData.rf; // Extracted rainfall
   const mslp = msldata.msl; // Extracted rainfall
   const cloud  = clouddata.clouds; // Extracted rainfall
@@ -1004,7 +1010,7 @@ Promise.all([
               series: [
               {
                 name: 'Temperature',
-                data: temperatures-273.15,
+                data: temperaturesInCelsius,
                 color: ' #ff531a',
                 marker: {
                     enabled: false // Disable markers for this series
