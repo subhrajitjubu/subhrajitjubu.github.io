@@ -10,6 +10,10 @@
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- <script src="nasa.js"></script> -->
 
     <style>
         body {
@@ -71,6 +75,36 @@
             background-color: #333;
             color: #fff;
         }
+        .tabs {
+    list-style: none;
+    padding: 0;
+    display: flex;
+    justify-content: space-around;
+    margin-bottom: 10px;
+    border-bottom: 1px solid #ccc;
+}
+.tabs li {
+    flex: 1;
+}
+.tabs a {
+    text-decoration: none;
+    padding: 10px;
+    display: block;
+    text-align: center;
+    color: #007BFF;
+    border-bottom: 2px solid transparent;
+}
+.tabs a.active {
+    border-bottom: 2px solid #007BFF;
+    font-weight: bold;
+}
+.tab-content .tab-pane {
+    display: none;
+}
+.tab-content .tab-pane.active {
+    display: block;
+}
+
       </style>
 
 
@@ -118,8 +152,8 @@ document.onkeydown = function(e) {
 
 
 
-let targetLat = 16.5; // Default latitude
-    let targetLon = 78.4; // Default longitude
+let targetLat = 16.5; // Default lat
+    let targetLon = 78.4; // Default long
     let place = ''
 
     // Initialize the Leaflet map
@@ -145,9 +179,9 @@ var open=L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
 });
 
 
- // Define bounds for longitude (60 to 100)
-    const southWest = L.latLng(-90, 60); // Southwest corner (latitude, longitude)
-    const northEast = L.latLng(90, 100); // Northeast corner (latitude, longitude)
+ // Define bounds for long (60 to 100)
+    const southWest = L.latLng(-90, 60); // Southwest corner (lat, long)
+    const northEast = L.latLng(90, 100); // Northeast corner (lat, long)
     const bounds = L.latLngBounds(southWest, northEast);
 
     // Set the max bounds for the map
@@ -256,12 +290,6 @@ var NASAGIBS_ModisTerraChlorophyll = L.tileLayer('https://map1.vis.earthdata.nas
 	opacity: 0.75
 });
 
-
-
-
-
-
-
 var googleHybrid = L.tileLayer('http://{s}.google.com/vt?lyrs=s,h&x={x}&y={y}&z={z}',{
     maxZoom: 20,
     subdomains:['mt0','mt1','mt2','mt3']
@@ -362,7 +390,7 @@ function findNearestIndex(value, array) {
 
 
 function getTemperatureData(targetLat, targetLon) {
-  return fetch('2m_temp.json')
+  return fetch('temp_tot_nasa.json')
     .then(response => {
       if (!response.ok) {
         throw new Error("Network response was not ok");
@@ -371,10 +399,11 @@ function getTemperatureData(targetLat, targetLon) {
     })
     .then(data => {
       if (data.data) {
+        console.log(data)
         const temperatureData = data.data;
 
-        const latArray = data.coords.latitude.data;
-        const lonArray = data.coords.longitude.data;
+        const latArray = data.coords.lat.data;
+        const lonArray = data.coords.lon.data;
 
         const nearestLatIndex = findNearestIndex(targetLat, latArray);
         const nearestLonIndex = findNearestIndex(targetLon, lonArray);
@@ -383,7 +412,7 @@ function getTemperatureData(targetLat, targetLon) {
         const lat1 = latArray[nearestLatIndex];
 
         // Extract the first 100 values for time and temperature
-        const labels = (data.coords.valid_time.data || []).slice(0, 100); // Limit to first 100 values
+        const labels = (data.coords.time.data || [])//.slice(0, 72); // Limit to first 100 values
         
         // Map the temperature data to Celsius
         const chartData = (temperatureData || []).map(row => {
@@ -407,9 +436,58 @@ function getTemperatureData(targetLat, targetLon) {
 }
 
 
+function getcloudData(targetLat, targetLon) {
+  return fetch('cloud_tot_nasa.json')
+    .then(response => {
+      if (!response.ok) {
+        throw new Error("Network response was not ok");
+      }
+      return response.json();
+    })
+    .then(data => {
+      if (data.data) {
+        console.log(data)
+        const temperatureData = data.data;
+
+        const latArray = data.coords.lat.data;
+        const lonArray = data.coords.lon.data;
+
+        const nearestLatIndex = findNearestIndex(targetLat, latArray);
+        const nearestLonIndex = findNearestIndex(targetLon, lonArray);
+
+        const lon1 = lonArray[nearestLonIndex];
+        const lat1 = latArray[nearestLatIndex];
+
+        // Extract the first 100 values for time and temperature
+        const labels = (data.coords.time.data || [])//.slice(0, 72); // Limit to first 100 values
+        
+        // Map the temperature data to Celsius
+        const chartData = (temperatureData || []).map(row => {
+          const tempInCelsius = row[nearestLatIndex][nearestLonIndex];
+          return parseFloat(tempInCelsius.toFixed(2)); // Round to 2 decimal places
+        })
+
+        // Return the chartData
+        return {
+          labels: labels,
+          clouds: chartData
+        };
+      } else {
+        throw new Error("No temperature data available");
+      }
+    })
+    .catch(error => {
+      console.error("Error fetching temperature data:", error);
+      return []; // Return an empty array or handle the error as needed
+    });
+}
+
+
+
+
 
 function getrfData(targetLat, targetLon) {
-  return fetch('rf.json')
+  return fetch('rf_tot_nasa.json')
     .then(response => {
       if (!response.ok) {
         throw new Error("Network response was not ok");
@@ -420,8 +498,8 @@ function getrfData(targetLat, targetLon) {
       if (data.data) {
         const temperatureData = data.data;
 
-        const latArray = data.coords.latitude.data;
-        const lonArray = data.coords.longitude.data;
+        const latArray = data.coords.lat.data;
+        const lonArray = data.coords.lon.data;
 
         const nearestLatIndex = findNearestIndex(targetLat, latArray);
         const nearestLonIndex = findNearestIndex(targetLon, lonArray);
@@ -451,7 +529,7 @@ function getrfData(targetLat, targetLon) {
 
 
 function getmslData(targetLat, targetLon) {
-  return fetch('msl.json')
+  return fetch('mslp_tot_nasa.json')
     .then(response => {
       if (!response.ok) {
         throw new Error("Network response was not ok");
@@ -462,8 +540,8 @@ function getmslData(targetLat, targetLon) {
       if (data.data) {
         const temperatureData = data.data;
 
-        const latArray = data.coords.latitude.data;
-        const lonArray = data.coords.longitude.data;
+        const latArray = data.coords.lat.data;
+        const lonArray = data.coords.lon.data;
 
         const nearestLatIndex = findNearestIndex(targetLat, latArray);
         const nearestLonIndex = findNearestIndex(targetLon, lonArray);
@@ -494,6 +572,54 @@ function getmslData(targetLat, targetLon) {
 
 
 
+
+function getdata(targetLat, targetLon,file) {
+  return fetch(file)
+    .then(response => {
+      if (!response.ok) {
+        throw new Error("Network response was not ok");
+      }
+      return response.json();
+    })
+    .then(data => {
+      if (data.data) {
+        console.log(data)
+        const temperatureData = data.data;
+
+        const latArray = data.coords.latitude.data;
+        const lonArray = data.coords.longitude.data;
+
+        const nearestLatIndex = findNearestIndex(targetLat, latArray);
+        const nearestLonIndex = findNearestIndex(targetLon, lonArray);
+
+        const lon1 = lonArray[nearestLonIndex];
+        const lat1 = latArray[nearestLatIndex];
+
+        // Extract the first 100 values for time and temperature
+        const labels = (data.coords.step.data || [])//.slice(0, 72); // Limit to first 100 values
+        
+        // Map the temperature data to Celsius
+        const chartData = (temperatureData || []).map(row => {
+          const tempInCelsius = row[nearestLatIndex][nearestLonIndex];
+          return parseFloat(tempInCelsius.toFixed(2)); // Round to 2 decimal places
+        })
+
+        // Return the chartData
+        return {
+          labels: labels,
+          var: chartData
+        };
+      } else {
+        throw new Error("No temperature data available");
+      }
+    })
+    .catch(error => {
+      console.error("Error fetching temperature data:", error);
+      return []; // Return an empty array or handle the error as needed
+    });
+}
+
+
 // const checkDebugger = setInterval(() => {
 //     const devtools = /./;
 //     devtools.toString = function() {
@@ -504,23 +630,25 @@ function getmslData(targetLat, targetLon) {
 //     console.log(devtools); // This will trigger the above function if the debugger is open
 //   }, 1000); // Check every second
 
-
-
-
-function createWeatherChart( targetLat, targetLon,container) {
+function createWeatherChartecmwf( targetLat, targetLon,container) {
 
 Promise.all([
-  getTemperatureData(targetLat, targetLon),
-  getrfData(targetLat, targetLon),
-  getmslData(targetLat, targetLon)
+  getdata(targetLat, targetLon,'2m_temp.json'),
+  getdata(targetLat, targetLon,'rf.json'),
+  getdata(targetLat, targetLon,'msl.json'),
+  getdata(targetLat, targetLon,'tcwv.json')
+  
 ])
-.then(([tempData, rainData,msldata]) => {
+.then(([tempData, rainData,msldata,clouddata]) => {
   // Extracting time, temperatures, and rainfall
   const time = tempData.labels; // Extracted time
-  const temperatures = tempData.temperatures; // Extracted temperatures
-  const rainfall = rainData.rf; // Extracted rainfall
-  const mslp = msldata.msl; // Extracted rainfall
+  const temperatures = tempData.var; // Extracted temperatures
+  const rainfall = rainData.var; // Extracted rainfall
+  const mslp = msldata.var; // Extracted rainfall
+  const cloud  = clouddata.var; // Extracted rainfall
   
+
+
   const localTime = time.map(gmtTime => {
       const date = new Date(gmtTime); // Parse the GMT time
       date.setHours(date.getHours() + 5); // Add 5 hours
@@ -543,22 +671,6 @@ Promise.all([
 
 
 
-
-
-
-
-
-
-
-  // Log the extracted data (optional)
-  console.log("Time:", localTime);
-  console.log("Temperatures:", temperatures);
-  console.log("Rainfall:", rainfall);
-  console.log("MSLP:", mslp);
-
-  
-
-
   var tempchart= Highcharts.chart(container, {
               chart: {
                 type: 'line'
@@ -574,7 +686,7 @@ Promise.all([
                categories: localTime,
 
                type: 'datetime',
-            tickInterval: 6* 1, // two hours
+            tickInterval: 12* 1, // two hours
             
             labels: {
                 format: '{value:%b}'
@@ -611,6 +723,21 @@ Promise.all([
                     }
                 }
             },
+            {
+                title: {
+                    text: 'Cloud cover (%)',
+                    style: {
+                        color: '#c83e9d'
+                    }
+                },
+                opposite: true, // Position the second axis on the opposite side
+                labels: {
+                    style: {
+                        color: '#c83e9d' // Set the color of the tick labels to blue
+                    }
+                }
+            },
+
             {
                 title: {
         text: 'Rainfall (mm/3hr)',
@@ -651,11 +778,22 @@ Promise.all([
                 name: 'Rainfall (mm/3hr)',
                 data: rainfall,
                 color: '#00cc00',
-                yAxis : 2,
+                yAxis : 3,
                 type: 'column'
+                ,marker: {
+                    enabled: false // Disable markers for this series
+                }
+                
+              }
+              
+              ,{
+                name: 'Total cloud cover  (%)',
+                data: cloud,
+                color: '#c83e9d',
+                yAxis : 2,
+                type: 'line'
                 
               }  
-              , 
 
               
           ],
@@ -692,7 +830,8 @@ const exceededTemps = temperatures.filter(temp => temp > highTempThreshold);
 const highrfThreshold = 10;
 const exceededrf = rainfall.filter(temp => temp > highrfThreshold);
 
-
+const mintempThreshold = 10;
+const exceededte = temperatures.filter(temp => temp <= mintempThreshold);
 
 
 const lowmslThreshold = 1000;
@@ -704,8 +843,13 @@ let alertMessage = '';
 
 
 if (exceededTemps.length > 0) {
-  alertMessage += `Temperature has crossed ${highTempThreshold}°C! `;
+  alertMessage += `Temperature has crossed above ${highTempThreshold}°C! `;
 }
+
+if (exceededte.length > 0) {
+  alertMessage += `Temperature has crossed below ${mintempThreshold}°C! `;
+}
+
 
 if (exceededrf.length > 0) {
   alertMessage += `Rainfall has crossed ${highrfThreshold} mm!`;
@@ -728,23 +872,247 @@ if (alertMessage) {
 
 
 
+})
+.catch(error => {
+  console.error("Error:", error);
+})};
+
+
+
+function createWeatherChart( targetLat, targetLon,container) {
+
+Promise.all([
+  getTemperatureData(targetLat, targetLon),
+  getrfData(targetLat, targetLon),
+  getmslData(targetLat, targetLon),
+  getcloudData(targetLat, targetLon)
+])
+.then(([tempData, rainData,msldata,clouddata]) => {
+  // Extracting time, temperatures, and rainfall
+  const time = tempData.labels; // Extracted time
+  const temperatures = tempData.temperatures; // Extracted temperatures
+  const rainfall = rainData.rf; // Extracted rainfall
+  const mslp = msldata.msl; // Extracted rainfall
+  const cloud  = clouddata.clouds; // Extracted rainfall
+  
+  const localTime = time.map(gmtTime => {
+      const date = new Date(gmtTime); // Parse the GMT time
+      date.setHours(date.getHours() + 5); // Add 5 hours
+      date.setMinutes(date.getMinutes() + 30); // Add 30 minutes
+
+      // Get day name
+      const days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+      const dayName = days[date.getDay()]; // Get day name
+
+      // Format day, month, and hour
+      const day = String(date.getDate()).padStart(2, '0'); // Get day and pad with zero
+      const month = String(date.getMonth() + 1).padStart(2, '0'); // Get month (0-indexed) and pad
+      let hour = date.getHours(); // Get hour
+      const ampm = hour >= 12 ? 'PM' : 'AM'; // Determine AM/PM
+      hour = hour % 12; // Convert to 12-hour format
+      hour = hour ? String(hour).padStart(2, '0') : '12'; // Pad with zero or set to 12
+
+      return `${dayName}, ${day}-${month}-2024 ${hour}:00 ${ampm}`; // Return formatted string
+    });
+
+
+
+  var tempchart= Highcharts.chart(container, {
+              chart: {
+                type: 'line'
+              },
+              title: {
+                  text: `` ,
+                  style: {
+        fontSize: '12px' 
+     }
+                  // at ${ place ||  `Lat: ${latArray[nearestLatIndex]}, Lon: ${lonArray[nearestLonIndex]}`
+              },
+                xAxis: {
+               categories: localTime,
+
+               type: 'datetime',
+            tickInterval: 12* 1, // two hours
+            
+            labels: {
+                format: '{value:%b}'
+            },
+               title: {
+                 text: 'Time',
+                 
+               }
+             },
+             yAxis: [{
+                title: {
+                    text: 'Temperature()',
+                    style: {
+                        color: ' #ff531a',
+                    }
+                },
+                labels: {
+                    style: {
+                        color: '#ff531a' // Set the color of the tick labels to blue
+                    }
+                }
+            }, 
+            {
+                title: {
+                    text: 'Pressure',
+                    style: {
+                        color: '#1a75ff'
+                    }
+                },
+                opposite: true, // Position the second axis on the opposite side
+                labels: {
+                    style: {
+                        color: '#1a75ff' // Set the color of the tick labels to blue
+                    }
+                }
+            },
+            {
+                title: {
+                    text: 'Cloud cover (%)',
+                    style: {
+                        color: '#c83e9d'
+                    }
+                },
+                opposite: true, // Position the second axis on the opposite side
+                labels: {
+                    style: {
+                        color: '#c83e9d' // Set the color of the tick labels to blue
+                    }
+                }
+            },
+
+            {
+                title: {
+        text: 'Rainfall (mm/3hr)',
+        style: {
+          color: '#00cc00'
+        }
+      },
+      opposite: false, // Keep it on the default side
+       labels: {
+                    style: {
+                        color: '#00cc00' // Set the color of the tick labels to blue
+                    }
+                }
+
+    }
+],
+            
+              series: [
+              {
+                name: 'Temperature',
+                data: temperatures,
+                color: ' #ff531a',
+                marker: {
+                    enabled: false // Disable markers for this series
+                }
+              }  
+              , 
+              {
+                name: 'Pressure',
+                data: mslp,
+                color: '#1a75ff',
+                yAxis : 1,dashStyle: 'ShortDash'
+                ,marker: {
+                    enabled: false // Disable markers for this series
+                }
+              }  
+              , {
+                name: 'Rainfall (mm/3hr)',
+                data: rainfall,
+                color: '#00cc00',
+                yAxis : 3,
+                type: 'column'
+                ,marker: {
+                    enabled: false // Disable markers for this series
+                }
+                
+              }
+              
+              ,{
+                name: 'Total cloud cover  (%)',
+                data: cloud,
+                color: '#c83e9d',
+                yAxis : 2,
+                type: 'line'
+                
+              }  
+
+              
+          ],
+          subtitle: {
+        text: 'Disclaimer: This is not a Official forecast. Data is for informational purposes only.'
+      },
+          tooltip: {
+    shared: true, // Enables a shared tooltip for all series
+    formatter: function () {
+      let tooltip = `<b>Time:</b> ${this.x}<br>`;
+      this.points.forEach(point => {
+        tooltip += `<span style="color:${point.color}">\u25CF</span> <b>${point.series.name}:</b> ${point.y}<br>`;
+      });
+      return tooltip;
+    }
+  },
+              responsive: {
+                rules: [{
+                  condition: {
+                    maxWidth: 500
+                  },
+                  chartOptions: {
+                    legend: {
+                      enabled: false
+                    }
+                  }
+                }]
+              }
+            });
+
+const highTempThreshold = 30;
+const exceededTemps = temperatures.filter(temp => temp > highTempThreshold);
+
+const highrfThreshold = 10;
+const exceededrf = rainfall.filter(temp => temp > highrfThreshold);
+
+const mintempThreshold = 10;
+const exceededte = temperatures.filter(temp => temp <= mintempThreshold);
+
+
+const lowmslThreshold = 1000;
+const exceededlow = mslp.filter(temp => temp < lowmslThreshold);
+let alertMessage = '';
 
 
 
 
 
+if (exceededTemps.length > 0) {
+  alertMessage += `Temperature has crossed above ${highTempThreshold}°C! `;
+}
+
+if (exceededte.length > 0) {
+  alertMessage += `Temperature has crossed below ${mintempThreshold}°C! `;
+}
 
 
+if (exceededrf.length > 0) {
+  alertMessage += `Rainfall has crossed ${highrfThreshold} mm!`;
+}
+
+if (exceededlow.length > 0) {
+  alertMessage += `MSLP has crossed below  ${lowmslThreshold} mm!`;
+}
 
 
+// Show alert if any condition is satisfied
 
 
-
-
-
-
-
-
+console.log("Alert Message:", alertMessage);
+if (alertMessage) {
+      alert(`Alert: ${alertMessage}`);
+    }
 
 
 
@@ -755,84 +1123,95 @@ if (alertMessage) {
   console.error("Error:", error);
 })};
 
-
-
-
-
-
-
-
-
-
-  
 map.on('click', function (e) {
-      const targetLat = parseFloat(e.latlng.lat.toFixed(2));
-      const targetLon = parseFloat(e.latlng.lng.toFixed(2));
-  
-      // Generate unique IDs for the chart containers within the popup
-      const uniqueContainerId1 = 'container-temp-' + Date.now();
-    //   const uniqueContainerId2 = 'container-rf-' + Date.now();
-    //   const uniqueContainerId3 = 'container-msl-' + Date.now();
-    //   const uniqueContainerId4 = 'container-tcwv-' + Date.now();
-  
-      // Popup content with unique container IDs
-      const popupContent = `
-          <div style="text-align: center;">
-              <strong>Coordinates:</strong> ${targetLat}, ${targetLon}
-              <div id="${uniqueContainerId1}" style="width:900px; margin-bottom:100px; height:400px;"></div>
-    
-          </div>`;
-  
-      // Remove existing markers
-      markers.forEach(function (marker) {
-          map.removeLayer(marker);
-      });
-      markers = [];
-  
-      // Add marker
-      const marker = L.marker([targetLat, targetLon]).addTo(map);
-  
-      // Bind the popup content to the marker
-      marker.bindPopup(popupContent, { maxWidth: 900, maxHeight: 400 });
-  
-      // Open the popup manually and wait for it to fully render
-      marker.openPopup();
-  
-      // Add a delay to ensure the popup content is rendered
-      setTimeout(() => {
-          console.log("Popup opened. Waiting for DOM to render...");
-  
-          // Check if all chart containers are available
-          const tempContainer = document.getElementById(uniqueContainerId1);
-          
-  
-          // console.log("Checking container IDs:");
-          // console.log(`Container for Temperature: ${uniqueContainerId1}, Found: ${!!tempContainer}`);
-          // console.log(`Container for Rainfall: ${uniqueContainerId2}, Found: ${!!rfContainer}`);
-          // console.log(`Container for MSL: ${uniqueContainerId3}, Found: ${!!mslContainer}`);
-  
-          if (tempContainer) {
-              console.log("All containers are available. Proceeding with plotting...");
-              // Initialize charts
-              createWeatherChart(targetLat, targetLon, uniqueContainerId1);
-              
-          } else {
-              console.error("Popup content not fully rendered. Containers not found in the DOM.");
-          }
-      }, 3); // Adjust delay as necessary
-  
-      // Save marker for later removal
-      markers.push(marker);
-  });
-  
-  
+    const targetLat = parseFloat(e.latlng.lat.toFixed(2));
+    const targetLon = parseFloat(e.latlng.lng.toFixed(2));
+    const uniqueId = Date.now(); // Unique ID for popup content
+
+    // Create tabs and content dynamically
+    const popupContent = `
+        <div style="text-align: center; width: 900px;">
+            <strong>Coordinates:</strong> ${targetLat}, ${targetLon}
+            <ul class="nav nav-tabs" role="tablist">
+                <li class="nav-item">
+                    <a class="nav-link active" data-bs-toggle="tab" href="#temp-${uniqueId}" role="tab">NOAA-GFS</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" data-bs-toggle="tab" href="#rain-${uniqueId}" role="tab">ECMWF-OPENDATA</a>
+                </li>
+                
+            </ul>
+            <div class="tab-content mt-3">
+                <div class="tab-pane fade show active" id="temp-${uniqueId}" role="tabpanel" style="width: 900px; height: 400px;"></div>
+                <div class="tab-pane fade" id="rain-${uniqueId}" role="tabpanel" style="width: 900px; height: 400px;"></div>
+                
+            </div>
+        </div>`;
+
+    // Remove existing markers
+    markers.forEach(function (marker) {
+        map.removeLayer(marker);
+    });
+    markers = [];
+
+    // Add marker
+    const marker = L.marker([targetLat, targetLon]).addTo(map);
+
+    // Bind the popup content to the marker
+    marker.bindPopup(popupContent, { maxWidth: 900, maxHeight: 400 });
+
+    // Open the popup manually and wait for it to fully render
+    marker.openPopup();
+
+    // Add a delay to ensure the popup content is rendered
+    setTimeout(() => {
+        console.log("Popup opened. Waiting for DOM to render...");
+
+        // Initialize charts in each tab
+        const tempContainer = document.getElementById(`temp-${uniqueId}`);
+        const rainContainer = document.getElementById(`rain-${uniqueId}`);
+        // const mslContainer = document.getElementById(`msl-${uniqueId}`);
+        // const tcwvContainer = document.getElementById(`tcwv-${uniqueId}`);
+
+        if (tempContainer && rainContainer ) {
+            console.log("All containers are available. Proceeding with plotting...");
+            // createWeatherChart(targetLat, targetLon, `temp-${uniqueId}`); // Temperature chart
+            createWeatherChartecmwf(targetLat, targetLon, `rain-${uniqueId}`); // Rainfall chart
 
 
 
+            
+        } else {
+            console.error("Popup content not fully rendered. Containers not found in the DOM.");
+        }
+    }, 3); // Adjust delay as necessary
+
+    // Save marker for later removal
+    markers.push(marker);
+});
 
 
+// JavaScript/CSS for Tabs
+document.addEventListener('click', (event) => {
+    if (event.target.classList.contains('tab-link')) {
+        event.preventDefault();
+        const allLinks = document.querySelectorAll('.tab-link');
+        const allPanes = document.querySelectorAll('.tab-pane');
 
+        // Deactivate all tabs and panes
+        allLinks.forEach(link => link.classList.remove('active'));
+        allPanes.forEach(pane => pane.classList.remove('active'));
 
+        // Activate the clicked tab and corresponding pane
+        event.target.classList.add('active');
+        const targetPane = document.querySelector(event.target.getAttribute('href'));
+        if (targetPane) {
+            targetPane.classList.add('active');
+        }
+    }
+});
+
+  
     </script>
 </body>
 </html>
