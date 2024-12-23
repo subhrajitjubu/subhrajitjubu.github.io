@@ -1,13 +1,9 @@
 <!DOCTYPE html>
 <html lang="en">
-  
-    <div class="container">
-        <!DOCTYPE html>
-<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Experience - Subhrajit Rath</title>
+    <!-- <title>Experience - Subhrajit Rath</title> -->
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -40,12 +36,39 @@
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
         }
         footer {
+           position:relative; 
+           bottom: 0; 
+            left: 0; 
+            right: 0; 
             text-align: center;
-            padding: 1rem 0;
+            padding: 0.1rem 0;
             background-color: #333;
             color: #fff;
         }
-        body { font-family: Arial, sans-serif; }
+       
+        .dropdown {
+            display: inline-flex;
+        }
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            background-color: #ffffff;
+            min-width: 160px;
+            box-shadow: 0 0 10px rgba(66, 4, 63, 0.1);
+            z-index: 1;
+        }
+        .dropdown-content a {
+            color: #333;
+            padding: 12px 16px;
+            text-decoration: none;
+            display: block;
+        }
+        .dropdown-content a:hover {
+            background-color: #f1f1f1;
+        }
+        .dropdown:hover .dropdown-content {
+            display: block;
+        }
         .section-title { margin-top: 20px; }
         ul { list-style-type: none; padding: 0; }
         li { margin-bottom: 10px; }
@@ -63,10 +86,9 @@
             color: #4c30ca;
             margin-top: 30px;
         }
-
         h5 {
             font-weight: bold;
-            font-family:'Times New Roman', Times, serif ;
+            font-family: 'Times New Roman', Times, serif;
             font-size: 125%;
             color: #dddddd;
             margin-top: 30px;
@@ -74,35 +96,36 @@
     </style>
 </head>
 <body>
-    <!-- <header>
-        <h1>Experience - Subhrajit Rath</h1>
-    </header> -->
+    <header>
+        <!-- <h1>Experience - Subhrajit Rath</h1> -->
+    </header>
     <nav>
-        
         <a href="index.html">Home</a>
         <a href="education.html">Education</a>
         <a href="experience.html">Skills</a>
         <a href="publications.html">Publications</a>
         <a href="contact.html">Contact</a>
         <a href="nwp_imd.html">NWP_IMD</a>
-        <a href="src/weatherchart.html">weather chart</a>
-        <a href="Jobs.html">Jobs</a>
-        <a href="https://www.tropmet.res.in/Careers">IITM career</a>
-        <a href="https://vacancies.incois.gov.in/">Incois career</a>
+        <a href="src/weatherchart.html">Weather Chart</a>
+        <div class="dropdown">
+            <a href="#">Jobs</a>
+            <div class="dropdown-content">
+                <a href="Jobs.html">MET Jobs</a>
+                <a href="https://www.tropmet.res.in/Careers" target="_blank">IITM Career</a>
+                <a href="https://vacancies.incois.gov.in/" target="_blank">INCOIS Career</a>
+                <a href=" https://www.niot.res.in/recruitment_details.php/" target="_blank">NIOT Career</a>
+               
+            </div>
+        </div>
         <a href="movies.html">Movies</a>
         <a href="series.html">Series</a>
-    
-        
     </nav>
 
-
-
-
- 
+    <div class="container">
         <h1>Work Experience</h1>
-    
-        <div class="container">
-            <h2>1) Project Scientist (Duration :Mar 2024 to present)</h2>
+        
+        <section>
+            <h2>1) Project Scientist (Duration: Mar 2024 to Present)</h2>
             <p><strong>Organization:</strong> Indian Institute of Tropical Meteorology, Pune, MH, India</p>
             <h3>Objective:</h3>
             <ul>
@@ -122,10 +145,10 @@
                 <li><strong>Hyperparameters:</strong> Tuned using RESNET, SPC Search</li>
                 <li>Integration into global models</li>
             </ul>
-        </div>
-    
-        <div class="container">
-            <h2>2) NCAP Project Experience (Duration :July 2023 to February 2024)</h2>
+        </section>
+
+        <section>
+            <h2>2) NCAP Project Experience (Duration: July 2023 to February 2024)</h2>
             <p><strong>Organization:</strong> National Atmospheric Research Laboratory, ISRO, Tirupati, AP, India</p>
             <h3>Role: NCAP Project</h3>
             <h3>Key Contributions:</h3>
@@ -135,7 +158,7 @@
             </ul>
             <h4>Data Science Workflow:</h4>
             <ul>
-                <li >Data Curation: Cleaned, processed, and formatted campaign data.</li>
+                <li>Data Curation: Cleaned, processed, and formatted campaign data.</li>
                 <li>Data Analysis: Utilised Python to uncover insights from the collected data.</li>
                 <li>Data Visualisation: Created informative, interactive visualisations to communicate findings.</li>
             </ul>
@@ -149,12 +172,10 @@
                 <li>Workflow Supervision: Oversaw the NCAP project's workflow, ensuring timely progress and quality deliverables.</li>
             </ul>
             <h4>Programming Language: Python</h4>
-          
-        </div>
-    
-        <div class="container">
-            <h2>3) Senior Research Fellow (Duration:July 2020 to July 2023)</h2>
-            <!-- <p><strong>Duration:</strong> July 2020 to July 2023</p> -->
+        </section>
+
+        <section>
+            <h2>3) Senior Research Fellow (Duration: July 2020 to July 2023)</h2>
             <p><strong>Organization:</strong> National Atmospheric Research Laboratory, ISRO, Tirupati, AP, India</p>
             <h3>Key Contributions:</h3>
             <ul>
@@ -163,11 +184,10 @@
                 <li>Curated HITRAN Molecular Data for radiation models.</li>
                 <li>Implemented Radiative Transfer Modeling and Advective Diffusion Solutions.</li>
             </ul>
-        </div>
-    
-        <div class="container">
-            <h2>4)Junior Research Fellow  (Duration:July 2018 to July 2020)</h2>
-            <!-- <p><strong>Duration:</strong> July 2018 to July 2020</p> -->
+        </section>
+
+        <section>
+            <h2>4) Junior Research Fellow (Duration: July 2018 to July 2020)</h2>
             <p><strong>Organization:</strong> National Atmospheric Research Laboratory, ISRO, Tirupati, AP, India</p>
             <h3>Key Contributions:</h3>
             <ul>
@@ -175,10 +195,10 @@
                 <li>Formulated methodology for evaluating radiational impact on microphysical processes.</li>
                 <li>Developed numerical techniques for solving radiative transfer and microphysics equations.</li>
             </ul>
-        </div>
+        </section>
+    </div>
 
-
-      <footer>
+    <footer>
         <h5>&copy; 2024 Subhrajit Rath - Personal Blog</h5>
     </footer>
 </body>
