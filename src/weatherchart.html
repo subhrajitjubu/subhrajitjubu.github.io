@@ -113,8 +113,14 @@
     <a href="../publications.html">Publications</a>
     <a href="../contact.html">Contact</a>
     <a href="../nwp_imd.html">NWP_IMD</a>
-    <a href="src/weatherchart.html">Weather Chart</a>
     <div class="dropdown">
+      <a href="#">Weather forecast</a>
+      <div class="dropdown-content">
+          <a href="../src/weatherchart.html">Weather Chart</a>
+          <a href="../srcc\geomap_multiple.html">Weather GeoHEATMap</a>    
+      </div>
+  </div>
+      <div class="dropdown">
         <a href="#">Jobs</a>
         <div class="dropdown-content">
             <a href="../Jobs.html">MET Jobs</a>
@@ -131,9 +137,9 @@
     <!-- <canvas id="weatherChart" width="400" height="200"></canvas>
     <div id="container" style="width:100%; height:400px;"></div> -->
     <div id="map"></div>
-    <header1>
+    <!-- <header1>
       <h1>Click on a point to find temperature , rainfall and MSLP </h1>
-   </header1>
+   </header1> -->
 
     <script>
 
@@ -156,7 +162,7 @@ let targetLat = 16.5; // Default latitude
     let place = ''
 
     // Initialize the Leaflet map
-    const map = L.map('map').setView([targetLat, targetLon], 6);
+    const map = L.map('map').setView([targetLat, targetLon], 5);
 
     // Add Google Satellite layer to the map
   
@@ -349,7 +355,7 @@ var overlays={
     'truecolor': NASAGIBS_ModisTerraTrueColorCR,
     'snow':NASAGIBS_ModisTerraSnowCover,
     'LST':NASAGIBS_ModisTerraLSTDay,
-    'AOD':NASAGIBS_ModisTerraAOD,
+    'AOD_T':NASAGIBS_ModisTerraAOD,
     'CHLOROPHYL':NASAGIBS_ModisTerraChlorophyll,
     // 'RAIN':NASAGIBS_ppt,
     'IMERG':IMERG_ppt,
@@ -416,7 +422,7 @@ function getTemperatureData(targetLat, targetLon) {
         const lat1 = latArray[nearestLatIndex];
 
         // Extract the first 100 values for time and temperature
-        const labels = (data.coords.valid_time.data || []).slice(0, 100); // Limit to first 100 values
+        const labels = (data.coords.valid_time.data || []); // Limit to first 100 values
         
         // Map the temperature data to Celsius
         const chartData = (temperatureData || []).map(row => {
@@ -584,7 +590,7 @@ Promise.all([
 
 
   // Log the extracted data (optional)
-  console.log("Time:", localTime);
+  console.log("Time:", time);
   console.log("Temperatures:", temperatures);
   console.log("Rainfall:", rainfall);
   console.log("MSLP:", mslp);
@@ -604,11 +610,11 @@ Promise.all([
                   // at ${ place ||  `Lat: ${latArray[nearestLatIndex]}, Lon: ${lonArray[nearestLonIndex]}`
               },
                 xAxis: {
-               categories: localTime,
-
+               categories: time,
                
             tickInterval: 6* 1, // two hours
             
+             
             labels: {
                 format: '{value:%b}'
             },
