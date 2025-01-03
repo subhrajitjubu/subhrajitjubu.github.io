@@ -1,5 +1,3 @@
-
-
 function daysSince1800ToCalendar(days) {
     const startDate = new Date('1800-01-01T00:00:00Z');
     const offset = 5.5 * 60 * 60 * 1000;
@@ -19,7 +17,7 @@ async function loadData() {
     const previousTimeIndex = document.getElementById('time-selector').value || 0; // Preserve selected index
 
     const data = await fetchData(currentData);
-    // console.log(data);
+    console.log(data);
 
     const timeData = data.coords.valid_time.data;
     const latData = data.coords.latitude.data;
