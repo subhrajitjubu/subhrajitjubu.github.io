@@ -11,6 +11,9 @@
             padding: 0;
             background-color: #f4f4f4;
             color: #333;
+            
+
+
         }
         header {
             
@@ -31,9 +34,16 @@
         }
         .container {
             width: 80%;
-            margin: 2rem auto;
-            background-color: #fff;
-            padding: 2rem;
+            margin: 3rem auto;
+            background-color: #1b87a89f;
+            padding: 1rem;
+            display: flex;
+            align-items: center; /* Center items vertically */
+            position: absolute; /* Positioning the image absolutely */
+            left: 10%; /* Align to the left */
+            transform: translateY(-10%); /* Center the image vertically */
+            z-index: 1000;
+
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
         }
         footer {
@@ -70,6 +80,38 @@
         .dropdown:hover .dropdown-content {
             display: block;
         }
+        .image-container {
+            position: absolute; /* Positioning the image absolutely */
+            top: 50%; /* 50% from the top */
+            left: 0; /* Align to the left */
+            transform: translateY(-50%); /* Center the image vertically */
+        }
+        img {
+            max-width: 100%; /* Responsive image */
+            height: auto; /* Maintain aspect ratio */
+            width: 200px; /* Adjust the size as needed */
+            height: 200px; /* Adjust the size as needed */
+            border-radius: 50%; /* This makes the image round */
+            object-fit: cover; /* This ensures the image covers the area */
+            margin: 2rem auto; /* Center the image with margin */
+            display: block; /* Make the image a block element */
+        }
+
+        .text-content {
+            max-width: 600px; /* Limit the width of the text */
+            margin-left: 2 auto;
+        }
+        p1{
+            font-family: "Times New Roman", Times, serif;
+            font-style: italic;
+            font-weight: bold;
+
+            font-size: 20px;
+
+            color: rgb(13, 14, 13);
+
+
+        }
     </style>
 </head>
 <body>
@@ -83,7 +125,14 @@
         <a href="publications.html">Publications</a>
         <a href="contact.html">Contact</a>
         <a href="nwp_imd.html">NWP_IMD</a>
-        <a href="src/weatherchart.html">Weather Chart</a>
+        <div class="dropdown">
+            <a href="#">Weather forecast</a>
+            <div class="dropdown-content">
+                <a href="src/weatherchart.html">Weather Chart</a>
+                <a href="srcc\geomap_multiple.html">Weather GeoHEATMap</a>    
+            </div>
+        </div>
+      
         <div class="dropdown">
             <a href="#">Jobs</a>
             <div class="dropdown-content">
@@ -97,9 +146,32 @@
         <a href="movies.html">Movies</a>
         <a href="series.html">Series</a>
     </nav>
+
+
+    
+    <div class="image-container">
+        <img src="subhrajit.jpg" alt="Profile Picture" >
+    </div>
+
     <div class="container">
-        <h2>About Me</h2>
-        <p>As a  researcher, I leverage expertise in curating HITRAN molecular data for seamless integration into radiation models, ensuring meticulous cleaning, organisation, and formatting. Proficient in Fortran, I have developed advanced computational methods and algorithms to solve infrared radiative transfer equations, enabling high-fidelity simulations of atmospheric radiative processes. Additionally, my research has unveiled crucial relationships between meteorological factors (temperature, humidity, wind shear) and cloud microphysics, enhancing predictive capabilities. I also possess expertise in implementing the advective diffusion equation via numerical techniques (finite difference, finite element, spectral methods), facilitating accurate modeling of substance transport in fluids, with a technical toolbox encompassing Fortran, Python, MATLAB, and specialised radiation transfer models (e.g., MODTRAN, ARTS) on Linux, Windows.</p>
+        <div class="text-content"></div>
+        <!-- <h2>About Me</h2> -->
+        <p1 >As a  researcher, I leverage expertise in curating 
+            HITRAN molecular data for seamless integration into radiation models, 
+            ensuring meticulous cleaning, organisation, and formatting.
+             Proficient in Fortran, I have developed advanced computational methods and 
+             algorithms to solve infrared radiative transfer equations, enabling high-fidelity 
+             simulations of atmospheric radiative processes. Additionally, my research has unveiled crucial 
+             relationships between meteorological factors (temperature, humidity, wind shear) and 
+             cloud microphysics, enhancing predictive capabilities. I also possess expertise in
+              implementing the advective diffusion equation via numerical techniques (finite difference, 
+              finite element, spectral methods), facilitating accurate modeling of substance transport in fluids,
+               with a technical toolbox encompassing Fortran, Python, 
+             MATLAB, and specialised radiation transfer models (e.g., MODTRAN, ARTS) on Linux, Windows.
+        
+        
+        </p1>
+        
     </div>
     <footer>
         <p>&copy; 2024 Subhrajit Rath - Personal Blog</p>
