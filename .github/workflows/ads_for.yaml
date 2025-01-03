@@ -1,4 +1,4 @@
-name: Download and preprocess 00UTC
+name: Download and preprocess ADS_00UTC
 
 on:
   schedule:
