@@ -410,6 +410,11 @@ dataType = 'Unknown Data Type';
         plotOptions: {
             mapline: {
                 enableMouseTracking: false,
+                states: {
+                    inactive: {
+                        enabled: false
+                    }
+                }
             }
         },
         series: [{
