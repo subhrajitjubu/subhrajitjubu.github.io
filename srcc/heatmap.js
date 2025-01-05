@@ -22,7 +22,7 @@ async function loadData() {
     console.log(data1.data);
 
 
-    const timeData =data1.coords.valid_time.data;
+    const timeData =data1.data;
     
 
     //const timeData = data.coords.valid_time.data;
