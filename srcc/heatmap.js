@@ -19,7 +19,7 @@ async function loadData() {
     const data = await fetchData(currentData);
     //console.log(data);
     const data1 =  await fetchData("TIME");
-    console.log(data1.coords.valid_time.data);
+    console.log(data1.data);
 
 
     const timeData =data1.coords.valid_time.data;
