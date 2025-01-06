@@ -1,3 +1,5 @@
+
+
 function daysSince1800ToCalendar(days) {
     const startDate = new Date('1800-01-01T00:00:00Z');
     const offset = 5.5 * 60 * 60 * 1000;
@@ -13,19 +15,17 @@ async function fetchData(dataType) {
     return response.json();
 }
 
+
+
 async function loadData() {
     const previousTimeIndex = document.getElementById('time-selector').value || 0; // Preserve selected index
 
     const data = await fetchData(currentData);
-    //console.log(data);
     const data1 =  await fetchData("TIME");
-    console.log(data1.data);
+    // console.log(data1.data);
 
 
-    const timeData =data1.data;
-    
-
-    //const timeData = data.coords.valid_time.data;
+    const timeData =data1.coords.valid_time.data;
     const latData = data.coords.latitude.data;
     const lonData = data.coords.longitude.data;
     const sstData = data.data;
@@ -85,65 +85,37 @@ async function createGeoHeatmapForTime(timeIndex, sstData, latData, lonData, top
     const indexmin = Math.ceil(0.01 * sortedValues.length) - 1; 
     const maxTemp90Percentile = sortedValues[indexmax];
     const minTemp90Percentile = sortedValues[indexmin];
-    console.log(maxTemp90Percentile,minTemp90Percentile);
+    // console.log(maxTemp90Percentile,minTemp90Percentile);
+
+    // minTemp = minTemp90Percentile;
+    // maxTemp = maxTemp90Percentile;
 
 
-    const minTemp = minTemp90Percentile;
-    const maxTemp = maxTemp90Percentile;
-    let dataType;
-if (currentData === '2m_temp') {
-dataType = 'Temperature (k)';
-} else if (currentData === 'tcwv') {
-dataType = 'Total Column Water Vapor (kg m-2)';
-} else if (currentData === 'rf') {
-dataType = 'Rainfall (mm)';
-} else if (currentData === 'msl') {
-dataType = 'Mean Sea Level (hPa)';
-} 
-else if (currentData === 'PM25') {
-    dataType = 'PM2.5 (µg/m³)';
-}    else if (currentData === 'PM10') {
-    dataType = 'PM10(µg/m³)';
-}else {
-dataType = 'Unknown Data Type';
-}
-
-
-    Highcharts.mapChart('container', {
-        chart: {
-            map: topology,
-            backgroundColor: '#222'
-        },
-
-        title: {
-            text: `GeoHeatmap Time ${timeData[timeIndex]}`,//for ${dataType} 
-            align: 'left',
-            style: {
-                color: '#fff'
-            }
-        },
-
-        mapNavigation: {
-            enabled: true,
-            buttonOptions: {
-                verticalAlign: 'bottom'
-            }
-        },
-
-        mapView: {
-            projection: {
-                name: 'Mercator'
-            },
-            center: [80, 20],
-            zoom: 5
-        },
-
-        colorAxis: {
-            min: minTemp,
-            max: maxTemp, // Adjust max based on your temperature range
-            stops:
-            [[0.0, 'rgba(0, 0, 0,0.8)'],
-            [0.004, 'rgba(0, 0, 7,0.8)'],
+    let pp;
+    if (currentData === 'AOD_SEA' || currentData === 'AOD_DUST' || currentData === 'PM25' 
+        || currentData === 'PM10' 
+        || currentData === 'AOD_TOT' || currentData === 'AOD_SUL' || currentData === 'AOD_NIT') 
+        {
+            pp=[
+                [0.000, 'rgba(255, 255, 255, 1.0)'], 
+                [0.063, 'rgba(209, 214, 234, 1.0)'], 
+                [0.126, 'rgba(165, 173, 214, 1.0)'], 
+                [0.196, 'rgba(135, 145, 191, 1.0)'], 
+                [0.256, 'rgba(163, 165, 142, 1.0)'], 
+                [0.326, 'rgba(188, 188, 99, 1.0)'],  
+                [0.393, 'rgba(214, 209, 56, 1.0)'],  
+                [0.463, 'rgba(242, 229, 10, 1.0)'],  
+                [0.523, 'rgba(242, 196, 10, 1.0)'],   
+                [0.583, 'rgba(244, 163, 7, 1.0)'],  
+                [0.653, 'rgba(247, 130, 5, 1.0)'],   
+                [0.720, 'rgba(247, 96, 5, 1.0)'],     
+                [0.790, 'rgba(249, 63, 2, 1.0)'],     
+                [0.853, 'rgba(252, 30, 0, 1.0)'],    
+                [1.000, 'rgba(255, 0, 0, 1.0)']      
+            ]
+        }
+        else{
+            pp=[[0.001, 'rgba(255, 255, 255,0.8)'],
             [0.008, 'rgba(0, 0, 14,0.8)'],
             [0.012, 'rgba(0, 0, 21,0.8)'],
             [0.016, 'rgba(0, 0, 28,0.8)'],
@@ -376,33 +348,99 @@ dataType = 'Unknown Data Type';
             [0.906, 'rgba(255, 87, 87,0.8)'],
             [0.91, 'rgba(255, 94, 94,0.8)'],
             [0.914, 'rgba(255, 101, 101,0.8)'],
-            [0.918, 'rgba(255, 107, 107,0.8)'],
-            [0.922, 'rgba(255, 114, 114,0.8)'],
-            [0.925, 'rgba(255, 122, 122,0.8)'],
-            [0.929, 'rgba(255, 129, 129,0.8)'],
-            [0.933, 'rgba(255, 136, 136,0.8)'],
-            [0.937, 'rgba(255, 143, 143,0.8)'],
-            [0.941, 'rgba(255, 150, 150,0.8)'],
-            [0.945, 'rgba(255, 156, 156,0.8)'],
-            [0.949, 'rgba(255, 163, 163,0.8)'],
-            [0.953, 'rgba(255, 170, 170,0.8)'],
-            [0.957, 'rgba(255, 178, 178,0.8)'],
-            [0.961, 'rgba(255, 185, 185,0.8)'],
-            [0.965, 'rgba(255, 192, 192,0.8)'],
-            [0.969, 'rgba(255, 199, 199,0.8)'],
-            [0.973, 'rgba(255, 206, 206,0.8)'],
-            [0.976, 'rgba(255, 212, 212,0.8)'],
-            [0.98, 'rgba(255, 219, 219,0.8)'],
-            [0.984, 'rgba(255, 226, 226,0.8)'],
-            [0.988, 'rgba(255, 234, 234,0.8)'],
-            [0.992, 'rgba(255, 241, 241,0.8)'],
-            [0.996, 'rgba(255, 248, 248,0.8)'],
-            [1.0, 'rgba(255, 255, 255,0.8)']]
+            [1, 'rgba(255, 107, 107,0.8)'],
+            ]
+        }    
+
+
+    let minTemp;
+    let maxTemp;
+    
+    if (currentData === 'AOD_SEA' || currentData === 'AOD_DUST' 
+        || currentData === 'AOD_TOT' || currentData === 'AOD_SUL' || currentData === 'AOD_NIT') {
+        minTemp = 0.001;
+        maxTemp = 3;
+        
+        
+    } else {
+        minTemp = minTemp90Percentile;
+        maxTemp = maxTemp90Percentile;
+       
+    }
+    
+    // // Now you can use minTemp and maxTemp here
+    console.log(minTemp, maxTemp);
+
+
+
+
+
+
+
+
+
+
+    let dataType;
+if (currentData === '2m_temp') {
+dataType = 'Temperature (k)';
+} else if (currentData === 'tcwv') {
+dataType = 'Total Column Water Vapor (kg m-2)';
+} else if (currentData === 'rf') {
+dataType = 'Rainfall (mm)';
+} else if (currentData === 'msl') {
+dataType = 'Mean Sea Level (hPa)';
+} 
+else if (currentData === 'PM25') {
+    dataType = 'PM2.5 (µg/m³)';
+}    else if (currentData === 'PM10') {
+    dataType = 'PM10(µg/m³)';
+}else {
+dataType = 'Unknown Data Type';
+}
+
+
+    Highcharts.mapChart('container', {
+        chart: {
+            map: topology,
+            backgroundColor: '#ffffff'
+            // '#222'
+        },
+
+        title: {
+            text: `GeoHeatmap Time ${timeData[timeIndex]}`,//for ${dataType} 
+            align: 'left',
+            style: {
+                color: '#000000'
+            }
+        },
+
+        mapNavigation: {
+            enabled: true,
+            buttonOptions: {
+                verticalAlign: 'bottom'
+            }
+        },
+
+        mapView: {
+            projection: {
+                name: 'Mercator'
+            },
+            center: [80, 20],
+            zoom: 5
+        },
+
+        colorAxis: {
+            min: minTemp,
+            max: maxTemp, // Adjust max based on your temperature range
+            stops:pp
+
+            
+            
                         
            ,
             labels: {
                 style: {
-                    color: '#ddd'
+                    color: '#000000'
                 }
             }
         },
@@ -415,6 +453,7 @@ dataType = 'Unknown Data Type';
                         enabled: false
                     }
                 }
+
             }
         },
         series: [{
@@ -431,7 +470,7 @@ dataType = 'Unknown Data Type';
             data: formattedData,
             type: 'geoheatmap',
             tooltip: {
-                headerFormat: '<span style="font-size: 11px">Lon: {point.point.lon:.2f}° Lat: {point.point.lat:.2f}°</span><br/>',
+                headerFormat: '<span style="font-size: 14">Lon: {point.point.lon:.2f}° Lat: {point.point.lat:.2f}°</span><br/>',
                 pointFormat: 'Value: {point.value:.2f}'
             },
         }, {
@@ -443,3 +482,11 @@ dataType = 'Unknown Data Type';
     });
 }
 
+function playAnimation() {
+    updateHeatmap(currentFrame);
+    currentFrame = (currentFrame + 1) % timeData.length; // Loop back to the first frame
+    setTimeout(playAnimation, 1000); // Adjust interval as needed
+}
+
+// Start animation
+playAnimation();
