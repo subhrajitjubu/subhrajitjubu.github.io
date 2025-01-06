@@ -25,7 +25,7 @@ async function loadData() {
     // console.log(data1.data);
 
 
-    const timeData =data1.coords.valid_time.data;
+    const timeData =data1.data;
     const latData = data.coords.latitude.data;
     const lonData = data.coords.longitude.data;
     const sstData = data.data;
