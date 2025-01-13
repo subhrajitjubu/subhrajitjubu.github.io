@@ -704,7 +704,7 @@ Promise.all([
           tooltip: {
     shared: true, // Enables a shared tooltip for all series
     formatter: function () {
-      let tooltip = `<b>Time:</b> ${this.x}<br>`;
+      let tooltip = `<b>Time:</b> ${this.key}<br>`;
       this.points.forEach(point => {
         tooltip += `<span style="color:${point.color}">\u25CF</span> <b>${point.series.name}:</b> ${point.y}<br>`;
       });
