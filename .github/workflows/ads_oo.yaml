@@ -2,7 +2,7 @@ name: Download and preprocess ADS_same_00UTC
 
 on:
   schedule:
-    - cron: '0 10 * * *'  # This runs every day at 10:00 UTC
+    - cron: '0 12 * * *'  # This runs every day at 10:00 UTC
   workflow_dispatch:  # Allows manual triggering
 
 jobs:
