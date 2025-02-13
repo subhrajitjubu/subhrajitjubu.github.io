@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Job Listings</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f9;
+      margin: 0;
+      padding: 20px;
+    }
+    h1 {
+      text-align: center;
+      color: #333;
+    }
+    .job-container {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 20px;
+      padding: 20px;
+    }
+    .job-card {
+      background-color: #fff;
+      border-radius: 8px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      padding: 20px;
+      transition: transform 0.3s ease;
+    }
+    .job-card:hover {
+      transform: translateY(-5px);
+    }
+    .job-title {
+      font-size: 1.5em;
+      color: #2c3e50;
+      margin-bottom: 10px;
+    }
+    .job-org {
+      font-size: 1.1em;
+      color: #34495e;
+      margin-bottom: 10px;
+    }
+    .job-location {
+      font-size: 0.9em;
+      color: #7f8c8d;
+      margin-bottom: 10px;
+    }
+    .job-description {
+      font-size: 0.9em;
+      color: #333;
+      margin-bottom: 10px;
+    }
+    .job-link {
+      display: inline-block;
+      background-color: #3498db;
+      color: #fff;
+      padding: 8px 16px;
+      border-radius: 4px;
+      text-decoration: none;
+      font-size: 0.9em;
+    }
+    .job-link:hover {
+      background-color: #2980b9;
+    }
+  </style>
+</head>
+<body>
+  <h1>Job Listings</h1>
+  <div class="job-container" id="job-container"></div>
+
+  <script>
+    const jobs = [
+      // Climate & Atmospheric Science Roles
+      {
+        title: "Climate Scientist",
+        organization: "National Center for Atmospheric Research (NCAR)",
+        location: "Boulder, Colorado, USA",
+        description: "Research climate variability, extreme weather events, and long-term climate projections.",
+        link: "https://www.ucar.edu/opportunities/careers"
+      },
+      {
+        title: "Atmospheric Scientist",
+        organization: "European Centre for Medium-Range Weather Forecasts (ECMWF)",
+        location: "Reading, UK",
+        description: "Study weather patterns, cloud microphysics, and radiative transfer.",
+        link: "https://www.ecmwf.int/en/about/jobs"
+      },
+      {
+        title: "Meteorologist (Research/Operational)",
+        organization: "Indian Meteorological Department (IMD)",
+        location: "New Delhi, India",
+        description: "Analyze weather models like WRF and MMCFS-v2 to improve forecasting.",
+        link: "https://mausam.imd.gov.in/"
+      },
+      {
+        title: "Environmental Scientist",
+        organization: "World Resources Institute (WRI)",
+        location: "Washington, D.C., USA",
+        description: "Work on air quality, aerosols, and climate change mitigation strategies.",
+        link: "https://www.wri.org/careers"
+      },
+      {
+        title: "Monsoon Specialist",
+        organization: "Indian Institute of Tropical Meteorology (IITM)",
+        location: "Pune, India",
+        description: "Study monsoon patterns in India and their impact on agriculture and water resources.",
+        link: "https://www.tropmet.res.in/"
+      },
+
+      // Data & Computational Science Roles
+      {
+        title: "HPC Research Scientist (Climate Modeling)",
+        organization: "Lawrence Berkeley National Laboratory",
+        location: "Berkeley, California, USA",
+        description: "Optimize climate models using HPC environments like Slurm.",
+        link: "https://jobs.lbl.gov/"
+      },
+      {
+        title: "Computational Climate Modeler",
+        organization: "Max Planck Institute for Meteorology",
+        location: "Hamburg, Germany",
+        description: "Develop and optimize numerical models for weather and climate simulations.",
+        link: "https://www.mpimet.mpg.de/en/career/jobs/"
+      },
+      {
+        title: "Geospatial Data Scientist",
+        organization: "Google Earth Engine",
+        location: "Remote",
+        description: "Use GIS, remote sensing, and Python (Cartopy, OpenCV) for environmental applications.",
+        link: "https://careers.google.com/"
+      },
+      {
+        title: "Machine Learning Scientist (Environmental Applications)",
+        organization: "ClimateAI",
+        location: "San Francisco, California, USA",
+        description: "Apply ML to climate predictions, air quality forecasting, and extreme weather detection.",
+        link: "https://climate.ai/careers"
+      },
+      {
+        title: "Data Engineer (Climate/Weather Data)",
+        organization: "The Weather Company (IBM)",
+        location: "Atlanta, Georgia, USA",
+        description: "Manage large-scale datasets from netCDF, xarray, and API sources.",
+        link: "https://www.ibm.com/careers"
+      },
+
+      // Industry & Policy-Oriented Roles
+      {
+        title: "Climate Risk Analyst",
+        organization: "McKinsey & Company",
+        location: "Global",
+        description: "Assess climate risks for businesses, agriculture, and disaster management.",
+        link: "https://www.mckinsey.com/careers"
+      },
+      {
+        title: "Sustainability Consultant",
+        organization: "Deloitte",
+        location: "Global",
+        description: "Work on climate policy, carbon footprints, and renewable energy integration.",
+        link: "https://www2.deloitte.com/global/en/careers.html"
+      },
+      {
+        title: "Environmental Policy Advisor",
+        organization: "United Nations Environment Programme (UNEP)",
+        location: "Nairobi, Kenya",
+        description: "Support government and NGOs in climate adaptation strategies.",
+        link: "https://www.unep.org/about-un-environment/careers"
+      },
+      {
+        title: "Weather & Climate Services Specialist",
+        organization: "AccuWeather",
+        location: "State College, Pennsylvania, USA",
+        description: "Collaborate with organizations like IMD, IITM, or private weather firms.",
+        link: "https://careers.accuweather.com/"
+      },
+
+      // Academia & Research Roles
+      {
+        title: "Postdoctoral Researcher (Climate & Weather Modeling)",
+        organization: "National Oceanic and Atmospheric Administration (NOAA)",
+        location: "Silver Spring, Maryland, USA",
+        description: "Continue research in cloud microphysics, infrared radiation effects, and monsoon dynamics.",
+        link: "https://www.noaa.gov/jobs"
+      },
+      {
+        title: "University Lecturer/Professor",
+        organization: "Indian Institute of Science (IISc)",
+        location: "Bangalore, India",
+        description: "Teach climate science, meteorology, and computational modeling.",
+        link: "https://iisc.ac.in/careers/"
+      },
+      {
+        title: "Research Scientist (National Labs & Institutes)",
+        organization: "Indian Space Research Organisation (ISRO)",
+        location: "Bengaluru, India",
+        description: "Join institutions like IITM, IMD, ISRO, or NCAR for climate research.",
+        link: "https://www.isro.gov.in/careers"
+      }
+    ];
+
+    const jobContainer = document.getElementById('job-container');
+
+    jobs.forEach(job => {
+      const jobCard = document.createElement('div');
+      jobCard.classList.add('job-card');
+
+      jobCard.innerHTML = `
+        <div class="job-title">${job.title}</div>
+        <div class="job-org">${job.organization}</div>
+        <div class="job-location">${job.location}</div>
+        <div class="job-description">${job.description}</div>
+        <a href="${job.link}" class="job-link" target="_blank">Apply Now</a>
+      `;
+
+      jobContainer.appendChild(jobCard);
+    });
+  </script>
+</body>
+</html>

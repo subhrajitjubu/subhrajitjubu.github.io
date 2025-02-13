@@ -3,84 +3,46 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>JOBS Viewer</title>
+    <title>Jobs Viewer</title>
     <style>
         body {
             font-family: Arial, sans-serif;
-            margin: 20px;
-        }
-        #rssFeed {
-            margin-top: 20px;
-        }
-        .item {
-            border: 1px solid black;
-            padding: 10px;
-            width: auto;
-            margin-bottom: 10px;
-            opacity: 0.5;
-            transition: opacity 0.1s, color 0.3s;
-        }
-        .item:hover {
-            opacity: 0.8;
-            color: green;
-            border: 3px solid blue;
-        }
-        #loadMore {
-            margin-top: 20px;
-            padding: 10px 20px;
-            background-color: #007BFF;
-            color: white;
-            border: none;
-            cursor: pointer;
-        }
-        #loadMore:hover {
-            background-color: #0056b3;
-        }
-        #loading {
-            display: none;
-            text-align: center;
-            font-size: 18px;
-        }
-        #filter {
-            margin-bottom: 20px;
-            padding: 10px;
-            width: 100%;
-            font-size: 16px;
+            background-color: #a3a3bd;
+            margin: 0;
+            padding: 20px;
         }
         nav {
             text-align: center;
             padding: 1rem 0;
-            background-color: #444;
+            background-color: #1b2049b2;
         }
         nav a {
             color: #fff;
             margin: 0 1rem;
             text-decoration: none;
+            font-size: 1.1em;
         }
-        footer {
-           position:fixed; 
-           bottom: 0; 
-            left: 0; 
-            right: 0; 
-            text-align: center;
-            padding: 0.1rem 0;
-            background-color: #333;
-            color: #fff;
-        }
-       
+        nav a:hover {
+        color: #ADD8E6; /* Light blue color */
+        text-decoration: underline;
+    }
         .dropdown {
             display: inline-flex;
+            position: relative;
         }
         .dropdown-content {
             display: none;
             position: absolute;
-            background-color: #ffffff;
+            background-color: #fff;
             min-width: 160px;
-            box-shadow: 0 0 10px rgba(66, 4, 63, 0.1);
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
             z-index: 1;
+            top: 100%;
+            left: 50%;
+            transform: translateX(-50%);
         }
         .dropdown-content a {
-            color: #333;
+            color: #08724f;
             padding: 12px 16px;
             text-decoration: none;
             display: block;
@@ -91,7 +53,93 @@
         .dropdown:hover .dropdown-content {
             display: block;
         }
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 20px;
+        }
+        #filter {
+            width: 100%;
+            padding: 10px;
+            font-size: 1em;
+            margin-bottom: 20px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        #rssFeed {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            padding: 20px;
+        }
+        .item {
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            transition: transform 0.3s ease, border 0.3s ease;
+        }
+        .item:hover {
+            transform: translateY(-5px);
+            border: 1px solid #007BFF;
+        }
+        .item h3 {
+            font-size: 1.2em;
+            margin-bottom: 10px;
+        }
+        .item p {
+            font-size: 0.9em;
+            color: #777;
+        }
+        #loadMore {
+            display: block;
+            margin: 20px auto;
+            padding: 10px 20px;
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 1em;
+        }
+        #loadMore:hover {
+            background-color: #0056b3;
+        }
+        #loading {
+            text-align: center;
+            font-size: 1.2em;
+            color: #555;
+            margin-top: 20px;
+        }
+        footer {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            text-align: center;
+            padding: 10px 0;
+            background-color: #333;
+            color: #fff;
+            font-size: 0.9em;
+        }
+        #refreshButton {
+        display: block;
+        margin: 20px auto;
+        padding: 10px 20px;
+        background-color: #28a745;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 1em;
+         }
+        #refreshButton:hover {
+        background-color: #218838;
+        }
+
+
     </style>
+
 </head>
 <body>
     <nav>
@@ -105,64 +153,37 @@
             <a href="#">Weather forecast</a>
             <div class="dropdown-content">
                 <a href="src/weatherchart.html">Weather Chart</a>
-                <a href="srcc\geomap_multiple.html">Weather GeoHEATMap</a>    
+                <a href="src/geomap_multiple.html">Weather GeoHEATMap</a>
             </div>
         </div>
-      
         <div class="dropdown">
             <a href="#">Jobs</a>
             <div class="dropdown-content">
                 <a href="Jobs.html">MET Jobs</a>
-                <a href="https://www.21centuryweather.org.au/about-us/positions-vacant/" target="_blank" >21st cent AUS MET Jobs</a>
-
+                <a href="https://www.21centuryweather.org.au/about-us/positions-vacant/" target="_blank">21st cent AUS MET Jobs</a>
                 <a href="https://www.tropmet.res.in/Careers" target="_blank">IITM Career</a>
                 <a href="https://vacancies.incois.gov.in/" target="_blank">INCOIS Career</a>
-                <a href=" https://www.niot.res.in/recruitment_details.php/" target="_blank">NIOT Career</a>
-               
+                <a href="https://www.niot.res.in/recruitment_details.php/" target="_blank">NIOT Career</a>
+                <a href="j1.html" target="_blank">Others</a>
             </div>
         </div>
         <a href="movies.html">Movies</a>
         <a href="series.html">Series</a>
     </nav>
 
-
     <h1>Jobs Viewer</h1>
     <input type="text" id="filter" placeholder="Filter jobs by keyword..." oninput="filterItems()">
     <div id="rssFeed"></div>
     <div id="loading">Loading...</div>
     <button id="loadMore">Load More</button>
+    <button id="refreshButton" onclick="refreshPage()">Refresh</button>
+
 
     <script>
-
-
-
-// Fetch content from the URL
-function fetchContent() {
-    showLoading(true);
-
-    // Using a proxy to bypass CORS
-    const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(url)}`;
-
-    fetch(proxyUrl)
-        .then(response => response.json())
-        .then(data => {
-            const contentDiv = document.getElementById('externalContent');
-            contentDiv.innerHTML = data.contents; // Render the fetched HTML content
-            showLoading(false);
-        })
-        .catch(error => {
-            console.error('Error fetching content:', error);
-            document.getElementById('externalContent').innerHTML = '<p>Error loading content. Please try again later.</p>';
-            showLoading(false);
-        });
-}
-
-// Fetch content on page load
-window.onload = fetchContent;
         const rssUrl = "https://maillists.reading.ac.uk/scripts/wa-READING.exe?RSS&L=MET-JOBS&v=2.0&LIMIT=1000";
         let items = [];
         let currentIndex = 0;
-        const itemsPerPage = 50;
+        const itemsPerPage = 10;
 
         // Show loading indicator
         function showLoading(isLoading) {
@@ -170,33 +191,43 @@ window.onload = fetchContent;
             loadingDiv.style.display = isLoading ? 'block' : 'none';
         }
 
-        // Function to fetch RSS feed
-        function fetchRSSFeed() {
+        async function fetchRSSFeed() {
             showLoading(true);
-            fetch(`https://api.allorigins.win/get?url=${encodeURIComponent(rssUrl)}`)
-                .then(response => response.json())
-                .then(data => {
+
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 seconds timeout
+
+                try {
+                    const response = await fetch(`https://api.allorigins.win/get?url=${encodeURIComponent(rssUrl)}`, { signal: controller.signal });
+                    const data = await response.json();
                     const parser = new DOMParser();
                     const xmlDoc = parser.parseFromString(data.contents, "text/xml");
                     items = Array.from(xmlDoc.getElementsByTagName('item'));
                     displayItems();
-                    showLoading(false);
-                })
-                .catch(error => {
+                } catch (error) {
                     console.error('Error fetching the RSS feed:', error);
-                    document.getElementById('rssFeed').innerHTML = '<p>Error fetching the RSS feed. Please check the URL.</p>';
+                    document.getElementById('rssFeed').innerHTML = '<p>Error fetching the RSS feed. Please try again later.</p>';
+                } finally {
+                    clearTimeout(timeoutId);
                     showLoading(false);
-                });
+                }
+
         }
 
+
+
+
+        function refreshPage() {
+            location.reload();
+        }
 
         // Function to display items
         function displayItems() {
             const rssFeedDiv = document.getElementById('rssFeed');
-            rssFeedDiv.innerHTML = ""; // Clear the feed before redisplaying
+            // rssFeedDiv.innerHTML = ""; // Clear the feed before redisplaying
             const endIndex = Math.min(currentIndex + itemsPerPage, items.length);
-            
-            for (let i = 0; i < endIndex; i++) {
+
+            for (let i = currentIndex; i < endIndex; i++) {
                 const title = items[i].getElementsByTagName('title')[0].textContent;
                 const link = items[i].getElementsByTagName('link')[0].textContent;
                 const pubDate = items[i].getElementsByTagName('pubDate')[0].textContent;
@@ -207,6 +238,10 @@ window.onload = fetchContent;
                 itemDiv.innerHTML = `<h3><a href="${link}" target="_blank">${title}</a></h3><p><strong>Published on:</strong> ${new Date(pubDate).toLocaleString()}</p>`;
                 rssFeedDiv.appendChild(itemDiv);
             }
+            currentIndex = endIndex;
+            if (currentIndex >= items.length) {
+                document.getElementById('loadMore').style.display = 'none';
+            }
         }
 
         // Function to filter items by keyword
@@ -214,7 +249,7 @@ window.onload = fetchContent;
             const filterInput = document.getElementById('filter').value.toLowerCase();
             const rssFeedDiv = document.getElementById('rssFeed');
             const itemsDiv = rssFeedDiv.getElementsByClassName('item');
-            
+
             Array.from(itemsDiv).forEach(item => {
                 const title = item.getAttribute('data-title');
                 if (title.includes(filterInput)) {
@@ -231,8 +266,8 @@ window.onload = fetchContent;
         // Fetch RSS feed on page load
         window.onload = fetchRSSFeed;
     </script>
+    <footer>
+        <p>&copy; 2024 Subhrajit Rath - Personal Blog</p>
+    </footer>
 </body>
-<footer>
-    <h4>&copy; 2024 Subhrajit Rath - Personal Blog</h1>
-</footer>
 </html>
