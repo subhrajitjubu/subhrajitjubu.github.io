@@ -176,7 +176,7 @@
     <button id="refreshButton" onclick="refreshPage()">Refresh</button>
 
     <script>
-        const rssUrl = "https://maillists.reading.ac.uk/scripts/wa-READING.exe?RSS&L=MET-JOBS&v=2.0&LIMIT=1000";
+        const rssUrl = "https://maillists.reading.ac.uk/scripts/wa-READING.exe?RSS&L=MET-JOBS&v=2.0&LIMIT=100";
         const cacheKey = 'jobsCache';
         const cacheExpiryKey = 'jobsCacheExpiry';
         const cacheDuration = 6 * 60 * 60 * 1000; // 6 hours in milliseconds
@@ -192,7 +192,7 @@
         }
 
         // Fetch and cache the RSS feed
-        async function fetchAndCacheJobs() {
+        async function fetchAndCacheJobs(retries = 3, delay = 1000) {
             showLoading(true);
 
             try {
