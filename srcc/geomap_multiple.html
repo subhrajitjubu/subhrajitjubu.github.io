@@ -136,19 +136,28 @@
         <a href="../movies.html">Movies</a>
         <a href="../series.html">Series</a>
     </nav>
-
     <div id="wrapper">
         <!-- Selectors on the left -->
         <div id="selectors">
             <select id="data-selector">
-                <option value="2m_temp">Temperature</option>
+                <option value="../src/2m_temp">Temperature</option>
                 <option value="D2M">Dew point Temp.</option>
-                <option value="rf">Rainfall</option>
+                <option value="../src/rf">Rainfall</option>
                 <option value="CP">Convective Rainfall</option>
                 <option value="CAPE">CAPE</option>
                 <option value="CIN">Convective Inhibition</option>
-                <option value="tcwv">TCWV</option>
-                <option value="msl">Mean Sea Level</option>
+                <option value="../src/tcwv">TCWV</option>
+                <option value="../src/msl">Mean Sea Level</option>
+                <option value="..\src\div850">850hPa Div.</option>
+                <option value="..\src\rh850">850hPa R.H.</option>
+                <option value="..\src\vo850">850hPa Vorticity.</option>
+                <option value="..\src\gh850">850hPa GPT.Height</option>
+
+                <option value="..\src\div500">500 hPa Div.</option>
+                <option value="..\src\rh500">500 hPa R.H.</option>
+                <option value="..\src\vo500">500 hPa Vorticity.</option>
+                <option value="..\src\gh500">500 hPa GPT.Height</option>
+
                 <option value="LCC">Low Cloud cover</option>
                 <option value="MCC">Mid Cloud cover</option>
                 <option value="HCC">High Cloud cover</option>
@@ -175,7 +184,7 @@
     </footer>
 
     <script>
-        let currentData = '2m_temp'; // Default data
+        let currentData = '../src/2m_temp'; // Default data
         // Event listener for dataset selection
         document.getElementById('data-selector').addEventListener('change', function() {
             currentData = this.value; // Update current data type
@@ -184,42 +193,42 @@
 
         loadData();
 
-        window.onload = function () {
-            document.addEventListener("contextmenu", function (e) {
-                e.preventDefault();
-            }, false);
-            document.addEventListener("keydown", function (e) {
-                // "I" key
-                if (e.ctrlKey && e.shiftKey && e.keyCode == 73) {
-                    disabledEvent(e);
-                }
-                // "J" key
-                if (e.ctrlKey && e.shiftKey && e.keyCode == 74) {
-                    disabledEvent(e);
-                }
-                // "S" key + macOS
-                if (e.keyCode == 83 && (navigator.platform.match("Mac") ? e.metaKey : e.ctrlKey)) {
-                    disabledEvent(e);
-                }
-                // "U" key
-                if (e.ctrlKey && e.keyCode == 85) {
-                    disabledEvent(e);
-                }
-                // "F12" key
-                if (e.keyCode == 123) {
-                    disabledEvent(e);
-                }
-            }, false);
-            function disabledEvent(e) {
-                if (e.stopPropagation) {
-                    e.stopPropagation();
-                } else if (window.event) {
-                    window.event.cancelBubble = true;
-                }
-                e.preventDefault();
-                return false;
-            }
-        }
+        // window.onload = function () {
+        //     document.addEventListener("contextmenu", function (e) {
+        //         e.preventDefault();
+        //     }, false);
+        //     document.addEventListener("keydown", function (e) {
+        //         // "I" key
+        //         if (e.ctrlKey && e.shiftKey && e.keyCode == 73) {
+        //             disabledEvent(e);
+        //         }
+        //         // "J" key
+        //         if (e.ctrlKey && e.shiftKey && e.keyCode == 74) {
+        //             disabledEvent(e);
+        //         }
+        //         // "S" key + macOS
+        //         if (e.keyCode == 83 && (navigator.platform.match("Mac") ? e.metaKey : e.ctrlKey)) {
+        //             disabledEvent(e);
+        //         }
+        //         // "U" key
+        //         if (e.ctrlKey && e.keyCode == 85) {
+        //             disabledEvent(e);
+        //         }
+        //         // "F12" key
+        //         if (e.keyCode == 123) {
+        //             disabledEvent(e);
+        //         }
+        //     }, false);
+        //     function disabledEvent(e) {
+        //         if (e.stopPropagation) {
+        //             e.stopPropagation();
+        //         } else if (window.event) {
+        //             window.event.cancelBubble = true;
+        //         }
+        //         e.preventDefault();
+        //         return false;
+        //     }
+        // }
     </script>
 </body>
 </html>
