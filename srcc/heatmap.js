@@ -482,11 +482,4 @@ dataType = 'Unknown Data Type';
     });
 }
 
-function playAnimation() {
-    updateHeatmap(currentFrame);
-    currentFrame = (currentFrame + 1) % timeData.length; // Loop back to the first frame
-    setTimeout(playAnimation, 1000); // Adjust interval as needed
-}
 
-// Start animation
-playAnimation();
