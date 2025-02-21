@@ -46,7 +46,7 @@ async function loadData() {
     };
 
     // Load the base world map topology
-    const topology = await fetch('IND.geojson').then(response => response.json());
+    const topology = await fetch('IND.json').then(response => response.json());
     // console.log(topology);
     const selectedTimeIndex = parseInt(timeSelector.value, 10);
     createGeoHeatmapForTime(selectedTimeIndex, sstData, latData, lonData, topology, timeData);
