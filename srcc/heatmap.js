@@ -12,7 +12,9 @@ function daysSince1800ToCalendar(days) {
 
 async function fetchData(dataType) {
     const response = await fetch(`${dataType}.json`);
+    console.log(dataType);
     return response.json();
+    
 }
 
 
@@ -21,11 +23,11 @@ async function loadData() {
     const previousTimeIndex = document.getElementById('time-selector').value || 0; // Preserve selected index
 
     const data = await fetchData(currentData);
-    const data1 =  await fetchData("TIME");
-    // console.log(data1.data);
+    // const data1 =  await fetchData("TIME");
+    // console.log(data.coords.valid_time.data);
 
 
-    const timeData =data1.data;
+    const timeData =data.coords.valid_time.data;
     const latData = data.coords.latitude.data;
     const lonData = data.coords.longitude.data;
     const sstData = data.data;
@@ -369,7 +371,7 @@ async function createGeoHeatmapForTime(timeIndex, sstData, latData, lonData, top
     }
     
     // // Now you can use minTemp and maxTemp here
-    console.log(minTemp, maxTemp);
+    // console.log(minTemp, maxTemp);
 
 
 
@@ -481,5 +483,4 @@ dataType = 'Unknown Data Type';
         }]
     });
 }
-
 

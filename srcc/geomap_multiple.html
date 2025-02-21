@@ -7,6 +7,8 @@
     <script src="https://code.highcharts.com/highcharts.js"></script>
     <script src="https://code.highcharts.com/maps/modules/map.js"></script>
     <script src="https://code.highcharts.com/maps/modules/geoheatmap.js"></script>
+    <script src="https://code.highcharts.com/modules/accessibility.js"></script>
+
     <script src="heatmap.js"></script>
     <style>
         body {
@@ -152,10 +154,12 @@
                 <option value="..\src\rh850">850hPa R.H.</option>
                 <option value="..\src\vo850">850hPa Vorticity.</option>
                 <option value="..\src\gh850">850hPa GPT.Height</option>
+
                 <option value="..\src\div500">500 hPa Div.</option>
                 <option value="..\src\rh500">500 hPa R.H.</option>
                 <option value="..\src\vo500">500 hPa Vorticity.</option>
                 <option value="..\src\gh500">500 hPa GPT.Height</option>
+
                 <option value="LCC">Low Cloud cover</option>
                 <option value="MCC">Mid Cloud cover</option>
                 <option value="HCC">High Cloud cover</option>
@@ -167,6 +171,7 @@
                 <option value="AOD_SEA">Sea Salt AOD(550nm)</option>
                 <option value="AOD_SUL">Sulphate AOD(550nm)</option>
                 <option value="AOD_NIT">Nitrate AOD(550nm)</option>
+
             </select>
             <select id="time-selector">
                 <option value="2">Select a time</option>
