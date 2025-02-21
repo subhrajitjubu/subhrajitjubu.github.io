@@ -103,7 +103,6 @@
       </style>
 
 
-
 </head>
 <body>
   <nav>
@@ -296,11 +295,6 @@ var NASAGIBS_ModisTerraChlorophyll = L.tileLayer('https://map1.vis.earthdata.nas
 });
 
 
-
-
-
-
-
 var googleHybrid = L.tileLayer('http://{s}.google.com/vt?lyrs=s,h&x={x}&y={y}&z={z}',{
     maxZoom: 20,
     subdomains:['mt0','mt1','mt2','mt3']
@@ -311,22 +305,6 @@ var googleHybrid = L.tileLayer('http://{s}.google.com/vt?lyrs=s,h&x={x}&y={y}&z=
     maxZoom: 20,
     subdomains:['mt0','mt1','mt2','mt3']
 });
-// var india = new L.GeoJSON('IND.json');
-
-
-// const uniqueContainerId = 'container-temp-' + Date.now();
-// const uniqueContainerId1 = 'container-rf-' + Date.now();
-
-
-// var popupContent = `
-//     <div>
-//         <strong>Coordinates:</strong> ${targetLat}, ${targetLon}
-//         <div id="${uniqueContainerId}" style="width:100%; height:400px;"></div>
-//         <div id="${uniqueContainerId1}" style="width:100%; height:400px;"></div>
-
-//     </div>`;
-
-
 
 
 
@@ -533,19 +511,6 @@ function getmslData(targetLat, targetLon) {
 
 
 
-// const checkDebugger = setInterval(() => {
-//     const devtools = /./;
-//     devtools.toString = function() {
-//       clearInterval(checkDebugger);
-//       alert("Debugger is open. Closing the page.");
-//       window.close(); // Attempt to close the page
-//     };
-//     console.log(devtools); // This will trigger the above function if the debugger is open
-//   }, 1000); // Check every second
-
-
-
-
 function createWeatherChart( targetLat, targetLon,container) {
 
 Promise.all([
@@ -560,186 +525,104 @@ Promise.all([
   const rainfall = rainData.rf; // Extracted rainfall
   const mslp = msldata.msl; // Extracted rainfall
   
-  const localTime = time.map(gmtTime => {
-      const date = new Date(gmtTime); // Parse the GMT time
-      date.setHours(date.getHours() + 5); // Add 5 hours
-      date.setMinutes(date.getMinutes() + 30); // Add 30 minutes
-
-      // Get day name
-      const days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
-      const dayName = days[date.getDay()]; // Get day name
-
-      // Format day, month, and hour
-      const day = String(date.getDate()).padStart(2, '0'); // Get day and pad with zero
-      const month = String(date.getMonth() + 1).padStart(2, '0'); // Get month (0-indexed) and pad
-      let hour = date.getHours(); // Get hour
-      const ampm = hour >= 12 ? 'PM' : 'AM'; // Determine AM/PM
-      hour = hour % 12; // Convert to 12-hour format
-      hour = hour ? String(hour).padStart(2, '0') : '12'; // Pad with zero or set to 12
-
-      return `${dayName}, ${day}-${month}-2024 ${hour}:00 ${ampm}`; // Return formatted string
-    });
 
 
+const istTime = time.map(t => {
+    let date = new Date(t);
+    date.setHours(date.getHours() + 5, date.getMinutes() + 30); // Convert to IST
 
+    let hours = date.getHours();
+    let minutes = date.getMinutes();
+    let ampm = hours >= 12 ? 'PM' : 'AM';
+    hours = hours % 12 || 12; // Convert to 12-hour format
 
+    // Format minutes to always be two digits
+    minutes = minutes < 10 ? '0' + minutes : minutes;
 
-
-
+    return `${date.getDate()}-${date.getMonth() + 1}-${date.getFullYear().toString().slice(-2)} ${hours}:${minutes} ${ampm}`;
+});
 
 
 
   // Log the extracted data (optional)
-  console.log("Time:", time);
-  console.log("Temperatures:", temperatures);
-  console.log("Rainfall:", rainfall);
-  console.log("MSLP:", mslp);
+  // console.log("Time:", istTime);
+  // console.log("Temperatures:", temperatures);
+  // console.log("Rainfall:", rainfall);
+  // console.log("MSLP:", mslp);
 
   
 
 
-  var tempchart= Highcharts.chart(container, {
-              chart: {
-                type: 'line'
-              },
-              title: {
-                  text: `` ,
-                  style: {
-        fontSize: '12px' 
-     }
-                  // at ${ place ||  `Lat: ${latArray[nearestLatIndex]}, Lon: ${lonArray[nearestLonIndex]}`
-              },
-                xAxis: {
-               categories: time,
-               
-            tickInterval: 6* 1, // two hours
-            
-             
-            labels: {
-                format: '{value:%b}'
-            },
-               title: {
-                 text: 'Time',
-                 
-               }
-             },
-             yAxis: [{
-                title: {
-                    text: 'Temperature()',
-                    style: {
-                        color: ' #ff531a',
-                    }
-                },
-                labels: {
-                    style: {
-                        color: '#ff531a' // Set the color of the tick labels to blue
-                    }
-                }
-            }, 
-            {
-                title: {
-                    text: 'Pressure',
-                    style: {
-                        color: '#1a75ff'
-                    }
-                },
-                opposite: true, // Position the second axis on the opposite side
-                labels: {
-                    style: {
-                        color: '#1a75ff' // Set the color of the tick labels to blue
-                    }
-                }
-            },
-            {
-                title: {
-        text: 'Rainfall (mm/3hr)',
-        style: {
-          color: '#00cc00'
+var tempchart = Highcharts.chart(container, {
+    chart: {
+        type: 'line'
+    },
+    title: {
+        text: ``,
+        style: { fontSize: '12px' }
+    },
+    xAxis: {
+        categories: istTime,
+        labels: {
+            rotation: -45, // Optional: Rotate labels for better visibility
+            style: { fontSize: '16px' ,color: '#187dee'  }
+        },
+        title: { text: 'Time (IST)' }
+    },
+    yAxis: [
+        {
+            title: { text: 'Temperature()', style: { color: '#ff531a' } },
+            labels: { style: {  fontSize: '16px',color: '#ff531a' } }
+        },
+        {
+            title: { text: 'Pressure', style: { color: '#1a75ff' } },
+            opposite: true,
+            labels: { style: {  fontSize: '16px',color: '#1a75ff' } }
+        },
+        {
+            title: { text: 'Rainfall (mm/3hr)', style: { color: '#00cc00' } },
+            labels: { style: {  fontSize: '16px', color: '#00cc00' } }
         }
-      },
-      opposite: false, // Keep it on the default side
-       labels: {
-                    style: {
-                        color: '#00cc00' // Set the color of the tick labels to blue
-                    }
-                }
-
-    }
-],
-            
-              series: [
-              {
-                name: 'Temperature',
-                data: temperatures,
-                color: ' #ff531a',
-                marker: {
-                    enabled: false // Disable markers for this series
-                }
-              }  
-              , 
-              {
-                name: 'Pressure',
-                data: mslp,
-                color: '#1a75ff',
-                yAxis : 1,dashStyle: 'ShortDash'
-                ,marker: {
-                    enabled: false // Disable markers for this series
-                }
-              }  
-              , {
-                name: 'Rainfall (mm/3hr)',
-                data: rainfall,
-                color: '#00cc00',
-                yAxis : 2,
-                type: 'column'
-                
-              }  
-              , 
-
-              
-          ],
-          subtitle: {
-        text: 'Disclaimer: This is not a Official forecast. Data is for informational purposes only.'
-      },
-          tooltip: {
-    shared: true, // Enables a shared tooltip for all series
+    ],
+    series: [
+        { name: 'Temperature', data: temperatures, color: '#ff531a', marker: { enabled: false } },
+        { name: 'Pressure', data: mslp, color: '#1a75ff', yAxis: 1, dashStyle: 'ShortDash', marker: { enabled: false } },
+        { name: 'Rainfall (mm/3hr)', data: rainfall, color: '#00cc00', yAxis: 2, type: 'column' }
+    ],
+    subtitle: { text: 'Disclaimer: This is not an official forecast. Data is for informational purposes only.' },
+    tooltip: {
+    shared: true,
     formatter: function () {
-      let tooltip = `<b>Time:</b> ${this.key}<br>`;
-      this.points.forEach(point => {
-        tooltip += `<span style="color:${point.color}">\u25CF</span> <b>${point.series.name}:</b> ${point.y}<br>`;
-      });
-      return tooltip;
-    }
-  },
-              responsive: {
-                rules: [{
-                  condition: {
-                    maxWidth: 500
-                  },
-                  chartOptions: {
-                    legend: {
-                      enabled: false
-                    }
-                  }
-                }]
-              }
-            });
+        // Get the x value (index) and use it to get the corresponding category (formatted time)
+        let timeIndex = this.x; // This is the index
+        let timeValue = this.series.xAxis.categories[timeIndex]; // Get the corresponding time from categories
 
-const highTempThreshold = 30;
+        let tooltip = `<b>Time (IST):</b> ${timeValue}<br>`;
+        this.points.forEach(point => {
+            tooltip += `<span style="color:${point.color}">\u25CF</span> <b>${point.series.name}:</b> ${point.y}<br>`;
+        });
+        return tooltip;
+    }
+},
+    responsive: {
+        rules: [{
+            condition: { maxWidth: 500 },
+            chartOptions: { legend: { enabled: false } }
+        }]
+    }
+});
+
+
+
+const highTempThreshold = 35;
 const exceededTemps = temperatures.filter(temp => temp > highTempThreshold);
 
 const highrfThreshold = 10;
 const exceededrf = rainfall.filter(temp => temp > highrfThreshold);
 
-
-
-
 const lowmslThreshold = 1000;
 const exceededlow = mslp.filter(temp => temp < lowmslThreshold);
 let alertMessage = '';
-
-
-
 
 
 if (exceededTemps.length > 0) {
@@ -763,47 +646,11 @@ if (alertMessage) {
       alert(`Alert: ${alertMessage}`);
     }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 })
 .catch(error => {
   console.error("Error:", error);
 })};
-
-
-
-
-
-
-
-
-
-
-  
+ 
 map.on('click', function (e) {
       const targetLat = parseFloat(e.latlng.lat.toFixed(2));
       const targetLon = parseFloat(e.latlng.lng.toFixed(2));
@@ -864,14 +711,6 @@ map.on('click', function (e) {
       markers.push(marker);
   });
   
-  
-
-
-
-
-
-
-
     </script>
 </body>
 <footer>
