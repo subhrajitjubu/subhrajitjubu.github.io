@@ -24,10 +24,11 @@ async function loadData() {
 
     const data = await fetchData(currentData);
     // const data1 =  await fetchData("TIME");
-    console.log(data.coords.valid_time.data);
 
 
     const timeData =data.coords.valid_time.data;
+    console.log(data.coords.valid_time.data);
+
     const latData = data.coords.latitude.data;
     const lonData = data.coords.longitude.data;
     const sstData = data.data;
