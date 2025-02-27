@@ -2,7 +2,7 @@ name: Download and preprocess 00 NASA-GFS
 
 on:
   schedule:
-    - cron: '0 9 * * *'  # This runs every day at 10:00 UTC
+    - cron: '0 9 * * *'  # This runs every day at 09:00 UTC
   workflow_dispatch:  # Allows manual triggering
 
 jobs:
@@ -11,45 +11,51 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: Set up Python
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v4
         with:
           python-version: '3.8'  # Specify the Python version you need
 
       - name: Cache Python packages
-        uses: actions/checkout@v3
+        id: cache-pip
+        uses: actions/cache@v3
         with:
-          cache: 'pip'
           path: ~/.cache/pip
           key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
           restore-keys: |
             ${{ runner.os }}-pip-
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt  # Install dependencies
+
       - name: Create virtual environment
         run: |
           python -m venv venv
-          source venv/bin/activate
-          pip install --upgrade pip
-          pip install -r requirements.txt  # Install your dependencies
-      - name: pull repo
-        run: |
-          git config --global user.name "subhrajitjubu"
-          git config --global user.email "66462700+subhrajitjubu@users.noreply.github.com"
-          git pull origin main
-          
+          . venv/bin/activate
+          pip install -r requirements.txt  # Install dependencies in the virtual environment
+
       - name: Run Jupyter Notebook
         run: |
-          source venv/bin/activate
+          . venv/bin/activate
           ipython -c "%run src/nasa_download_00.ipynb"
-      - name: Commit and push changes
+
+      - name: Set up Git LFS
         run: |
-          git config --global user.name "subhrajitjubu"
-          git config --global user.email "66462700+subhrajitjubu@users.noreply.github.com"
-          git pull origin main
+          git lfs install  # Install Git LFS in the workflow
+          git lfs track "*.json"  # Track JSON files with Git LFS
+          git add .gitattributes  # Add .gitattributes to the repo
+
+      - name: Move JSON files and commit changes
+        run: |
           mv *nasa*.json src/
           git add src/*.json
           if [ -n "$(git status --porcelain)" ]; then
+            git config --global user.name "subhrajitjubu"
+            git config --global user.email "66462700+subhrajitjubu@users.noreply.github.com"
             git commit -m "Update files created by Jupyter Notebook"
             git push origin main
           else
