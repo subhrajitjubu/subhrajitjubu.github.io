@@ -41,7 +41,7 @@ jobs:
       - name: Run Jupyter Notebook
         run: |
           source venv/bin/activate
-          ipython -c "%run src/nasa_download_06.ipynb"
+          ipython -c "%run src/nasa_download_00.ipynb"
       - name: Commit and push changes
         run: |
           git config --global user.name "subhrajitjubu"
