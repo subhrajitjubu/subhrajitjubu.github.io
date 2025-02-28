@@ -45,11 +45,16 @@ jobs:
           source venv/bin/activate
           rm src/*.json
           ipython -c "%run src/singlelevel_00.ipynb"
+          mv *.json src/
           rm atms.grib2*
 
       - name: Compress JSON files
         run: |
           tar -czvf json_files.tar.gz src/*.json
+
+      - name: Clean up original JSON files
+        run: |
+          rm src/*.json  # Delete the original JSON files
 
       - name: Commit and push compressed files
         run: |
