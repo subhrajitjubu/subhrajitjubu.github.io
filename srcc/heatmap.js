@@ -25,9 +25,10 @@ async function loadData() {
     const data = await fetchData(currentData);
     // const data1 =  await fetchData("TIME");
 
-
+    // console.log(data);
     const timeData =data.coords.valid_time.data;
-    console.log(data.coords.valid_time.data);
+
+    // console.log(data.coords.valid_time.data);
 
     const latData = data.coords.latitude.data;
     const lonData = data.coords.longitude.data;
@@ -269,9 +270,7 @@ async function createGeoHeatmapForTime(timeIndex, sstData, latData, lonData, top
             [0.584, 'rgba(255, 246, 0,0.8)'],
             [0.588, 'rgba(255, 244, 0,0.8)'],
             [0.592, 'rgba(255, 241, 0,0.8)'],
-            [0.596, 'rgba(255, 239, 0,0.8)'],
-            [0.6, 'rgba(255, 237, 0,0.8)'],
-            [0.604, 'rgba(255, 234, 0,0.8)'],
+       
             [0.608, 'rgba(255, 232, 0,0.8)'],
             [0.612, 'rgba(255, 229, 0,0.8)'],
             [0.616, 'rgba(255, 227, 0,0.8)'],
@@ -288,10 +287,7 @@ async function createGeoHeatmapForTime(timeIndex, sstData, latData, lonData, top
             [0.659, 'rgba(255, 199, 0,0.8)'],
             [0.663, 'rgba(255, 197, 0,0.8)'],
             [0.667, 'rgba(255, 195, 0,0.8)'],
-            [0.671, 'rgba(255, 192, 0,0.8)'],
-            [0.675, 'rgba(255, 190, 0,0.8)'],
-            [0.678, 'rgba(255, 187, 0,0.8)'],
-            [0.682, 'rgba(255, 185, 0,0.8)'],
+       
             [0.686, 'rgba(255, 182, 0,0.8)'],
             [0.69, 'rgba(255, 180, 0,0.8)'],
             [0.694, 'rgba(255, 177, 0,0.8)'],
@@ -317,23 +313,8 @@ async function createGeoHeatmapForTime(timeIndex, sstData, latData, lonData, top
             [0.773, 'rgba(255, 97, 0,0.8)'],
             [0.776, 'rgba(255, 93, 0,0.8)'],
             [0.78, 'rgba(255, 88, 0,0.8)'],
-            [0.784, 'rgba(255, 84, 0,0.8)'],
-            [0.788, 'rgba(255, 79, 0,0.8)'],
-            [0.792, 'rgba(255, 75, 0,0.8)'],
-            [0.796, 'rgba(255, 70, 0,0.8)'],
-            [0.8, 'rgba(255, 65, 0,0.8)'],
-            [0.804, 'rgba(255, 61, 0,0.8)'],
-            [0.808, 'rgba(255, 56, 0,0.8)'],
-            [0.812, 'rgba(255, 52, 0,0.8)'],
-            [0.816, 'rgba(255, 47, 0,0.8)'],
-            [0.82, 'rgba(255, 43, 0,0.8)'],
-            [0.824, 'rgba(255, 38, 0,0.8)'],
-            [0.827, 'rgba(255, 34, 0,0.8)'],
-            [0.831, 'rgba(255, 29, 0,0.8)'],
-            [0.835, 'rgba(255, 25, 0,0.8)'],
-            [0.839, 'rgba(255, 20, 0,0.8)'],
-            [0.843, 'rgba(255, 16, 0,0.8)'],
-            [0.847, 'rgba(255, 11, 0,0.8)'],
+           
+        
             [0.851, 'rgba(255, 7, 0,0.8)'],
             [0.855, 'rgba(255, 2, 0,0.8)'],
             [0.859, 'rgba(255, 2, 2,0.8)'],
