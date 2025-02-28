@@ -5,62 +5,120 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>TV Series Search and Embed</title>
     <style>
-        .container { 
-            height: 400px;
-            position: relative;
-            border: 3px solid green; 
-        }
         body {
             font-family: Arial, sans-serif;
-            margin: 20px;
-            background-color: #f4f4f4;
-        }
-        h1 {
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f9;
             color: #333;
         }
-        #searchContainer {
-            margin: 1rem;
+       
+        nav {
+            background: #4a5568;
+            padding: 0.5rem 0;
+            text-align: center;
+            position: relative;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
         }
-        input[type="text"] {
-            padding: 5px;
-            font-size: 16px;
-            margin-right: 5px;
-            width: 20%;
+
+        nav a {
+            color: #63b3ed;
+            margin: 0 1.8rem;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s ease;
         }
-        input[type="number"] {
-            padding: 2px;
-            width: 60px; /* Use the specified width */
-            font-size: 12px; /* Use the specified font size */
-            margin-right: 2px; /* Use the specified margin */
+
+        nav a:hover {
+            color: #fff;
         }
-        #iframeContainer {
-            display: flex;
-            margin: 2rem;
-            flex-direction: column; /* Stack children vertically */
-            align-items: center; /* Center children horizontally */
-            width: 100%; /* Full width for the container */
+
+        .dropdown {
+            display: inline-flex;
+            position: relative;
         }
-        .poster {
-            width: 70%; /* Set width to 70% of the screen */
-            height: 80vh; /* Set height to 80% of the viewport height */
-            background-size: 85%; /* Cover the entire div */
-            background-position: center; /* Center the background image */
-            border: 2px solid rgba(88, 46, 11, 0.11); /* Blue border for the poster */
-            margin-top: 20px;
+
+        .dropbtn {
+            padding: 14px 16px;
+            color: #63b3ed;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s ease;
         }
-        .error {
-            color: red;
-            font-size: 14px;
-            margin-top: 10px;
+
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            top: 100%;
+            background-color: #fff;
+            min-width: 160px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+            border-radius: 8px;
+            z-index: 1;
+        }
+
+        .dropdown-content a {
+            color: #1461e6;
+            padding: 10px 16px;
+            text-decoration: none;
+            display: block;
+            transition: background-color 0.3s ease;
+        }
+
+        .dropdown-content a:hover {
+            background-color: #c2192765;
+        }
+
+        .dropdown:hover .dropdown-content {
+            display: block;
+        }
+
+        .dropdown:hover .dropbtn {
+            color: #fff;
+        }
+        .container {
+            padding: 20px;
+        }
+        h1, h2 {
+            color: #2c3e50;
+        }
+        .search-box {
+            width: calc(50%);
+
+            margin: 20px 0;
+            padding: 20px;
+            background-color: #ecf0f1;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        .search-box input {
+            padding: 10px;
+            width: calc(50% - 22px);
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        .search-box button {
+            
+            padding: 10px 20px;
+            background-color: #27ae60;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .search-box button:hover {
+            background-color: #219653;
         }
         #suggestions {
-            border: none;
-            max-height: 150px;
-            overflow-y: hidden;
             background-color: #fff;
-            position: relative;
-            width: 300px;
-            z-index: 1000;
+            border-radius: 4px;
+            max-height: 150px;
+            overflow-y: auto;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
         }
         #suggestions div {
             padding: 10px;
@@ -69,55 +127,66 @@
         #suggestions div:hover {
             background-color: #eee;
         }
-        .server-button {
-            border: 2px solid rgb(216, 10, 171);
-            padding: 5px 10px;
+        .error {
+            color: red;
             font-size: 14px;
-            color: rgb(34, 148, 44);
-            cursor: pointer;
-            margin: 0 5px; /* Add horizontal margin for spacing between buttons */
-        }
-        #serverButtons {
-            display: flex; /* Use flexbox to arrange buttons in a row */
-            justify-content: center; /* Center buttons horizontally */
-            margin-top: 1px; /* Add some space above the buttons */
-        }
-        nav {
             text-align: center;
-            padding: 1rem 0;
-            background-color: #444;
+            margin: 10px 0;
         }
-        nav a {
+        #iframeContainer {
+            position: relative;
+            padding: 20px;
+        }
+        .stream-options {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+        .stream-option {
+            background-color: #fff;
+            padding: 15px;
+            text-align: center;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+            cursor: pointer;
+        }
+        .stream-option:hover, .stream-option.active {
+            transform: translateY(-5px);
+            background-color: #2980b9;
             color: #fff;
-            margin: 0 1rem;
-            text-decoration: none;
         }
-        .dropdown {
-            display: inline-flex;
-        }
-        .dropdown-content {
-            display: none;
+        .loading {
             position: absolute;
-            background-color: #ffffff;
-            min-width: 160px;
-            box-shadow: 0 0 10px rgba(66, 4, 63, 0.1);
-            z-index: 1;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 50px;
+            height: 50px;
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid #2980b9;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            display: none;
         }
-        .dropdown-content a {
-            color: #333;
-            padding: 12px 16px;
-            text-decoration: none;
-            display: block;
+        @keyframes spin {
+            to { transform: translate(-50%, -50%) rotate(360deg); }
         }
-        .dropdown-content a:hover {
-            background-color: #f1f1f1;
+        footer {
+            background-color: #2c3e50;
+            color: #fff;
+            text-align: center;
+            padding: 10px;
+            position: fixed;
+            bottom: 0;
+            width: 100%;
         }
-        .dropdown:hover .dropdown-content {
-            display: block;
-        }
+        
     </style>
 </head>
 <body>
+
     <nav>
         <a href="index.html">Home</a>
         <a href="education.html">Education</a>
@@ -128,244 +197,259 @@
         <div class="dropdown">
             <a href="#" class="dropbtn">Weather forecast</a>
             <div class="dropdown-content">
+                <a href="sw.html">Weather Card</a>
                 <a href="src/weatherchart.html">Weather Chart</a>
-                <a href="srcc/geomap_multiple.html">Weather GeoHEATMap</a>    
+                <a href="srcc/geomap_multiple.html">Weather GeoHEATMap</a>
+                <a href="AQI.html">AQI HEATMap</a>
+                <a href="Weather_web.html">Weather websites</a>
+                <a href="meteogram.html">Meteogram_others</a>
             </div>
         </div>
-      
+        <div class="dropdown">
+            <a href="#" class="dropbtn">Satellite view</a>
+            <div class="dropdown-content">
+                <a href="mosdac_live.html">Mosdac/ISRO</a>
+                <a href="gibs.html">GIBS/NASA</a>
+            </div>
+        </div>
+        <div class="dropdown">
+            <a href="#" class="dropbtn">Climatic info.</a>
+            <div class="dropdown-content">
+                <a href="climate/monavg/chloro.html">Monthly statistic</a>
+                <a href="climate/Dailyavg/chloro.html">Daily average</a>
+            </div>
+        </div>
         <div class="dropdown">
             <a href="#" class="dropbtn">Jobs</a>
             <div class="dropdown-content">
-                <a href="Jobs.html" target="_blank" >MET Jobs</a>
-                <a href="https://www.21centuryweather.org.au/about-us/positions-vacant/" target="_blank" >21st cent AUS MET Jobs</a>
+                <a href="Jobs.html" target="_blank">MET Jobs</a>
+                <a href="https://www.21centuryweather.org.au/about-us/positions-vacant/" target="_blank">21st cent AUS MET Jobs</a>
                 <a href="https://www.tropmet.res.in/Careers" target="_blank">IITM Career</a>
                 <a href="https://vacancies.incois.gov.in/" target="_blank">INCOIS Career</a>
-                <a href=" https://www.niot.res.in/recruitment_details.php/" target="_blank">NIOT Career</a>
-               
+                <a href="https://www.niot.res.in/recruitment_details.php/" target="_blank">NIOT Career</a>
+                <a href="j1.html" target="_blank">Others</a>
             </div>
         </div>
         <a href="movies.html">Movies</a>
         <a href="series.html">Series</a>
     </nav>
-
-
-    <div id="searchContainer">
-        <label for="seriesTitle">TV Series Title:</label>
-        <input type="text" id="seriesTitle" placeholder="Enter TV series title..." oninput="autoSuggest()">
-        
-        <label for="seasonNumber">Season:</label>
-        <input type="number" id="seasonNumber" placeholder="Season" min="1" onchange="fetchMaxEpisodes()">
-        
-        <label for="episodeNumber">Episode:</label>
-        <input type="number" id="episodeNumber" placeholder="Episode" min="1" onchange="searchSeries()">
-        
-        <div id="suggestions"></div>
+    <div class="container">
+        <section id="search">
+            <h2>Search TV Series</h2>
+            <div class="search-box">
+                <input type="text" id="seriesTitle" placeholder="TV Series Title" oninput="autoSuggest()">
+                <input type="number" id="seasonNumber" placeholder="Season" min="1" onchange="fetchMaxEpisodes()">
+                <input type="number" id="episodeNumber" placeholder="Episode" min="1" onchange="searchSeries()">
+                <button onclick="searchSeries()">Search</button>
+                <div id="suggestions"></div>
+            </div>
+        </section>
+        <div class="error" id="errorMessage"></div>
+        <section id="streams">
+            <h2>Streaming Options</h2>
+            <div id="iframeContainer">
+                <div class="loading" id="loading"></div>
+                <iframe id="myIframe" src="" style="width: 100%; height: 600px; border-radius: 8px; border: none;" allowfullscreen></iframe>
+                <div class="stream-options" id="serverButtons">
+                    <div class="stream-option" id="server1" onclick="selectServer('server1')">2Embed</div>
+                    <div class="stream-option" id="server2" onclick="selectServer('server2')">Vidsrc</div>
+                    <div class="stream-option" id="server3" onclick="selectServer('server3')">Autoembed</div>
+                    <div class="stream-option" id="server4" onclick="selectServer('server4')">Vidsrc.icu</div>
+                    <div class="stream-option" id="server5" onclick="selectServer('server5')">Superembed</div>
+                    <!-- <div class="stream-option" id="streamtape" onclick="selectServer('streamtape')">Streamtape</div>
+                    <div class="stream-option" id="vidcloud" onclick="selectServer('vidcloud')">Vidcloud</div>
+                    <div class="stream-option" id="mixdrop" onclick="selectServer('mixdrop')">Mixdrop</div>
+                    <div class="stream-option" id="upcloud" onclick="selectServer('upcloud')">Upcloud</div>
+                    <div class="stream-option" id="doodstream" onclick="selectServer('doodstream')">Doodstream</div>
+                    <div class="stream-option" id="filemoon" onclick="selectServer('filemoon')">Filemoon</div>
+                    <div class="stream-option" id="vidplay" onclick="selectServer('vidplay')">Vidplay</div>
+                    <div class="stream-option" id="vidstream" onclick="selectServer('vidstream')">Vidstream</div> -->
+                </div>
+            </div>
+        </section>
     </div>
-    <div class="error" id="errorMessage"></div>
+    <footer>
+        <p>© 2025 TV Series Search and Embed. All rights reserved.</p>
+    </footer>
 
-    <!-- Div to display the poster -->
-    <div id="iframeContainer">
-        <!-- <div id="myPoster" class="poster" style="background-image: url('');"></div> -->
-        <iframe id="myIframe" src="" style="width: 90%; height: 600px;" frameborder="2" referrerpolicy="origin" allowfullscreen></iframe>
-        <ul>
-            <div id="serverButtons">
-            <button class="server-button" id="server1Button" onclick="selectServer('server1')">2Embed</button>
-            <button class="server-button" id="server2Button" onclick="selectServer('server2')">Vidsrc</button>
-            <button class="server-button" id="server3Button" onclick="selectServer('server3')">autoembed</button>
-            <button class="server-button" id="server4Button" onclick="selectServer('server4')">vidsrcicu</button>
-            <button class="server-button" id="server5Button" onclick="selectServer('server5')">Superembed</button>
-        </div>
-        </ul>
-    </div>
-    
     <script>
-        // Your OMDb API key
         const apiKey = "6829d8f4";
-        let selectedServer = 'server1'; // Default server
-        let suggestionTimeout; // Variable to hold the timeout ID
-        // const episodeNumber = 1
+        let selectedServer = 'server4';
+        let suggestionTimeout;
+        let seriesCache = new Map();
 
-        // Function to fetch TV series suggestions based on partial input
-        function autoSuggest() {
-    clearTimeout(suggestionTimeout); // Clear the previous timeout
-
-    suggestionTimeout = setTimeout(() => {
-        const title = document.getElementById("seriesTitle").value.trim();
-        const suggestionsBox = document.getElementById("suggestions");
-
-        if (title.length < 3) {
-            suggestionsBox.innerHTML = ""; // Clear suggestions if input is too short
-            return;
+        function toggleLoading(show) {
+            document.getElementById('loading').style.display = show ? 'block' : 'none';
         }
 
-        const url = `https://www.omdbapi.com/?s=${encodeURIComponent(title)}&type=series&apikey=${apiKey}`;
+        function autoSuggest() {
+            clearTimeout(suggestionTimeout);
+            toggleLoading(true);
 
-        fetch(url)
-            .then(response => response.json())
-            .then(data => {
-                if (data.Response === "True") {
-                    suggestionsBox.innerHTML = ""; // Clear previous suggestions
-                    data.Search.forEach(series => {
-                        if (series.Title.toLowerCase().includes(title.toLowerCase())) {
-                            const suggestion = document.createElement("div");
-                            suggestion.style.display = "flex"; // Use flexbox for layout
-                            suggestion.style.alignItems = "center"; // Center items vertically
-                            suggestion.style.cursor = "pointer"; // Change cursor on hover
+            suggestionTimeout = setTimeout(async () => {
+                const title = document.getElementById("seriesTitle").value.trim();
+                const suggestionsBox = document.getElementById("suggestions");
 
-                            // Create an image element for the poster
-                            const posterImg = document.createElement("img");
-                            posterImg.src = series.Poster; // Get the poster URL
-                            posterImg.alt = series.Title; // Set alt text
-                            posterImg.style.width = "50px"; // Set width for poster
-                            posterImg.style.height = "auto"; // Maintain aspect ratio
-                            posterImg.style.marginRight = "10px"; // Add some space between image and text
+                if (title.length < 3) {
+                    suggestionsBox.innerHTML = "";
+                    toggleLoading(false);
+                    return;
+                }
 
-                            // Create a text element for the suggestion
-                            const suggestionText = document.createElement("span");
-                            suggestionText.textContent = `${series.Title} (${series.Year})`;
+                if (seriesCache.has(title)) {
+                    displaySuggestions(seriesCache.get(title));
+                    toggleLoading(false);
+                    return;
+                }
 
-                            // Append poster and text to the suggestion div
-                            suggestion.appendChild(posterImg);
-                            suggestion.appendChild(suggestionText);
-
-                            // Set the click event for the suggestion
-                            suggestion.onclick = () => selectSuggestion(series);
-                            suggestionsBox.appendChild(suggestion);
-                        }
-                    });
-                    if (suggestionsBox.innerHTML === "") {
+                try {
+                    const response = await fetch(`https://www.omdbapi.com/?s=${encodeURIComponent(title)}&type=series&apikey=${apiKey}`);
+                    const data = await response.json();
+                    if (data.Response === "True") {
+                        seriesCache.set(title, data.Search);
+                        displaySuggestions(data.Search);
+                    } else {
                         suggestionsBox.innerHTML = "<div>No suggestions found.</div>";
                     }
-                } else {
-                    suggestionsBox.innerHTML = "<div>No suggestions found.</div>";
+                } catch (error) {
+                    console.error("Error fetching suggestions:", error);
+                    suggestionsBox.innerHTML = "<div>Error fetching suggestions</div>";
+                } finally {
+                    toggleLoading(false);
                 }
-            })
-            .catch(error => {
-                console.error("Error fetching suggestions from OMDb API:", error);
+            }, 600);
+        }
+
+        function displaySuggestions(seriesList) {
+            const suggestionsBox = document.getElementById("suggestions");
+            suggestionsBox.innerHTML = "";
+            const title = document.getElementById("seriesTitle").value.trim().toLowerCase();
+
+            seriesList.forEach(series => {
+                if (series.Title.toLowerCase().includes(title)) {
+                    const div = document.createElement("div");
+                    div.innerHTML = `
+                        <img src="${series.Poster === 'N/A' ? 'placeholder.jpg' : series.Poster}" 
+                             alt="${series.Title}" 
+                             style="width: 50px; height: auto; margin-right: 10px;">
+                        <span>${series.Title} (${series.Year})</span>
+                    `;
+                    div.style.display = "flex";
+                    div.style.alignItems = "center";
+                    div.onclick = () => selectSuggestion(series);
+                    suggestionsBox.appendChild(div);
+                }
             });
-    }, 1000); // 1000 ms timeout
-}
-        // Function to select a suggestion and fill the input box
-        function selectSuggestion(series) {
-            if (typeof series === 'object' && series !== null && series.Title && series.Poster) {
-                document.getElementById("seriesTitle").value = series.Title;
-                document.getElementById("suggestions").innerHTML = ""; // Clear suggestions
-                document.getElementById("myPoster").style.backgroundImage = `url(${series.Poster})`; // Set the background image
-                fetchMaxSeasons(series.Title); // Fetch the maximum number of seasons for the selected series
-            } else {
-                console.error("Invalid series object:", series);
+        }
+
+        async function selectSuggestion(series) {
+            document.getElementById("seriesTitle").value = series.Title;
+            document.getElementById("suggestions").innerHTML = "";
+            await fetchMaxSeasons(series.Title);
+        }
+
+        async function fetchMaxSeasons(title) {
+            toggleLoading(true);
+            try {
+                const response = await fetch(`https://www.omdbapi.com/?t=${encodeURIComponent(title)}&apikey=${apiKey}`);
+                const data = await response.json();
+                if (data.Response === "True") {
+                    const seasonInput = document.getElementById("seasonNumber");
+                    seasonInput.max = data.totalSeasons;
+                    seasonInput.placeholder = `Season (1-${data.totalSeasons})`;
+                    seasonInput.value = "";
+                    document.getElementById("episodeNumber").value = "";
+                }
+            } catch (error) {
+                console.error("Error fetching seasons:", error);
+            } finally {
+                toggleLoading(false);
             }
         }
 
-        // Function to fetch IMDb ID, set the maximum season number, and fetch maximum episodes for the season
-        function fetchMaxSeasons(title) {
-            const url = `https://www.omdbapi.com/?t=${encodeURIComponent(title)}&apikey=${apiKey}`;
-
-            fetch(url)
-                .then(response => response.json())
-                .then(data => {
-                    if (data.Response === "True") {
-                        const maxSeasons = data.totalSeasons;
-                        document.getElementById("seasonNumber").max = maxSeasons;
-                        document.getElementById("seasonNumber").placeholder = `Season (1-${maxSeasons})`;
-                        document.getElementById("seasonNumber").value = ""; // Reset season input
-                        document.getElementById("episodeNumber").value = ""; // Reset episode input
-                    } else {
-                        document.getElementById("seasonNumber").placeholder = "Season";
-                        console.error("Could not retrieve max seasons: ", data.Error);
-                    }
-                })
-                .catch(error => {
-                    console.error("Error fetching data from OMDb API:", error);
-                });
-        }
-
-        // Function to fetch the maximum number of episodes for the selected season
-        function fetchMaxEpisodes() {
+        async function fetchMaxEpisodes() {
             const title = document.getElementById("seriesTitle").value;
             const season = document.getElementById("seasonNumber").value;
+            if (!title || !season) return;
 
-            if (!title || !season) {
-                return;
+            toggleLoading(true);
+            try {
+                const response = await fetch(`https://www.omdbapi.com/?t=${encodeURIComponent(title)}&Season=${season}&apikey=${apiKey}`);
+                const data = await response.json();
+                if (data.Response === "True") {
+                    const episodeInput = document.getElementById("episodeNumber");
+                    episodeInput.max = data.Episodes.length;
+                    episodeInput.placeholder = `Episode (1-${data.Episodes.length})`;
+                }
+            } catch (error) {
+                console.error("Error fetching episodes:", error);
+            } finally {
+                toggleLoading(false);
             }
-
-            const url = `https://www.omdbapi.com/?t=${encodeURIComponent(title)}&Season=${season}&apikey=${apiKey}`;
-
-            fetch(url)
-                .then(response => response.json())
-                .then(data => {
-                    if (data.Response === "True") {
-                        const maxEpisodes = data.Episodes.length;
-                        document.getElementById("episodeNumber").max = maxEpisodes;
-                        document.getElementById("episodeNumber").placeholder = `Episode (1-${maxEpisodes})`;
-                    } else {
-                        console.error("Could not retrieve max episodes: ", data.Error);
-                    }
-                })
-                .catch(error => {
-                    console.error("Error fetching max episodes from OMDb API:", error);
-                });
         }
 
-        // Function to fetch IMDb ID based on the selected TV series title, season, and episode
-        function searchSeries() {
+        async function searchSeries() {
             const title = document.getElementById("seriesTitle").value;
             const season = document.getElementById("seasonNumber").value;
             const episode = document.getElementById("episodeNumber").value;
             const errorMessage = document.getElementById("errorMessage");
+            const iframe = document.getElementById("myIframe");
 
-            if (title === "" || season === "" || episode === "") {
+            if (!title || !season || !episode) {
                 errorMessage.textContent = "Enter a TV series title, season, and episode.";
                 return;
             }
 
-            const url = `https://www.omdbapi.com/?t=${encodeURIComponent(title)}&apikey=${apiKey}`;
-
-            fetch(url)
-                .then(response => response.json())
-                .then(data => {
-                    if (data.Response === "True") {
-                        const imdbId = data.imdbID;
-                        const iframe = document.getElementById("myIframe");
-
-                        // Embed based on the selected server
-                        if (selectedServer === "server1") {
-                            iframe.src = `https://vidsrc.xyz/embed/tv?imdb=${imdbId}&season=${season}&episode=${episode}`;
-                        } else if (selectedServer === "server2") {
-                            iframe.src = 'https://vidsrc.cc/v2/embed/tv/${imdbId}/${season}/${episode}'
-                            // `https://vidsrc.me/embed/${imdbId}/${season}/${episode}`;
-                        } else if (selectedServer === "server3") {
-                            iframe.src = `https://autoembed.co/tv/imdb/${imdbId}-${season}-${episode}`; 
-                        } else if (selectedServer === "server4") {
-                            iframe.src = `https://vidsrc.icu/embed/tv/${imdbId}/${season}/${episode}`; 
-                        } else if (selectedServer === "server5") {
-                            iframe.src = `https://multiembed.mov/?video_id=${imdbId}&s=${season}&e=${episode}`; 
-                        }
-
-                        
-                        errorMessage.textContent = ""; // Clear any previous error message
-                    } else {
-                        document.getElementById("myIframe").src = "about:blank"; // Clear the iframe if there's an error
-                        errorMessage.textContent = "TV series not found: " + data.Error;
-                    }
-                })
-                .catch(error => {
-                    console.error("Error fetching data from OMDb API:", error);
-                    errorMessage.textContent = "An error occurred. Please try again.";
-                });
+            toggleLoading(true);
+            try {
+                const response = await fetch(`https://www.omdbapi.com/?t=${encodeURIComponent(title)}&apikey=${apiKey}`);
+                const data = await response.json();
+                if (data.Response === "True") {
+                    const imdbId = data.imdbID;
+                    iframe.src = getServerUrl(imdbId, season, episode);
+                    errorMessage.textContent = "";
+                } else {
+                    iframe.src = "about:blank";
+                    errorMessage.textContent = "TV series not found: " + data.Error;
+                }
+            } catch (error) {
+                console.error("Error fetching series:", error);
+                errorMessage.textContent = "An error occurred. Please try again.";
+                iframe.src = "about:blank";
+            } finally {
+                toggleLoading(false);
+            }
         }
 
-        // Function to select the server and trigger search
+        function getServerUrl(imdbId, season, episode) {
+            const servers = {
+                server1: `https://vidsrc.xyz/embed/tv?imdb=${imdbId}&season=${season}&episode=${episode}`,
+                server2: `https://vidsrc.cc/v2/embed/tv/${imdbId}/${season}/${episode}`,
+                server3: `https://autoembed.co/tv/imdb/${imdbId}-${season}-${episode}`,
+                server4: `https://vidsrc.icu/embed/tv/${imdbId}/${season}/${episode}`,
+                server5: `https://multiembed.mov/?video_id=${imdbId}&s=${season}&e=${episode}`,
+                streamtape: `https://streamtape.com/e/${imdbId}/${season}/${episode}`,
+                vidcloud: `https://vidcloud.co/embed/${imdbId}/${season}/${episode}`,
+                mixdrop: `https://mixdrop.co/e/${imdbId}/${season}/${episode}`,
+                upcloud: `https://upcloud.pro/embed/${imdbId}/${season}/${episode}`,
+                doodstream: `https://doodstream.com/e/${imdbId}/${season}/${episode}`,
+                filemoon: `https://filemoon.sx/e/${imdbId}/${season}/${episode}`,
+                vidplay: `https://vidplay.co/embed-${imdbId}/${season}/${episode}`,
+                vidstream: `https://vidstream.pro/embed-${imdbId}/${season}/${episode}`
+            };
+            return servers[selectedServer] || servers.server4; // Fallback to server4
+        }
+
         function selectServer(server) {
-            selectedServer = server; // Set the selected server
-            searchSeries(); // Trigger the search
+            selectedServer = server;
+            document.querySelectorAll('.stream-option').forEach(opt => opt.classList.remove('active'));
+            document.getElementById(server).classList.add('active');
+            searchSeries();
         }
 
-        // Automatically load server1 on page load
-        window.onload = function() {
+        window.onload = () => {
             selectServer('server4');
         };
     </script>
-
 </body>
 </html>

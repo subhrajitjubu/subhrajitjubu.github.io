@@ -3,125 +3,259 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!-- <title>Experience - Subhrajit Rath</title> -->
+    <title>Experience - Subhrajit Rath</title>
     <style>
-        body {
-            font-family: Arial, sans-serif;
+        * {
             margin: 0;
             padding: 0;
-            background-color: #f4f4f4;
-            color: #333;
+            box-sizing: border-box;
+            font-family: 'Arial', sans-serif;
         }
-      
+
+        body {
+            background: linear-gradient(135deg, #e2e8f0, #cbd5e0);
+            color: #2d3748;
+            line-height: 1.6;
+        }
+
         nav {
             text-align: center;
             padding: 1rem 0;
-            background-color: #444;
+            background: #4a5568;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
         }
+
         nav a {
-            color: #28d3ca;
-            margin: 0 1rem;
+            color: #63b3ed;
+            margin: 0 1.2rem;
             text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s ease;
         }
-        .container {
-            width: 80%;
-            margin: 2rem auto;
-            background-color: #fff;
-            padding: 2rem;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-        }
-        footer {
-           position:relative; 
-           bottom: 0; 
-            left: 0; 
-            right: 0; 
-            text-align: center;
-            padding: 0.1rem 0;
-            background-color: #333;
+
+        nav a:hover {
             color: #fff;
         }
-       
-        .dropbtn {
-    display: inline-block;
-    text-align: center;
-    padding: 14px 16px;
-    text-decoration: none;
-    }
 
-  
-    .dropdown {
-            display: inline-flex;
-        }
-    .dropdown-content {
-        margin-top:2.5rem ;
-        display: none;
-        position: absolute;
-        background-color: #acc8f3;
-        min-width: 140px;
-        box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
-        z-index: 1;
+        .container {
+            width: 80%;
+            max-width: 900px;
+            margin: 2rem auto;
+            padding: 2rem;
+            position: relative;
         }
 
-.dropdown-content a {
-  color: rgb(81, 79, 201);
-  padding: 12px 16px;
-  text-decoration: none;
-  display: block;
-  text-align: left;
-}
-
-.dropdown-content a:hover {background-color: #f1f1f1;}
-
-.dropdown:hover .dropdown-content {
-  display: block;
-}
-
-
-    li a:hover, .dropdown:hover .dropbtn {
-    background-color: red;
-    }
-
-    li.dropdown {
-    display: inline-block;
-    }
-
-
-     
-
-        p1{
-            font-family: "Times New Roman", Times, serif;
-            font-style: italic;
-            font-weight: bold;
-
-            font-size: 20px;
-
-            color: rgb(13, 14, 13);
-
-
-        }
-        .section-title { margin-top: 20px; }
-        ul { list-style-type: none; padding: 0; }
-        li { margin-bottom: 10px; }
-        .role { font-weight: bold; }
-        .responsibilities { margin-left: 20px; }
         h1 {
             text-align: center;
-            color: #007BFF;
+            color: #2b6cb0;
+            font-family: 'Times New Roman', Times, serif;
+            font-size: 2.5rem;
+            margin-bottom: 2rem;
         }
+
+        .timeline {
+            position: relative;
+        }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: #4299e1;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .timeline-item {
+            display: flex;
+            align-items: center;
+            margin: 2rem 0;
+            position: relative;
+        }
+
+        .timeline-item:nth-child(odd) {
+            flex-direction: row;
+        }
+
+        .timeline-item:nth-child(even) {
+            flex-direction: row-reverse;
+        }
+
+        .timeline-content {
+            width: 45%;
+            position: relative;
+            background: none; /* Remove background from container to avoid white marks */
+        }
+
+        .timeline-marker {
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #4299e1;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            z-index: 1;
+        }
+
+        .timeline-item:nth-child(odd) .timeline-content {
+            margin-right: 50px;
+        }
+
+        .timeline-item:nth-child(even) .timeline-content {
+            margin-left: 50px;
+        }
+
+        .position-label {
+            display: block;
+            background: #fff;
+            padding: 0.8rem 1rem; /* Reduced padding to minimize extra space */
+            border-radius: 6px;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+            cursor: pointer;
+            transition: background 0.3s ease;
+            margin: 0; /* Remove default margins */
+        }
+
+        .position-label:hover {
+            background: #edf2f7;
+        }
+
         h2 {
             color: #0056b3;
-            margin-top: 30px;
+            font-family: 'Times New Roman', Times, serif;
+            font-size: 1.4rem; /* Slightly smaller for compactness */
+            margin: 0; /* Remove default margins */
         }
+
+        /* Hide checkbox */
+        .toggle-details {
+            display: none;
+        }
+
+        .details {
+            display: none;
+            background: #fff;
+            padding: 1.5rem;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+            margin-top: 0.5rem;
+        }
+
+        .toggle-details:checked ~ .details {
+            display: block;
+        }
+
+        p {
+            font-family: 'Times New Roman', Times, serif;
+            font-size: 1rem;
+            color: #4a5568;
+        }
+
         h3 {
             color: #4c30ca;
-            margin-top: 30px;
-        }
-        h5 {
-            font-weight: bold;
             font-family: 'Times New Roman', Times, serif;
-            font-size: 110%;
-            color: #dddddd;
-            margin-top: 1px;
+            font-size: 1.2rem;
+            margin-top: 1rem;
+        }
+
+        h4 {
+            font-family: 'Times New Roman', Times, serif;
+            font-size: 1.1rem;
+            color: #2d3748;
+            margin-top: 0.5rem;
+        }
+
+        ul {
+            list-style-type: none;
+            padding: 0;
+            margin-left: 20px;
+        }
+
+        li {
+            margin-bottom: 0.5rem;
+            position: relative;
+        }
+
+        li:before {
+            content: '•';
+            color: #4299e1;
+            position: absolute;
+            left: -15px;
+        }
+
+        .dropdown {
+            display: inline-flex;
+            position: relative;
+        }
+
+        .dropbtn {
+            padding: 14px 16px;
+            color: #63b3ed;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            top: 100%;
+            background-color: #fff;
+            min-width: 160px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+            border-radius: 8px;
+            z-index: 1;
+        }
+
+        .dropdown-content a {
+            color: #1461e6;
+            padding: 10px 16px;
+            text-decoration: none;
+            display: block;
+            transition: background-color 0.3s ease;
+        }
+
+        .dropdown-content a:hover {
+            background-color: #c2192765;
+        }
+
+        .dropdown:hover .dropdown-content {
+            display: block;
+        }
+
+        .dropdown:hover .dropbtn {
+            color: #fff;
+        }
+
+        footer {  text-align: center; padding: 1.5rem 0; position: relative; bottom: 0; left: 0; right: 0; }
+
+
+        h5 {
+            color: #309bb6;
+            font-family: 'Times New Roman', Times, serif;
+            font-size: 1.1rem; /* Slightly smaller for compactness */
+            margin: 0; /* Remove default margins */
+        }
+        @media (max-width: 768px) {
+            .timeline::before {
+                left: 20px;
+            }
+            .timeline-item {
+                flex-direction: column;
+            }
+            .timeline-content {
+                width: 100%;
+                margin: 1rem 0;
+            }
+            .timeline-marker {
+                left: 20px;
+            }
         }
     </style>
 </head>
@@ -139,20 +273,42 @@
         <div class="dropdown">
             <a href="#" class="dropbtn">Weather forecast</a>
             <div class="dropdown-content">
+                <a href="sw.html">Weather Card</a>
                 <a href="src/weatherchart.html">Weather Chart</a>
                 <a href="srcc/geomap_multiple.html">Weather GeoHEATMap</a>    
+                <a href="AQI.html">AQI HEATMap</a>    
+                <a href="Weather_web.html">Weather websites</a>    
+                <a href="meteogram.html">Meteogram_ others</a>    
+
+
             </div>
         </div>
-      
+        <div class="dropdown">
+            <a href="#" class="dropbtn">Satellite view</a>
+            <div class="dropdown-content">
+                <a href="../mosdac_live.html">Mosdac/ISRO</a>
+                <a href="../gibs.html">GIBS/NASA</a>
+                   
+
+            </div>
+        </div>
+        <div class="dropdown">
+            <a href="#" class="dropbtn">Climatic info.</a>
+            <div class="dropdown-content">
+                <a href="climate\monavg/chloro.html">Monthly statistic</a>
+                <a href="climate/Dailyavg/chloro.html">Daily average</a>    
+            </div>
+        </div>
         <div class="dropdown">
             <a href="#" class="dropbtn">Jobs</a>
             <div class="dropdown-content">
-                <a href="Jobs.html" target="_blank" >MET Jobs</a>
-                <a href="https://www.21centuryweather.org.au/about-us/positions-vacant/" target="_blank" >21st cent AUS MET Jobs</a>
+                <a href="Jobs.html" target="_blank">MET Jobs</a>
+                <a href="https://www.21centuryweather.org.au/about-us/positions-vacant/" target="_blank">21st cent AUS MET Jobs</a>
                 <a href="https://www.tropmet.res.in/Careers" target="_blank">IITM Career</a>
                 <a href="https://vacancies.incois.gov.in/" target="_blank">INCOIS Career</a>
-                <a href=" https://www.niot.res.in/recruitment_details.php/" target="_blank">NIOT Career</a>
-               
+                <a href="https://www.niot.res.in/recruitment_details.php/" target="_blank">NIOT Career</a>
+                <a href="j1.html" target="_blank">Others</a>
+
             </div>
         </div>
         <a href="movies.html">Movies</a>
@@ -160,86 +316,118 @@
     </nav>
 
 
-
     <div class="container">
         <h1>Work Experience</h1>
-        
-        <section>
-            <h2>1) Project Scientist (Duration: Mar 2024 to Present)</h2>
-            <p><strong>Organization:</strong> Indian Institute of Tropical Meteorology, Pune, MH, India</p>
-            <h3>Objective:</h3>
-            <ul>
-                <li>Cloud fraction forecasting using machine learning techniques integrated into global models.</li>
-            </ul>
-            <h3>Data Collection:</h3>
-            <ul>
-                <li>Atmospheric variables (temperature, divergence, geopotential, mixing ratios)</li>
-                <li>Cloud parameters (total cloud cover, cloud liquid water content, cloud droplet number concentration)</li>
-                <li>Historical Cloud fraction data</li>
-            </ul>
-            <h3>Machine Learning Workflow:</h3>
-            <ul>
-                <li><strong>Model:</strong> Convolutional Neural Network (CNN)</li>
-                <li><strong>Input Features:</strong> Atmospheric variables, Cloud Variables</li>
-                <li><strong>Output:</strong> Rainfall intensity (mm/h)</li>
-                <li><strong>Hyperparameters:</strong> Tuned using RESNET, SPC Search</li>
-                <li>Integration into global models</li>
-            </ul>
-        </section>
+        <div class="timeline">
+            <div class="timeline-item">
+                <div class="timeline-marker"></div>
+                <section class="timeline-content">
+                    <input type="checkbox" class="toggle-details" id="details1">
+                    <label for="details1" class="position-label">
+                        <h2>1) Project Scientist (Mar 2024 - Present)</h2>
+                    </label>
+                    <div class="details">
+                        <p><strong>Organization:</strong> Indian Institute of Tropical Meteorology, Pune, MH, India</p>
+                        <h3>Objective:</h3>
+                        <ul>
+                            <li>Cloud fraction forecasting using machine learning techniques integrated into global models.</li>
+                        </ul>
+                        <h3>Data Collection:</h3>
+                        <ul>
+                            <li>Atmospheric variables (temperature, divergence, geopotential, mixing ratios)</li>
+                            <li>Cloud parameters (total cloud cover, cloud liquid water content, cloud droplet number concentration)</li>
+                            <li>Historical Cloud fraction data</li>
+                        </ul>
+                        <h3>Machine Learning Workflow:</h3>
+                        <ul>
+                            <li><strong>Model:</strong> Convolutional Neural Network (CNN)</li>
+                            <li><strong>Input Features:</strong> Atmospheric variables, Cloud Variables</li>
+                            <li><strong>Output:</strong> Rainfall intensity (mm/h)</li>
+                            <li><strong>Hyperparameters:</strong> Tuned using RESNET, SPC Search</li>
+                            <li>Integration into global models</li>
+                        </ul>
+                    </div>
+                </section>
+            </div>
 
-        <section>
-            <h2>2) NCAP Project Experience (Duration: July 2023 to February 2024)</h2>
-            <p><strong>Organization:</strong> National Atmospheric Research Laboratory, ISRO, Tirupati, AP, India</p>
-            <h3>Role: NCAP Project</h3>
-            <h3>Key Contributions:</h3>
-            <h4>Vehicular Emission Campaign Study:</h4>
-            <ul>
-                <li>Vehicular Count & Typology & Emission Intensity Assessment</li>
-            </ul>
-            <h4>Data Science Workflow:</h4>
-            <ul>
-                <li>Data Curation: Cleaned, processed, and formatted campaign data.</li>
-                <li>Data Analysis: Utilised Python to uncover insights from the collected data.</li>
-                <li>Data Visualisation: Created informative, interactive visualisations to communicate findings.</li>
-            </ul>
-            <h4>Meteorological Analysis:</h4>
-            <ul>
-                <li>Location-Specific Analysis: Examined meteorological conditions across the 4 districts.</li>
-                <li>Impact on Air Quality: Investigated the relationship between weather patterns and emission dispersion.</li>
-            </ul>
-            <h4>Project Management:</h4>
-            <ul>
-                <li>Workflow Supervision: Oversaw the NCAP project's workflow, ensuring timely progress and quality deliverables.</li>
-            </ul>
-            <h4>Programming Language: Python</h4>
-        </section>
+            <div class="timeline-item">
+                <div class="timeline-marker"></div>
+                <section class="timeline-content">
+                    <input type="checkbox" class="toggle-details" id="details2">
+                    <label for="details2" class="position-label">
+                        <h2>2) NCAP Project Experience (July 2023 - Feb 2024)</h2>
+                    </label>
+                    <div class="details">
+                        <p><strong>Organization:</strong> National Atmospheric Research Laboratory, ISRO, Tirupati, AP, India</p>
+                        <h3>Role: NCAP Project</h3>
+                        <h3>Key Contributions:</h3>
+                        <h4>Vehicular Emission Campaign Study:</h4>
+                        <ul>
+                            <li>Vehicular Count & Typology & Emission Intensity Assessment</li>
+                        </ul>
+                        <h4>Data Science Workflow:</h4>
+                        <ul>
+                            <li>Data Curation: Cleaned, processed, and formatted campaign data.</li>
+                            <li>Data Analysis: Utilised Python to uncover insights from the collected data.</li>
+                            <li>Data Visualisation: Created informative, interactive visualisations to communicate findings.</li>
+                        </ul>
+                        <h4>Meteorological Analysis:</h4>
+                        <ul>
+                            <li>Location-Specific Analysis: Examined meteorological conditions across the 4 districts.</li>
+                            <li>Impact on Air Quality: Investigated the relationship between weather patterns and emission dispersion.</li>
+                        </ul>
+                        <h4>Project Management:</h4>
+                        <ul>
+                            <li>Workflow Supervision: Oversaw the NCAP project's workflow, ensuring timely progress and quality deliverables.</li>
+                        </ul>
+                        <h4>Programming Language: Python</h4>
+                    </div>
+                </section>
+            </div>
 
-        <section>
-            <h2>3) Senior Research Fellow (Duration: July 2020 to July 2023)</h2>
-            <p><strong>Organization:</strong> National Atmospheric Research Laboratory, ISRO, Tirupati, AP, India</p>
-            <h3>Key Contributions:</h3>
-            <ul>
-                <li>Extracted 3D/4D gridded data sets from satellite, weather stations, and re-analysis sources for weather analysis.</li>
-                <li>Model developments for Weather Parameter Analysis for Cloud Microphysics.</li>
-                <li>Curated HITRAN Molecular Data for radiation models.</li>
-                <li>Implemented Radiative Transfer Modeling and Advective Diffusion Solutions.</li>
-            </ul>
-        </section>
+            <div class="timeline-item">
+                <div class="timeline-marker"></div>
+                <section class="timeline-content">
+                    <input type="checkbox" class="toggle-details" id="details3">
+                    <label for="details3" class="position-label">
+                        <h2>3) Senior Research Fellow (July 2020 - July 2023)</h2>
+                    </label>
+                    <div class="details">
+                        <p><strong>Organization:</strong> National Atmospheric Research Laboratory, ISRO, Tirupati, AP, India</p>
+                        <h3>Key Contributions:</h3>
+                        <ul>
+                            <li>Extracted 3D/4D gridded data sets from satellite, weather stations, and re-analysis sources for weather analysis.</li>
+                            <li>Model developments for Weather Parameter Analysis for Cloud Microphysics.</li>
+                            <li>Curated HITRAN Molecular Data for radiation models.</li>
+                            <li>Implemented Radiative Transfer Modeling and Advective Diffusion Solutions.</li>
+                        </ul>
+                    </div>
+                </section>
+            </div>
 
-        <section>
-            <h2>4) Junior Research Fellow (Duration: July 2018 to July 2020)</h2>
-            <p><strong>Organization:</strong> National Atmospheric Research Laboratory, ISRO, Tirupati, AP, India</p>
-            <h3>Key Contributions:</h3>
-            <ul>
-                <li>Analyzed Radiational and Microphysics Schemes (e.g., RRTMG, Morrison).</li>
-                <li>Formulated methodology for evaluating radiational impact on microphysical processes.</li>
-                <li>Developed numerical techniques for solving radiative transfer and microphysics equations.</li>
-            </ul>
-        </section>
+            <div class="timeline-item">
+                <div class="timeline-marker"></div>
+                <section class="timeline-content">
+                    <input type="checkbox" class="toggle-details" id="details4">
+                    <label for="details4" class="position-label">
+                        <h2>4) Junior Research Fellow (July 2018 - July 2020)</h2>
+                    </label>
+                    <div class="details">
+                        <p><strong>Organization:</strong> National Atmospheric Research Laboratory, ISRO, Tirupati, AP, India</p>
+                        <h3>Key Contributions:</h3>
+                        <ul>
+                            <li>Analyzed Radiational and Microphysics Schemes (e.g., RRTMG, Morrison).</li>
+                            <li>Formulated methodology for evaluating radiational impact on microphysical processes.</li>
+                            <li>Developed numerical techniques for solving radiative transfer and microphysics equations.</li>
+                        </ul>
+                    </div>
+                </section>
+            </div>
+        </div>
     </div>
 
     <footer>
-        <h5>&copy; 2024 Subhrajit Rath - Personal Blog</h5>
+        <h5>© 2024 Subhrajit Rath - Personal Blog</h5>
     </footer>
 </body>
 </html>
