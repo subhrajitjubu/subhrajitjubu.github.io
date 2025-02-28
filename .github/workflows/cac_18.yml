@@ -40,12 +40,31 @@ jobs:
           source venv/bin/activate
           
           ipython -c "%run src/singlelevel-Updated.ipynb"
+          mv *.json src/
           rm atms.grib2*
-      - name: Commit and push changes
+
+      - name: Compress JSON files
+        run: |
+          tar -czvf json_files.tar.gz src/*.json
+
+      - name: Clean up original JSON files
+        run: |
+          rm src/*.json  # Delete the original JSON files
+
+      - name: Commit and push compressed files
         run: |
           git config --global user.name "subhrajitjubu"
           git config --global user.email "66462700+subhrajitjubu@users.noreply.github.com"
-          mv  *.json src/
-          git add src/*.json
-          git commit -m "Update files created by Jupyter Notebook"
-          git push origin main
+          git pull origin main
+          git add json_files.tar.gz
+          if [ -n "$(git status --porcelain)" ]; then
+            git commit -m "Update compressed JSON files"
+            git push origin main
+          else
+            echo "No changes to commit."
+          fi
+
+      - name: Uncompress JSON files (optional)
+        run: |
+          tar -xzvf json_files.tar.gz  src/
+          rm json_files.tar.gz
