@@ -2,193 +2,208 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=0.50">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Model Image Display</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
     <style>
         body {
+            font-family: 'Roboto', Arial, sans-serif;
             margin: 0;
-            height: 90vh;
-            font-family: Arial, sans-serif;
+            padding: 0;
+            background: linear-gradient(135deg, #bee3f8, #2d3748); /* Initial gradient */
+            color: #2d3748;
+            padding-bottom: 60px;
+            transition: background 1s ease; /* Smooth transition for gradient changes */
+        }
+        header {
+            background: linear-gradient(135deg, #3182ce, #2b6cb0);
+            color: #fff;
+            padding: 0.01rem;
+            text-align: center;
+        }
+        nav {
+            background: #4a5568;
+            padding: 1rem 0;
+            text-align: center;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        nav a {
+            color: #63b3ed;
+            margin: 0 1.2rem;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+        nav a:hover {
+            color: #fff;
+        }
+        .dropdown {
+            display: inline-flex;
+            position: relative;
         }
 
-        /* Container to hold the menu and image side by side */
+        .dropbtn {
+            padding: 14px 16px;
+            color: #63b3ed;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            top: 100%;
+            background-color: #fff;
+            min-width: 160px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+            border-radius: 8px;
+            z-index: 1;
+        }
+
+        .dropdown-content a {
+            color: #1461e6;
+            padding: 10px 16px;
+            text-decoration: none;
+            display: block;
+            transition: background-color 0.3s ease;
+        }
+
+        .dropdown-content a:hover {
+            background-color: #c2192765;
+        }
+
+        .dropdown:hover .dropdown-content {
+            display: block;
+        }
+
+        .dropdown:hover .dropbtn {
+            color: #fff;
+        }
+
         .container {
             display: flex;
             justify-content: space-between;
-            padding: 20px;
+            align-items: flex-start;
+            max-width: 1200px;
+            margin: 2rem auto;
+            gap: 20px;
         }
-
-        /* Menu styling */
         .menu {
-            display: flex;
-            flex-direction: column;
-            width: 30%;
-            padding: 0.1rem;
-            background-color: #24bd82;
-            box-shadow: 0 0 10px rgba(218, 9, 9, 0.1);
-            /* margin-right: 20px;
-            margin-bottom: 10px; */
-            margin: 1rem;
+            width: 25%;
+            background-color: #fff;
+            padding: 1rem;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            position: sticky;
+            top: 80px;
         }
-
-        /* Dropdowns inside the menu */
+        .menu label {
+            font-weight: 500;
+            margin-bottom: 5px;
+            display: block;
+        }
         .menu select {
-            margin: 10px 0;
-            padding: 5px;
+            width: 100%;
+            padding: 10px;
             font-size: 1rem;
+            border: 1px solid #cbd5e0;
+            border-radius: 5px;
+            background-color: #fff;
+            color: #2d3748;
+            cursor: pointer;
+            transition: border-color 0.3s ease;
         }
-
-        /* Image container styling */
+        .menu select:focus {
+            outline: none;
+            border-color: #4299e1;
+        }
+        #tabContainer {
+            margin-top: 15px;
+        }
+        .tab-button {
+            padding: 8px 16px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            background-color: #e2e8f0;
+            border: none;
+            border-radius: 5px;
+            margin: 5px;
+            display: inline-block;
+            transition: all 0.3s ease;
+        }
+        .tab-button:hover {
+            background-color: #4299e1;
+            color: #fff;
+        }
+        .tab-button.active {
+            background-color: #2b6cb0;
+            color: #fff;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
         .image-container {
-    flex-grow: 1; /* Allow the container to grow if needed */
-    display: flex;
-    justify-content: center; /* Center horizontally */
-    align-items: center; /* Center vertically */
-    padding: 20px;
-    border: 2px solid #ccc;
-    border-radius: 70px;
-    box-shadow: 0 4px 8px rgba(136, 77, 77, 0.2);
-    overflow: hidden;
-    margin: 0 auto; /* This will ensure it is centered in the parent container */
-    max-width: 100%; /* Ensure it doesn't overflow the screen */
-}
-
+            width: 70%;
+            background: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            position: relative;
+        }
         .image-container img {
             width: 100%;
             max-width: 600px;
-            height: 100%;
-            max-height: 600px;
             height: auto;
+            border-radius: 8px;
+            transition: transform 0.3s ease;
         }
-
-        .tab {
+        .image-container img:hover {
+            transform: scale(1.02);
+        }
+        .loading {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 1.2rem;
+            color: #4299e1;
             display: none;
         }
-
-        .tab-button {
-            padding: 0.2rem 0.5rem;
-            font-size: 0.8rem;
-            cursor: pointer;
-            background-color: #f1f1f1;
-            display: inline-block;
-            margin: 0.3rem;
-            border: 1px dotted;
-            border-radius: 3px;
-            transition: 0.3s ease-in-out;
-        }
-        /* Button tab styles */
-        /* .tab-button {
-            padding: 0.2rem 0.5rem;
-            font-size: 1;
-            cursor: pointer;
-            background-color: #f1f1f1;
-            border: 0.1px solid #ccc;
-            margin-right: 10px;
-            align-items: center;
-            border-radius: 1px;
-            transition: background-color 0.3s;
-        } */
-
-        .tab-button:hover {
-            background-color: #655acc;
-        }
-
-        .active {
-            background-color: #960c96;
-        }
-
-        /* Styling for the header, nav, and footer */
-       
-
-        nav {
-            text-align: center;
-            padding: 1rem;
-            background-color: #444;
-        }
-
-        nav a {
-            color: #28d3ca;
-            margin: 0 1rem;
-            text-decoration: none;
-        }
         footer {
-           position:absolute; 
-           bottom: 0; 
-            left: 0; 
-            right: 0; 
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
             text-align: center;
-            padding: 0.1rem 0;
-            background-color: #333;
-            color: #fff;
+            background-color: #2d3748;
+            padding: 1rem 0;
+            color: #a0aec0;
         }
-       
-        .dropbtn {
-    display: inline-block;
-    text-align: center;
-    padding: 14px 16px;
-    text-decoration: none;
-    }
-
-  
-    .dropdown {
-            display: inline-flex;
+        footer p {
+            font-size: 0.9rem;
+            margin: 0;
         }
-    .dropdown-content {
-        margin-top:2.5rem ;
-        display: none;
-        position: absolute;
-        background-color: #acc8f3;
-        min-width: 140px;
-        box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
-        z-index: 1;
-        }
-
-.dropdown-content a {
-  color: rgb(81, 79, 201);
-  padding: 12px 16px;
-  text-decoration: none;
-  display: block;
-  text-align: left;
-}
-
-.dropdown-content a:hover {background-color: #f1f1f1;}
-
-.dropdown:hover .dropdown-content {
-  display: block;
-}
-
-
-    li a:hover, .dropdown:hover .dropbtn {
-    background-color: red;
-    }
-
-    li.dropdown {
-    display: inline-block;
-    }
-
-
-     
-
-        p1{
-            font-family: "Times New Roman", Times, serif;
-            font-style: italic;
-            font-weight: bold;
-
-            font-size: 20px;
-
-            color: rgb(13, 14, 13);
-
-
+        @media (max-width: 768px) {
+            .container {
+                flex-direction: column;
+                margin: 1rem;
+            }
+            .menu, .image-container {
+                width: 100%;
+            }
+            .menu {
+                position: static;
+            }
         }
     </style>
 </head>
 <body>
-    <!-- Header section -->
     <header>
-        <!-- <h1>NWP IMAGES</h1> -->
+        <h1 style="font-size: 20px;">NWP Images</h1>
     </header>
-
-    <!-- Navigation links -->
     <nav>
         <a href="index.html">Home</a>
         <a href="education.html">Education</a>
@@ -199,69 +214,94 @@
         <div class="dropdown">
             <a href="#" class="dropbtn">Weather forecast</a>
             <div class="dropdown-content">
+                <a href="sw.html">Weather Card</a>
                 <a href="src/weatherchart.html">Weather Chart</a>
                 <a href="srcc/geomap_multiple.html">Weather GeoHEATMap</a>    
+                <a href="AQI.html">AQI HEATMap</a>    
+                <a href="Weather_web.html">Weather websites</a>    
+                <a href="meteogram.html">Meteogram_ others</a>    
+
+
             </div>
         </div>
-      
+        <div class="dropdown">
+            <a href="#" class="dropbtn">Satellite view</a>
+            <div class="dropdown-content">
+                <a href="../mosdac_live.html">Mosdac/ISRO</a>
+                <a href="../gibs.html">GIBS/NASA</a>
+                   
+
+            </div>
+        </div>
+        <div class="dropdown">
+            <a href="#" class="dropbtn">Climatic info.</a>
+            <div class="dropdown-content">
+                <a href="climate\monavg/chloro.html">Monthly statistic</a>
+                <a href="climate/Dailyavg/chloro.html">Daily average</a>    
+            </div>
+        </div>
         <div class="dropdown">
             <a href="#" class="dropbtn">Jobs</a>
             <div class="dropdown-content">
-                <a href="Jobs.html" target="_blank" >MET Jobs</a>
-                <a href="https://www.21centuryweather.org.au/about-us/positions-vacant/" target="_blank" >21st cent AUS MET Jobs</a>
+                <a href="Jobs.html" target="_blank">MET Jobs</a>
+                <a href="https://www.21centuryweather.org.au/about-us/positions-vacant/" target="_blank">21st cent AUS MET Jobs</a>
                 <a href="https://www.tropmet.res.in/Careers" target="_blank">IITM Career</a>
                 <a href="https://vacancies.incois.gov.in/" target="_blank">INCOIS Career</a>
-                <a href=" https://www.niot.res.in/recruitment_details.php/" target="_blank">NIOT Career</a>
-               
+                <a href="https://www.niot.res.in/recruitment_details.php/" target="_blank">NIOT Career</a>
+                <a href="j1.html" target="_blank">Others</a>
+
             </div>
         </div>
         <a href="movies.html">Movies</a>
         <a href="series.html">Series</a>
     </nav>
-
-
-
-
-
-    
-
-    <!-- Main content area -->
     <div class="container">
-        <!-- Left side menu -->
         <div class="menu">
             <label for="dataType">Variable:</label>
             <select id="dataType" onchange="updateDataType()">
-                <option value="rf_3hrly" selected>3hrs accumulated Precipitation</option>
-                <option value="rf_6hrly">6hrs accumulated Precipitation</option>
+                <option value="rf_3hrly" selected>3hrs Accumulated Precipitation</option>
+                <option value="rf_6hrly">6hrs Accumulated Precipitation</option>
                 <option value="temp">2m Temp</option>
                 <option value="Wind850">Wind 850hPa</option>
-                <option value="Wind850c">Wind 850hPa conver.</option>
+                <option value="Wind850c">Wind 850hPa Convergence</option>
                 <option value="Wind500">Wind 500hPa</option>
-                <option value="Wind500d">Wind 500hPa divergence</option>
-                <option value="Wind850rain">Wind 850+ rain</option>
-                      
+                <option value="Wind500d">Wind 500hPa Divergence</option>
+                <option value="Wind850rain">Wind 850 + Rain</option>
             </select>
-
-            <!-- Tab buttons will dynamically appear here -->
-            <div id="tabContainer">
-                <!-- Tabs will be generated dynamically -->
-            </div>
+            <div id="tabContainer"></div>
         </div>
-
-        <!-- Right side image display -->
         <div class="image-container">
-            <img id="imageDisplay" src="https://nwp.imd.gov.in/wrf/WRF3km-03-RAIN_india_03.png" alt="3hrs Accumulated Precipitation" />
+            <div class="loading" id="loading">Loading...</div>
+            <img id="imageDisplay" src="https://nwp.imd.gov.in/wrf/WRF3km-03-RAIN_india_03.png" alt="3hrs Accumulated Precipitation">
         </div>
     </div>
-
-    <!-- Footer section -->
     <footer>
-        <p>&copy; 2024 ALL the products shown here are of NCMRWF / IMD property</p>
+        <p>© 2024 All products shown here are property of NCMRWF / IMD</p>
     </footer>
 
     <script>
-        let currentDataType = 'rf_3hrly'; // Default data type
-        let currentInterval = 3; // Default interval for 3hrly
+        let currentDataType = 'rf_3hrly';
+        let currentInterval = 3;
+
+        // Gradient combinations
+        const gradients = [
+            { start: '#bee3f8', end: '#2d3748' }, // Blue to dark gray
+            { start: '#a3bffa', end: '#1a5276' }, // Purple-blue to teal
+            { start: '#81e6d9', end: '#2c7a7b' }, // Teal to dark teal
+            { start: '#fed7e2', end: '#9f7aea' }, // Pink to purple
+            { start: '#fefcbf', end: '#ed8936' }  // Yellow to orange
+        ];
+        let gradientIndex = 0;
+
+        // Function to change gradient
+        function changeGradient() {
+            const { start, end } = gradients[gradientIndex];
+            document.body.style.background = `linear-gradient(135deg, ${start}, ${end})`;
+            gradientIndex = (gradientIndex + 1) % gradients.length; // Cycle through gradients
+        }
+
+        // Change gradient every 5 seconds
+        setInterval(changeGradient, 300000);
 
         function getCurrentDate() {
             const date = new Date();
@@ -274,47 +314,52 @@
         function updateDataType() {
             const dropdown = document.getElementById('dataType');
             currentDataType = dropdown.value;
-            updateTabs(); // Update the tabs based on the selected data type
-            showTab(currentInterval, null); // Show the default tab after update
+            updateTabs();
+            showTab(currentInterval, null);
+            changeGradient(); // Change gradient on data type change
         }
 
-        // Function to dynamically update tabs
         function updateTabs() {
             const tabContainer = document.getElementById('tabContainer');
-            tabContainer.innerHTML = ''; // Clear existing tabs
-
-            // let start = (currentDataType === 'rf_3hrly' || currentDataType === 'Wind850' || currentDataType === 'Wind500') ? 3 : 6;
-            // let end = (currentDataType === 'rf_3hrly' || currentDataType === 'Wind850' || currentDataType === 'Wind500') ? 54 : 108;
-
-
-            // currentInterval = (currentDataType === 'rf_3hrly' || currentDataType === 'Wind850' || currentDataType === 'Wind500') ? 3 : 6;
-            if (currentDataType === 'rf_3hrly' || currentDataType === 'Wind850' || currentDataType === 'Wind500') {
-        start = 3;
-        end = 54;
-        currentInterval = 3;
-    } else if (currentDataType === 'rf_6hrly' || currentDataType === 'Wind850c' || currentDataType === 'Wind500d'  ) {
-        start = 6;
-        end = 108;
-        currentInterval = 6;
-    } else if (currentDataType === 'Wind850rain') { // New condition for 24-hourly data type
-        start = 24;
-        end = 240;
-        currentInterval = 24;
-    }
-
-            // Generate tab buttons
-            for (let i = start; i <= end; i += currentInterval) {
+            tabContainer.innerHTML = '';
+            let { start, end, step } = getIntervals();
+            for (let i = start; i <= end; i += step) {
                 const tabButton = document.createElement('div');
                 tabButton.classList.add('tab-button');
-                tabButton.innerText = String(i).padStart(2, '0');
+                tabButton.innerText = `${i}h`;
                 tabButton.setAttribute('onclick', `showTab(${i}, event)`);
                 tabContainer.appendChild(tabButton);
             }
         }
 
+        function getIntervals() {
+            if (currentDataType === 'rf_3hrly' || currentDataType === 'Wind850' || currentDataType === 'Wind500') {
+                currentInterval = 3;
+                return { start: 3, end: 54, step: 3 };
+            } else if (currentDataType === 'rf_6hrly' || currentDataType === 'Wind850c' || currentDataType === 'Wind500d') {
+                currentInterval = 6;
+                return { start: 6, end: 108, step: 6 };
+            } else if (currentDataType === 'Wind850rain') {
+                currentInterval = 24;
+                return { start: 24, end: 240, step: 24 };
+            } else {
+                currentInterval = 6;
+                return { start: 6, end: 108, step: 6 };
+            }
+        }
+
         function showTab(hours, event) {
             const imageDisplay = document.getElementById('imageDisplay');
+            const loading = document.getElementById('loading');
             const currentDate = getCurrentDate();
+
+            loading.style.display = 'block';
+            imageDisplay.onload = () => loading.style.display = 'none';
+            imageDisplay.onerror = () => {
+                loading.style.display = 'none';
+                imageDisplay.src = 'https://via.placeholder.com/600x400?text=Image+Not+Available';
+                imageDisplay.alt = 'Image not available';
+            };
 
             if (currentDataType === 'rf_3hrly') {
                 const nhr = String(hours).padStart(2, '0');
@@ -337,19 +382,8 @@
                 imageDisplay.src = `https://www.ncmrwf.gov.in/HomePage/Data/mihir/${currentDate}/00/Upper%20Level%20Divergence%20/500/pf${hours}_500div.png`;
             } else if (currentDataType === 'Wind850rain') {
                 const nhr = String(hours).padStart(2, '0');
-                imageDisplay.src = ` https://nwp.imd.gov.in/gfs/00/${hours}hGFS1534w850rf.gif`;
-            } 
-
-
-
-
-            https://nwp.imd.gov.in/gfs/00/24hGFS1534w850rf.gif
-
-
-
-            
-            // https://www.ncmrwf.gov.in/HomePage/Data/mihir/2024-09-26/00/
-            //     https://www.ncmrwf.gov.in/HomePage/Data/mihir/2024-09-26/00/Upper%20Level%20Divergence%20/500/pf84_500div.png
+                imageDisplay.src = `https://nwp.imd.gov.in/gfs/00/${hours}hGFS1534w850rf.gif`;
+            }
 
             if (event) {
                 const buttons = document.getElementsByClassName('tab-button');
@@ -357,12 +391,14 @@
                     buttons[i].classList.remove('active');
                 }
                 event.target.classList.add('active');
+                changeGradient(); // Change gradient on tab click
             }
         }
 
         window.onload = function() {
-            updateTabs(); // Initialize the tabs when the page loads
-            showTab(currentInterval, null); // Show the default tab when the page loads
+            updateTabs();
+            showTab(currentInterval, null);
+            changeGradient(); // Initial gradient change
         };
     </script>
 </body>

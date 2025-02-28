@@ -172,9 +172,301 @@
                 width: 100%;
             }
         }
+        nav {
+            text-align: center;
+            padding: 1rem 0;
+            background: #4a5568;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        nav a {
+            color: #63b3ed;
+            margin: 0 1.2rem;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+
+        nav a:hover {
+            color: #fff;
+        }
+
+        .container {
+            width: 80%;
+            max-width: 900px;
+            margin: 2rem auto;
+            padding: 2rem;
+            position: relative;
+        }
+
+        h1 {
+            text-align: center;
+            color: #2b6cb0;
+            font-family: 'Times New Roman', Times, serif;
+            font-size: 2.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .timeline {
+            position: relative;
+        }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: #4299e1;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .timeline-item {
+            display: flex;
+            align-items: center;
+            margin: 2rem 0;
+            position: relative;
+        }
+
+        .timeline-item:nth-child(odd) {
+            flex-direction: row;
+        }
+
+        .timeline-item:nth-child(even) {
+            flex-direction: row-reverse;
+        }
+
+        .timeline-content {
+            width: 45%;
+            position: relative;
+            background: none; /* Remove background from container to avoid white marks */
+        }
+
+        .timeline-marker {
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #4299e1;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            z-index: 1;
+        }
+
+        .timeline-item:nth-child(odd) .timeline-content {
+            margin-right: 50px;
+        }
+
+        .timeline-item:nth-child(even) .timeline-content {
+            margin-left: 50px;
+        }
+
+        .position-label {
+            display: block;
+            background: #fff;
+            padding: 0.8rem 1rem; /* Reduced padding to minimize extra space */
+            border-radius: 6px;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+            cursor: pointer;
+            transition: background 0.3s ease;
+            margin: 0; /* Remove default margins */
+        }
+
+        .position-label:hover {
+            background: #edf2f7;
+        }
+
+        h2 {
+            color: #0056b3;
+            font-family: 'Times New Roman', Times, serif;
+            font-size: 1.4rem; /* Slightly smaller for compactness */
+            margin: 0; /* Remove default margins */
+        }
+
+        /* Hide checkbox */
+        .toggle-details {
+            display: none;
+        }
+
+        .details {
+            display: none;
+            background: #fff;
+            padding: 1.5rem;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+            margin-top: 0.5rem;
+        }
+
+        .toggle-details:checked ~ .details {
+            display: block;
+        }
+
+        p {
+            font-family: 'Times New Roman', Times, serif;
+            font-size: 1rem;
+            color: #4a5568;
+        }
+
+        h3 {
+            color: #4c30ca;
+            font-family: 'Times New Roman', Times, serif;
+            font-size: 1.2rem;
+            margin-top: 1rem;
+        }
+
+        h4 {
+            font-family: 'Times New Roman', Times, serif;
+            font-size: 1.1rem;
+            color: #2d3748;
+            margin-top: 0.5rem;
+        }
+
+        ul {
+            list-style-type: none;
+            padding: 0;
+            margin-left: 20px;
+        }
+
+        li {
+            margin-bottom: 0.5rem;
+            position: relative;
+        }
+
+        li:before {
+            content: '•';
+            color: #4299e1;
+            position: absolute;
+            left: -15px;
+        }
+
+        .dropdown {
+            display: inline-flex;
+            position: relative;
+        }
+
+        .dropbtn {
+            padding: 14px 16px;
+            color: #63b3ed;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            top: 100%;
+            background-color: #fff;
+            min-width: 160px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+            border-radius: 8px;
+            z-index: 1;
+        }
+
+        .dropdown-content a {
+            color: #1461e6;
+            padding: 10px 16px;
+            text-decoration: none;
+            display: block;
+            transition: background-color 0.3s ease;
+        }
+
+        .dropdown-content a:hover {
+            background-color: #c2192765;
+        }
+
+        .dropdown:hover .dropdown-content {
+            display: block;
+        }
+
+        .dropdown:hover .dropbtn {
+            color: #fff;
+        }
+
+        footer {  text-align: center; padding: 1.5rem 0; position: fixed; bottom: 0; left: 0; right: 0; }
+
+
+        h5 {
+            color: #309bb6;
+            font-family: 'Times New Roman', Times, serif;
+            font-size: 1.1rem; /* Slightly smaller for compactness */
+            margin: 0; /* Remove default margins */
+        }
+        @media (max-width: 768px) {
+            .timeline::before {
+                left: 20px;
+            }
+            .timeline-item {
+                flex-direction: column;
+            }
+            .timeline-content {
+                width: 100%;
+                margin: 1rem 0;
+            }
+            .timeline-marker {
+                left: 20px;
+            }
+        }
     </style>
 </head>
 <body>
+    <nav>
+        <a href="index.html">Home</a>
+        <a href="education.html">Education</a>
+        <a href="experience.html">Skills</a>
+        <a href="publications.html">Publications</a>
+        <a href="contact.html">Contact</a>
+        <a href="nwp_imd.html">NWP_IMD</a>
+        <div class="dropdown">
+            <a href="#" class="dropbtn">Weather forecast</a>
+            <div class="dropdown-content">
+                <a href="sw.html">Weather Card</a>
+                <a href="src/weatherchart.html">Weather Chart</a>
+                <a href="srcc/geomap_multiple.html">Weather GeoHEATMap</a>    
+                <a href="AQI.html">AQI HEATMap</a>    
+                <a href="Weather_web.html">Weather websites</a>    
+                <a href="meteogram.html">Meteogram_ others</a>    
+
+
+            </div>
+        </div>
+        <div class="dropdown">
+            <a href="#" class="dropbtn">Satellite view</a>
+            <div class="dropdown-content">
+                <a href="../mosdac_live.html">Mosdac/ISRO</a>
+                <a href="../gibs.html">GIBS/NASA</a>
+                   
+
+            </div>
+        </div>
+        <div class="dropdown">
+            <a href="#" class="dropbtn">Climatic info.</a>
+            <div class="dropdown-content">
+                <a href="climate\monavg/chloro.html">Monthly statistic</a>
+                <a href="climate/Dailyavg/chloro.html">Daily average</a>    
+            </div>
+        </div>
+        <div class="dropdown">
+            <a href="#" class="dropbtn">Jobs</a>
+            <div class="dropdown-content">
+                <a href="Jobs.html" target="_blank">MET Jobs</a>
+                <a href="https://www.21centuryweather.org.au/about-us/positions-vacant/" target="_blank">21st cent AUS MET Jobs</a>
+                <a href="https://www.tropmet.res.in/Careers" target="_blank">IITM Career</a>
+                <a href="https://vacancies.incois.gov.in/" target="_blank">INCOIS Career</a>
+                <a href="https://www.niot.res.in/recruitment_details.php/" target="_blank">NIOT Career</a>
+                <a href="j1.html" target="_blank">Others</a>
+
+            </div>
+        </div>
+        <a href="movies.html">Movies</a>
+        <a href="series.html">Series</a>
+    </nav>
+    
+
     <div class="container">
         <div class="input-section">
             <div class="input-group">
