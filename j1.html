@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Job Listings</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f9;
+      margin: 0;
+      padding: 20px;
+    }
+    h1 {
+      text-align: center;
+      color: #333;
+    }
+    .job-container {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 20px;
+      padding: 20px;
+    }
+    .job-card {
+      background-color: #fff;
+      border-radius: 8px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      padding: 20px;
+      transition: transform 0.3s ease;
+    }
+    .job-card:hover {
+      transform: translateY(-5px);
+    }
+    .job-title {
+      font-size: 1.5em;
+      color: #2c3e50;
+      margin-bottom: 10px;
+    }
+    .job-org {
+      font-size: 1.1em;
+      color: #34495e;
+      margin-bottom: 10px;
+    }
+    .job-location {
+      font-size: 0.9em;
+      color: #7f8c8d;
+      margin-bottom: 10px;
+    }
+    .job-description {
+      font-size: 0.9em;
+      color: #333;
+      margin-bottom: 10px;
+    }
+    .job-link {
+      display: inline-block;
+      background-color: #3498db;
+      color: #fff;
+      padding: 8px 16px;
+      border-radius: 4px;
+      text-decoration: none;
+      font-size: 0.9em;
+    }
+    .job-link:hover {
+      background-color: #2980b9;
+    }
+    .footer {
+            background: rgba(20, 59, 44, 0.18);
+            color: #f1f1f1;
+            text-align: center;
+            padding: 10px;
+            font-size: 16px;
+        }
+        nav {
+            background: #4a5568;
+            padding: 0.5rem 0;
+            text-align: center;
+            position: relative;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        nav a {
+            color: #63b3ed;
+            margin: 0 1.8rem;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+
+        nav a:hover {
+            color: #fff;
+        }    
+
+
+        .dropdown {
+            display: inline-flex;
+            position: relative;
+        }
+
+        .dropbtn {
+            padding: 14px 16px;
+            color: #63b3ed;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            top: 100%;
+            background-color: #fff;
+            min-width: 160px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+            border-radius: 8px;
+            z-index: 1;
+        }
+
+        .dropdown-content a {
+            color: #1461e6;
+            padding: 10px 16px;
+            text-decoration: none;
+            display: block;
+            transition: background-color 0.3s ease;
+        }
+
+        .dropdown-content a:hover {
+            background-color: #c2192765;
+        }
+
+        .dropdown:hover .dropdown-content {
+            display: block;
+        }
+
+        .dropdown:hover .dropbtn {
+            color: #fff;
+        }
+
+  </style>
+</head>
+<body>
+  <nav>
+    <a href="index.html">Home</a>
+    <a href="education.html">Education</a>
+    <a href="experience.html">Skills</a>
+    <a href="publications.html">Publications</a>
+    <a href="contact.html">Contact</a>
+    <a href="nwp_imd.html">NWP_IMD</a>
+    <div class="dropdown">
+        <a href="#" class="dropbtn">Weather forecast</a>
+        <div class="dropdown-content">
+            <a href="sw.html">Weather Card</a>
+            <a href="src/weatherchart.html">Weather Chart</a>
+            <a href="srcc/geomap_multiple.html">Weather GeoHEATMap</a>    
+            <a href="AQI.html">AQI HEATMap</a>    
+            <a href="Weather_web.html">Weather websites</a>    
+            <a href="meteogram.html">Meteogram_ others</a>    
+
+
+        </div>
+    </div>
+    <div class="dropdown">
+        <a href="#" class="dropbtn">Satellite view</a>
+        <div class="dropdown-content">
+            <a href="mosdac_live.html">Mosdac/ISRO</a>
+            <a href="gibs.html">GIBS/NASA</a>
+               
+
+        </div>
+    </div>
+    <div class="dropdown">
+        <a href="#" class="dropbtn">Climatic info.</a>
+        <div class="dropdown-content">
+            <a href="climate\monavg/chloro.html">Monthly statistic</a>
+            <a href="climate/Dailyavg/chloro.html">Daily average</a>    
+        </div>
+    </div>
+    <div class="dropdown">
+        <a href="#" class="dropbtn">Jobs</a>
+        <div class="dropdown-content">
+            <a href="Jobs.html" target="_blank">MET Jobs</a>
+            <a href="https://www.21centuryweather.org.au/about-us/positions-vacant/" target="_blank">21st cent AUS MET Jobs</a>
+            <a href="https://www.tropmet.res.in/Careers" target="_blank">IITM Career</a>
+            <a href="https://vacancies.incois.gov.in/" target="_blank">INCOIS Career</a>
+            <a href="https://www.niot.res.in/recruitment_details.php/" target="_blank">NIOT Career</a>
+            <a href="j1.html" target="_blank">Others</a>
+
+        </div>
+    </div>
+    <a href="movies.html">Movies</a>
+    <a href="series.html">Series</a>
+</nav>
+
+  <h1>Job Listings</h1>
+  <div class="job-container" id="job-container"></div>
+
+  <script>
+    const jobs = [
+      // Climate & Atmospheric Science Roles
+      {
+        title: "Climate Scientist",
+        organization: "National Center for Atmospheric Research (NCAR)",
+        location: "Boulder, Colorado, USA",
+        description: "Research climate variability, extreme weather events, and long-term climate projections.",
+        link: "https://www.ucar.edu/opportunities/careers"
+      },
+      {
+        title: "Atmospheric Scientist",
+        organization: "European Centre for Medium-Range Weather Forecasts (ECMWF)",
+        location: "Reading, UK",
+        description: "Study weather patterns, cloud microphysics, and radiative transfer.",
+        link: "https://www.ecmwf.int/en/about/jobs"
+      },
+      {
+        title: "Meteorologist (Research/Operational)",
+        organization: "Indian Meteorological Department (IMD)",
+        location: "New Delhi, India",
+        description: "Analyze weather models like WRF and MMCFS-v2 to improve forecasting.",
+        link: "https://mausam.imd.gov.in/"
+      },
+      {
+        title: "Environmental Scientist",
+        organization: "World Resources Institute (WRI)",
+        location: "Washington, D.C., USA",
+        description: "Work on air quality, aerosols, and climate change mitigation strategies.",
+        link: "https://www.wri.org/careers"
+      },
+      {
+        title: "Monsoon Specialist",
+        organization: "Indian Institute of Tropical Meteorology (IITM)",
+        location: "Pune, India",
+        description: "Study monsoon patterns in India and their impact on agriculture and water resources.",
+        link: "https://www.tropmet.res.in/"
+      },
+
+      // Data & Computational Science Roles
+      {
+        title: "HPC Research Scientist (Climate Modeling)",
+        organization: "Lawrence Berkeley National Laboratory",
+        location: "Berkeley, California, USA",
+        description: "Optimize climate models using HPC environments like Slurm.",
+        link: "https://jobs.lbl.gov/"
+      },
+      {
+        title: "Computational Climate Modeler",
+        organization: "Max Planck Institute for Meteorology",
+        location: "Hamburg, Germany",
+        description: "Develop and optimize numerical models for weather and climate simulations.",
+        link: "https://www.mpimet.mpg.de/en/career/jobs/"
+      },
+      {
+        title: "Geospatial Data Scientist",
+        organization: "Google Earth Engine",
+        location: "Remote",
+        description: "Use GIS, remote sensing, and Python (Cartopy, OpenCV) for environmental applications.",
+        link: "https://careers.google.com/"
+      },
+      {
+        title: "Machine Learning Scientist (Environmental Applications)",
+        organization: "ClimateAI",
+        location: "San Francisco, California, USA",
+        description: "Apply ML to climate predictions, air quality forecasting, and extreme weather detection.",
+        link: "https://climate.ai/careers"
+      },
+      {
+        title: "Data Engineer (Climate/Weather Data)",
+        organization: "The Weather Company (IBM)",
+        location: "Atlanta, Georgia, USA",
+        description: "Manage large-scale datasets from netCDF, xarray, and API sources.",
+        link: "https://www.ibm.com/careers"
+      },
+
+      // Industry & Policy-Oriented Roles
+      {
+        title: "Climate Risk Analyst",
+        organization: "McKinsey & Company",
+        location: "Global",
+        description: "Assess climate risks for businesses, agriculture, and disaster management.",
+        link: "https://www.mckinsey.com/careers"
+      },
+      {
+        title: "Sustainability Consultant",
+        organization: "Deloitte",
+        location: "Global",
+        description: "Work on climate policy, carbon footprints, and renewable energy integration.",
+        link: "https://www2.deloitte.com/global/en/careers.html"
+      },
+      {
+        title: "Environmental Policy Advisor",
+        organization: "United Nations Environment Programme (UNEP)",
+        location: "Nairobi, Kenya",
+        description: "Support government and NGOs in climate adaptation strategies.",
+        link: "https://www.unep.org/about-un-environment/careers"
+      },
+      {
+        title: "Weather & Climate Services Specialist",
+        organization: "AccuWeather",
+        location: "State College, Pennsylvania, USA",
+        description: "Collaborate with organizations like IMD, IITM, or private weather firms.",
+        link: "https://careers.accuweather.com/"
+      },
+
+      // Academia & Research Roles
+      {
+        title: "Postdoctoral Researcher (Climate & Weather Modeling)",
+        organization: "National Oceanic and Atmospheric Administration (NOAA)",
+        location: "Silver Spring, Maryland, USA",
+        description: "Continue research in cloud microphysics, infrared radiation effects, and monsoon dynamics.",
+        link: "https://www.noaa.gov/jobs"
+      },
+      {
+        title: "University Lecturer/Professor",
+        organization: "Indian Institute of Science (IISc)",
+        location: "Bangalore, India",
+        description: "Teach climate science, meteorology, and computational modeling.",
+        link: "https://iisc.ac.in/careers/"
+      },
+      {
+        title: "Research Scientist (National Labs & Institutes)",
+        organization: "Indian Space Research Organisation (ISRO)",
+        location: "Bengaluru, India",
+        description: "Join institutions like IITM, IMD, ISRO, or NCAR for climate research.",
+        link: "https://www.isro.gov.in/careers"
+      }
+    ];
+
+    const jobContainer = document.getElementById('job-container');
+
+    jobs.forEach(job => {
+      const jobCard = document.createElement('div');
+      jobCard.classList.add('job-card');
+
+      jobCard.innerHTML = `
+        <div class="job-title">${job.title}</div>
+        <div class="job-org">${job.organization}</div>
+        <div class="job-location">${job.location}</div>
+        <div class="job-description">${job.description}</div>
+        <a href="${job.link}" class="job-link" target="_blank">Apply Now</a>
+      `;
+
+      jobContainer.appendChild(jobCard);
+    });
+  </script>
+</body>
+</html>

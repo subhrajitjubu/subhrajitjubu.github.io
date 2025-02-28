@@ -1,0 +1,682 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weather Forecast</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --neon-blue: #00f3ff;
+            --neon-purple: #bc13fe;
+            --dark-bg: #0a0a0f;
+        }
+
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            background: linear-gradient(-45deg, #00172e, #0a0a0f, #17001f);
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
+            color: white;
+            min-height: 100vh;
+        }
+
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+            backdrop-filter: blur(10px);
+        }
+
+        .input-section {
+            display: grid;
+            gap: 1.5rem;
+            margin-bottom: 3rem;
+            background: rgba(10, 10, 15, 0.8);
+            padding: 2rem;
+            border-radius: 15px;
+            border: 1px solid var(--neon-blue);
+            box-shadow: 0 0 20px rgba(0, 243, 255, 0.2);
+        }
+
+        .input-group {
+            display: flex;
+            gap: 1rem;
+            position: relative;
+        }
+
+        input {
+            flex: 1;
+            padding: 1rem;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid var(--neon-blue);
+            border-radius: 8px;
+            color: white;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: var(--neon-purple);
+            box-shadow: 0 0 15px rgba(188, 19, 254, 0.3);
+        }
+
+        button {
+            padding: 1rem 2rem;
+            background: linear-gradient(45deg, var(--neon-blue), var(--neon-purple));
+            border: none;
+            border-radius: 8px;
+            color: white;
+            cursor: pointer;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(188, 19, 254, 0.4);
+        }
+
+        .weather-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .weather-card {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 1.5rem;
+            border-radius: 12px;
+            border: 1px solid rgba(0, 243, 255, 0.3);
+            transition: all 0.3s ease;
+            backdrop-filter: blur(5px);
+        }
+
+        .weather-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 243, 255, 0.2);
+        }
+
+        .chart-container {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 20px;
+            border-radius: 10px;
+            height: 400px;
+            margin-top: 2rem;
+        }
+
+        .location-info {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 2rem;
+            border: 1px solid var(--neon-purple);
+        }
+
+        .location-info h2 {
+            margin: 0 0 0.5rem 0;
+            color: var(--neon-blue);
+        }
+
+        .suggestions-dropdown {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: rgba(10, 10, 15, 0.9);
+            border: 1px solid var(--neon-blue);
+            border-radius: 8px;
+            max-height: 200px;
+            overflow-y: auto;
+            z-index: 1000;
+            margin-top: 0.5rem;
+            display: none;
+        }
+
+        .suggestions-dropdown div {
+            padding: 0.75rem;
+            cursor: pointer;
+            color: white;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            transition: background 0.3s ease;
+        }
+
+        .suggestions-dropdown div:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .suggestions-dropdown div:last-child {
+            border-bottom: none;
+        }
+
+        @media (max-width: 768px) {
+            .input-group {
+                flex-direction: column;
+            }
+
+            button {
+                width: 100%;
+            }
+        }
+        nav {
+            text-align: center;
+            padding: 1rem 0;
+            background: #4a5568;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        nav a {
+            color: #63b3ed;
+            margin: 0 1.2rem;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+
+        nav a:hover {
+            color: #fff;
+        }
+
+        .container {
+            width: 80%;
+            max-width: 900px;
+            margin: 2rem auto;
+            padding: 2rem;
+            position: relative;
+        }
+
+        h1 {
+            text-align: center;
+            color: #2b6cb0;
+            font-family: 'Times New Roman', Times, serif;
+            font-size: 2.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .timeline {
+            position: relative;
+        }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: #4299e1;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .timeline-item {
+            display: flex;
+            align-items: center;
+            margin: 2rem 0;
+            position: relative;
+        }
+
+        .timeline-item:nth-child(odd) {
+            flex-direction: row;
+        }
+
+        .timeline-item:nth-child(even) {
+            flex-direction: row-reverse;
+        }
+
+        .timeline-content {
+            width: 45%;
+            position: relative;
+            background: none; /* Remove background from container to avoid white marks */
+        }
+
+        .timeline-marker {
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #4299e1;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            z-index: 1;
+        }
+
+        .timeline-item:nth-child(odd) .timeline-content {
+            margin-right: 50px;
+        }
+
+        .timeline-item:nth-child(even) .timeline-content {
+            margin-left: 50px;
+        }
+
+        .position-label {
+            display: block;
+            background: #fff;
+            padding: 0.8rem 1rem; /* Reduced padding to minimize extra space */
+            border-radius: 6px;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+            cursor: pointer;
+            transition: background 0.3s ease;
+            margin: 0; /* Remove default margins */
+        }
+
+        .position-label:hover {
+            background: #edf2f7;
+        }
+
+        h2 {
+            color: #0056b3;
+            font-family: 'Times New Roman', Times, serif;
+            font-size: 1.4rem; /* Slightly smaller for compactness */
+            margin: 0; /* Remove default margins */
+        }
+
+        /* Hide checkbox */
+        .toggle-details {
+            display: none;
+        }
+
+        .details {
+            display: none;
+            background: #fff;
+            padding: 1.5rem;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+            margin-top: 0.5rem;
+        }
+
+        .toggle-details:checked ~ .details {
+            display: block;
+        }
+
+        p {
+            font-family: 'Times New Roman', Times, serif;
+            font-size: 1rem;
+            color: #4a5568;
+        }
+
+        h3 {
+            color: #4c30ca;
+            font-family: 'Times New Roman', Times, serif;
+            font-size: 1.2rem;
+            margin-top: 1rem;
+        }
+
+        h4 {
+            font-family: 'Times New Roman', Times, serif;
+            font-size: 1.1rem;
+            color: #2d3748;
+            margin-top: 0.5rem;
+        }
+
+        ul {
+            list-style-type: none;
+            padding: 0;
+            margin-left: 20px;
+        }
+
+        li {
+            margin-bottom: 0.5rem;
+            position: relative;
+        }
+
+        li:before {
+            content: '•';
+            color: #4299e1;
+            position: absolute;
+            left: -15px;
+        }
+
+        .dropdown {
+            display: inline-flex;
+            position: relative;
+        }
+
+        .dropbtn {
+            padding: 14px 16px;
+            color: #63b3ed;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            top: 100%;
+            background-color: #fff;
+            min-width: 160px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+            border-radius: 8px;
+            z-index: 1;
+        }
+
+        .dropdown-content a {
+            color: #1461e6;
+            padding: 10px 16px;
+            text-decoration: none;
+            display: block;
+            transition: background-color 0.3s ease;
+        }
+
+        .dropdown-content a:hover {
+            background-color: #c2192765;
+        }
+
+        .dropdown:hover .dropdown-content {
+            display: block;
+        }
+
+        .dropdown:hover .dropbtn {
+            color: #fff;
+        }
+
+        footer {  text-align: center; padding: 1.5rem 0; position: fixed; bottom: 0; left: 0; right: 0; }
+
+
+        h5 {
+            color: #309bb6;
+            font-family: 'Times New Roman', Times, serif;
+            font-size: 1.1rem; /* Slightly smaller for compactness */
+            margin: 0; /* Remove default margins */
+        }
+        @media (max-width: 768px) {
+            .timeline::before {
+                left: 20px;
+            }
+            .timeline-item {
+                flex-direction: column;
+            }
+            .timeline-content {
+                width: 100%;
+                margin: 1rem 0;
+            }
+            .timeline-marker {
+                left: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <a href="index.html">Home</a>
+        <a href="education.html">Education</a>
+        <a href="experience.html">Skills</a>
+        <a href="publications.html">Publications</a>
+        <a href="contact.html">Contact</a>
+        <a href="nwp_imd.html">NWP_IMD</a>
+        <div class="dropdown">
+            <a href="#" class="dropbtn">Weather forecast</a>
+            <div class="dropdown-content">
+                <a href="sw.html">Weather Card</a>
+                <a href="src/weatherchart.html">Weather Chart</a>
+                <a href="srcc/geomap_multiple.html">Weather GeoHEATMap</a>    
+                <a href="AQI.html">AQI HEATMap</a>    
+                <a href="Weather_web.html">Weather websites</a>    
+                <a href="meteogram.html">Meteogram_ others</a>    
+
+
+            </div>
+        </div>
+        <div class="dropdown">
+            <a href="#" class="dropbtn">Satellite view</a>
+            <div class="dropdown-content">
+                <a href="../mosdac_live.html">Mosdac/ISRO</a>
+                <a href="../gibs.html">GIBS/NASA</a>
+                   
+
+            </div>
+        </div>
+        <div class="dropdown">
+            <a href="#" class="dropbtn">Climatic info.</a>
+            <div class="dropdown-content">
+                <a href="climate\monavg/chloro.html">Monthly statistic</a>
+                <a href="climate/Dailyavg/chloro.html">Daily average</a>    
+            </div>
+        </div>
+        <div class="dropdown">
+            <a href="#" class="dropbtn">Jobs</a>
+            <div class="dropdown-content">
+                <a href="Jobs.html" target="_blank">MET Jobs</a>
+                <a href="https://www.21centuryweather.org.au/about-us/positions-vacant/" target="_blank">21st cent AUS MET Jobs</a>
+                <a href="https://www.tropmet.res.in/Careers" target="_blank">IITM Career</a>
+                <a href="https://vacancies.incois.gov.in/" target="_blank">INCOIS Career</a>
+                <a href="https://www.niot.res.in/recruitment_details.php/" target="_blank">NIOT Career</a>
+                <a href="j1.html" target="_blank">Others</a>
+
+            </div>
+        </div>
+        <a href="movies.html">Movies</a>
+        <a href="series.html">Series</a>
+    </nav>
+    
+
+    <div class="container">
+        <div class="input-section">
+            <div class="input-group">
+                <input type="text" id="location" placeholder="Enter city or address" oninput="fetchLocationSuggestions()">
+                <button onclick="getLocationWeather()"><i class="fas fa-search-location"></i> Search</button>
+                <div id="suggestions" class="suggestions-dropdown"></div>
+            </div>
+            <div class="input-group">
+                <input type="number" id="latitude" step="any" placeholder="Latitude">
+                <input type="number" id="longitude" step="any" placeholder="Longitude">
+                <button onclick="getCoordWeather()"><i class="fas fa-map-marker-alt"></i> Use Coordinates</button>
+            </div>
+        </div>
+
+        <div id="weather-display"></div>
+        <div class="chart-container">
+            <canvas id="weatherChart"></canvas>
+        </div>
+    </div>
+
+    <script>
+        let weatherChart = null;
+        const CORS_PROXY = "https://api.allorigins.win/get?url=";
+
+        async function getLocationWeather() {
+            const location = document.getElementById('location').value;
+            if (!location) return alert('Please enter a location');
+
+            try {
+                const response = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(location)}`);
+                const data = await response.json();
+                if (data.length === 0) return alert('Location not found');
+
+                const { lat, lon, display_name } = data[0];
+                document.getElementById('latitude').value = lat;
+                document.getElementById('longitude').value = lon;
+
+                fetchWeather(lat, lon, display_name);
+            } catch (error) {
+                alert('Error fetching location coordinates');
+            }
+        }
+
+        async function getCoordWeather() {
+            const lat = document.getElementById('latitude').value;
+            const lon = document.getElementById('longitude').value;
+            if (!lat || !lon) return alert('Please enter coordinates');
+
+            try {
+                const response = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}`);
+                const data = await response.json();
+                fetchWeather(lat, lon, data.display_name);
+            } catch (error) {
+                fetchWeather(lat, lon, `Custom Location (${lat}, ${lon})`);
+            }
+        }
+
+        function convertUTCtoIST(utcDate) {
+            const date = new Date(utcDate);
+            return new Date(date.getTime() + (5.5 * 60 * 60 * 1000));
+        }
+
+        async function fetchWeather(lat, lon, locationName) {
+            try {
+                const apiUrl = `https://sweatherapi.vercel.app/timeseries?lat=${lat}&lon=${lon}`;
+                const response = await fetch(CORS_PROXY + encodeURIComponent(apiUrl));
+                const data = await response.json();
+                const weatherData = JSON.parse(data.contents);
+
+                displayWeather(weatherData, lat, lon, locationName);
+                updateChart(weatherData);
+            } catch (error) {
+                alert('Error fetching weather data');
+            }
+        }
+
+        function displayWeather(data, lat, lon, locationName) {
+            const container = document.getElementById('weather-display');
+            container.innerHTML = `
+                <div class="location-info">
+                    <h2>${locationName}</h2>
+                    <p>Coordinates: ${Number(lat).toFixed(4)}°N, ${Number(lon).toFixed(4)}°E</p>
+                </div>
+                <div class="weather-cards">
+                    ${data.timeseries.map(entry => {
+                        const istDate = convertUTCtoIST(entry.time);
+                        return `
+                        <div class="weather-card">
+                            <h3>${istDate.toLocaleString('en-IN', {
+                                timeZone: 'Asia/Kolkata',
+                                weekday: 'short',
+                                day: 'numeric',
+                                month: 'short',
+                                hour: '2-digit',
+                                minute: '2-digit'
+                            })}</h3>
+                            <p><i class="fas fa-thermometer-half"></i> ${(entry.temperature - 273.15).toFixed(1)}°C</p>
+                            <p><i class="fas fa-cloud-rain"></i> ${entry.rainfall} mm</p>
+                        </div>
+                        `}).join('')}
+                </div>
+            `;
+        }
+
+        function updateChart(data) {
+            const ctx = document.getElementById('weatherChart').getContext('2d');
+            if (weatherChart) weatherChart.destroy();
+
+            weatherChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: data.timeseries.map(entry => {
+                        const istDate = convertUTCtoIST(entry.time);
+                        return istDate.toLocaleString('en-IN', {
+                            timeZone: 'Asia/Kolkata',
+                            month: 'short',
+                            day: 'numeric',
+                            hour: '2-digit'
+                        });
+                    }),
+                    datasets: [
+                        {
+                            label: 'Temperature (°C)',
+                            data: data.timeseries.map(entry => (entry.temperature - 273.15).toFixed(1)),
+                            borderColor: '#2196F3',
+                            tension: 0.4,
+                            yAxisID: 'y'
+                        },
+                        {
+                            label: 'Rainfall (mm)',
+                            data: data.timeseries.map(entry => entry.rainfall.toFixed(2)), 
+                            backgroundColor: '#607D8B55',
+                            borderColor: '#607D8B',
+                            tension: 0.4,
+                            type: 'bar',
+                            yAxisID: 'y1'
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            type: 'linear',
+                            display: true,
+                            position: 'left',
+                            title: {
+                                display: true,
+                                text: 'Temperature (°C)'
+                            }
+                        },
+                        y1: {
+                            type: 'linear',
+                            display: true,
+                            position: 'right',
+                            title: {
+                                display: true,
+                                text: 'Rainfall (mm)'
+                            },
+                            grid: {
+                                drawOnChartArea: false
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        let timeoutId;
+
+        async function fetchLocationSuggestions() {
+            const locationInput = document.getElementById('location').value;
+            const suggestionsContainer = document.getElementById('suggestions');
+
+            if (!locationInput) {
+                suggestionsContainer.style.display = 'none';
+                return;
+            }
+
+            clearTimeout(timeoutId);
+            timeoutId = setTimeout(async () => {
+                try {
+                    const response = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(locationInput)}&limit=5`);
+                    const data = await response.json();
+
+                    if (data.length > 0) {
+                        suggestionsContainer.innerHTML = data.map(item => `
+                            <div onclick="selectSuggestion('${item.lat}', '${item.lon}', '${item.display_name.replace(/'/g, "\\'")}')">
+                                ${item.display_name}
+                            </div>
+                        `).join('');
+                        suggestionsContainer.style.display = 'block';
+                    } else {
+                        suggestionsContainer.style.display = 'none';
+                    }
+                } catch (error) {
+                    console.error('Error fetching suggestions:', error);
+                    suggestionsContainer.style.display = 'none';
+                }
+            }, 300);
+        }
+
+        function selectSuggestion(lat, lon, displayName) {
+            document.getElementById('latitude').value = lat;
+            document.getElementById('longitude').value = lon;
+            document.getElementById('location').value = displayName;
+            document.getElementById('suggestions').style.display = 'none';
+            fetchWeather(lat, lon, displayName);
+        }
+    </script>
+</body>
+</html>

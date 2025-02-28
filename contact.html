@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About - Subhrajit Rath</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Arial', sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #e2e8f0, #0d1e30);
+            color: #2d3748;
+            line-height: 1.3;
+}
+
+        header {
+            background: linear-gradient(135deg, #0f97c0, #a1610d);
+            color: #fff;
+            padding: 1.5rem 0;
+            text-align: center;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        nav {
+            background: #4a5568;
+            padding: 1rem 0;
+            text-align: center;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        nav a {
+            color: #63b3ed;
+            margin: 0 1.2rem;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+
+        nav a:hover {
+            color: #fff;
+        }
+
+        .container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-around;
+            align-items: center;
+            max-width: 1200px;
+            margin: 30px auto;
+            padding: 25px;
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        }
+
+        .image-container {
+            flex: 1;
+            min-width: 300px;
+            max-width: 45%;
+            padding: 15px;
+        }
+
+        .image-container img {
+            width: 100%;
+            height: auto;
+            border-radius: 12px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .text-container {
+            flex: 1;
+            min-width: 300px;
+            max-width: 50%;
+            padding: 15px;
+        }
+
+        .dropdown {
+            display: inline-flex;
+            position: relative;
+        }
+
+        .dropbtn {
+            padding: 14px 16px;
+            color: #63b3ed;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            top: 100%;
+            background-color: #fff;
+            min-width: 160px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+            border-radius: 8px;
+            z-index: 1;
+        }
+
+        .dropdown-content a {
+            color: #1461e6;
+            padding: 10px 16px;
+            text-decoration: none;
+            display: block;
+            transition: background-color 0.3s ease;
+        }
+
+        .dropdown-content a:hover {
+            background-color: #c2192765;
+        }
+
+        .dropdown:hover .dropdown-content {
+            display: block;
+        }
+
+        .dropdown:hover .dropbtn {
+            color: #fff;
+        }
+
+        p1 {
+            font-family: 'Georgia', serif;
+            font-style: italic;
+            font-weight: bold;
+            font-size: 1.2rem;
+            color: #1a202c;
+            display: block;
+            margin-top: 10px;
+        }
+
+        .social-links {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-top: 25px;
+        }
+
+        .social-links a {
+            text-decoration: none;
+            color: #4a5568;
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .social-links a:hover {
+            background-color: #4299e1;
+            color: #fff;
+            transform: translateX(5px);
+        }
+
+        footer {  color: #ce1b65; text-align: center; padding: 1.5rem 0; position: fixed; bottom: 0; left: 0; right: 0; }
+
+
+        @media (max-width: 768px) {
+            .container {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .image-container, .text-container {
+                max-width: 100%;
+            }
+
+            nav a {
+                margin: 0 0.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <a href="index.html">Home</a>
+        <a href="education.html">Education</a>
+        <a href="experience.html">Skills</a>
+        <a href="publications.html">Publications</a>
+        <a href="contact.html">Contact</a>
+        <a href="nwp_imd.html">NWP_IMD</a>
+        <div class="dropdown">
+            <a href="#" class="dropbtn">Weather forecast</a>
+            <div class="dropdown-content">
+                <a href="sw.html">Weather Card</a>
+                <a href="src/weatherchart.html">Weather Chart</a>
+                <a href="srcc/geomap_multiple.html">Weather GeoHEATMap</a>    
+                <a href="AQI.html">AQI HEATMap</a>    
+                <a href="Weather_web.html">Weather websites</a>    
+                <a href="meteogram.html">Meteogram_ others</a>    
+
+
+            </div>
+        </div>
+        <div class="dropdown">
+            <a href="#" class="dropbtn">Satellite view</a>
+            <div class="dropdown-content">
+                <a href="../mosdac_live.html">Mosdac/ISRO</a>
+                <a href="../gibs.html">GIBS/NASA</a>
+                   
+
+            </div>
+        </div>
+        <div class="dropdown">
+            <a href="#" class="dropbtn">Climatic info.</a>
+            <div class="dropdown-content">
+                <a href="climate\monavg/chloro.html">Monthly statistic</a>
+                <a href="climate/Dailyavg/chloro.html">Daily average</a>    
+            </div>
+        </div>
+        <div class="dropdown">
+            <a href="#" class="dropbtn">Jobs</a>
+            <div class="dropdown-content">
+                <a href="Jobs.html" target="_blank">MET Jobs</a>
+                <a href="https://www.21centuryweather.org.au/about-us/positions-vacant/" target="_blank">21st cent AUS MET Jobs</a>
+                <a href="https://www.tropmet.res.in/Careers" target="_blank">IITM Career</a>
+                <a href="https://vacancies.incois.gov.in/" target="_blank">INCOIS Career</a>
+                <a href="https://www.niot.res.in/recruitment_details.php/" target="_blank">NIOT Career</a>
+                <a href="j1.html" target="_blank">Others</a>
+
+            </div>
+        </div>
+        <a href="movies.html">Movies</a>
+        <a href="series.html">Series</a>
+    </nav>
+
+    <div class="container">
+        <h1>Contact</h2>
+        <p>Email: subhrajitrath17@gmail.com</p>
+
+        <p>Mob: </p>
+    </div>
+
+    <footer>
+        <p>© 2024 Subhrajit Rath - Personal Blog</p>
+    </footer>
+
+    <script>
+              const gradients = [
+            { start: '#bee3f8', end: '#2d3748' }, // Blue to dark gray
+            { start: '#a3bffa', end: '#1a5276' }, // Purple-blue to teal
+            { start: '#81e6d9', end: '#2c7a7b' }, // Teal to dark teal
+            { start: '#fed7e2', end: '#9f7aea' }, // Pink to purple
+            { start: '#fefcbf', end: '#ed8936' }  // Yellow to orange
+        ];
+        let gradientIndex = 0;
+
+        // Function to change gradient
+        function changeGradient() {
+            const { start, end } = gradients[gradientIndex];
+            document.body.style.background = `linear-gradient(135deg, ${start}, ${end})`;
+            gradientIndex = (gradientIndex + 1) % gradients.length; // Cycle through gradients
+        }
+
+        // Change gradient every 5 seconds
+        setInterval(changeGradient, 5000);
+
+    </script>
+</body>
+</html>

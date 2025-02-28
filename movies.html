@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Movie Search</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #c7d1d8;
+        }
+
+        h1 {
+            color: #333;
+        }
+
+        #searchContainer {
+            margin-bottom: 20px;
+            margin-top: 20px;
+            text-align: left;
+            width: 100%;
+            max-width: 600px;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            font-size: 16px;
+            margin-right: 10px;
+        }
+
+        #iframeContainer {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+            height: 90%;
+        }
+
+        iframe {
+            width: 70%;
+            height: 90vh;
+            border: 2px solid rgba(88, 46, 11, 0.11);
+            margin-top: 20px;
+        }
+
+        .error {
+            color: red;
+            font-size: 14px;
+            margin-top: 10px;
+        }
+
+        #suggestions {
+            border: 1px solid #e7e7e7;
+            max-height: 150px;
+            overflow-y: auto;
+            background-color: navajowhite;
+            position: absolute;
+            width: 100%;
+            z-index: 1000;
+        }
+
+        #suggestions div {
+            padding: 10px;
+            cursor: pointer;
+        }
+
+        #suggestions div:hover {
+            background-color: #10a6d4;
+        }
+
+        .server-button {
+            border: 2px solid rgb(216, 10, 171);
+            padding: 5px 10px;
+            font-size: 14px;
+            color: rgb(34, 148, 44);
+            cursor: pointer;
+            margin: 5px;
+            width: 100px;
+        }
+
+        #serverButtons {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin-top: 10px;
+            max-width: 100%;
+        }
+
+        .footer {
+            background: rgba(20, 59, 44, 0.18);
+            color: #f1f1f1;
+            text-align: center;
+            padding: 10px;
+            font-size: 16px;
+        }
+
+        nav {
+            background: #4a5568;
+            padding: 0.5rem 0;
+            text-align: center;
+            position: relative;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        nav a {
+            color: #63b3ed;
+            margin: 0 1.8rem;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+
+        nav a:hover {
+            color: #fff;
+        }
+
+        .dropdown {
+            display: inline-flex;
+            position: relative;
+        }
+
+        .dropbtn {
+            padding: 14px 16px;
+            color: #63b3ed;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            top: 100%;
+            background-color: #fff;
+            min-width: 160px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+            border-radius: 8px;
+            z-index: 1;
+        }
+
+        .dropdown-content a {
+            color: #1461e6;
+            padding: 10px 16px;
+            text-decoration: none;
+            display: block;
+            transition: background-color 0.3s ease;
+        }
+
+        .dropdown-content a:hover {
+            background-color: #c2192765;
+        }
+
+        .dropdown:hover .dropdown-content {
+            display: block;
+        }
+
+        .dropdown:hover .dropbtn {
+            color: #fff;
+        }
+
+        p1 {
+            font-family: "Times New Roman", Times, serif;
+            font-style: italic;
+            font-weight: bold;
+            font-size: 20px;
+            color: rgb(13, 14, 13);
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <a href="index.html">Home</a>
+        <a href="education.html">Education</a>
+        <a href="experience.html">Skills</a>
+        <a href="publications.html">Publications</a>
+        <a href="contact.html">Contact</a>
+        <a href="nwp_imd.html">NWP_IMD</a>
+        <div class="dropdown">
+            <a href="#" class="dropbtn">Weather forecast</a>
+            <div class="dropdown-content">
+                <a href="sw.html">Weather Card</a>
+                <a href="src/weatherchart.html">Weather Chart</a>
+                <a href="srcc/geomap_multiple.html">Weather GeoHEATMap</a>
+                <a href="AQI.html">AQI HEATMap</a>
+                <a href="Weather_web.html">Weather websites</a>
+                <a href="meteogram.html">Meteogram_ others</a>
+            </div>
+        </div>
+        <div class="dropdown">
+            <a href="#" class="dropbtn">Satellite view</a>
+            <div class="dropdown-content">
+                <a href="mosdac_live.html">Mosdac/ISRO</a>
+                <a href="gibs.html">GIBS/NASA</a>
+            </div>
+        </div>
+        <div class="dropdown">
+            <a href="#" class="dropbtn">Climatic info.</a>
+            <div class="dropdown-content">
+                <a href="climate/monavg/chloro.html">Monthly statistic</a>
+                <a href="climate/Dailyavg/chloro.html">Daily average</a>
+            </div>
+        </div>
+        <div class="dropdown">
+            <a href="#" class="dropbtn">Jobs</a>
+            <div class="dropdown-content">
+                <a href="Jobs.html" target="_blank">MET Jobs</a>
+                <a href="https://www.21centuryweather.org.au/about-us/positions-vacant/" target="_blank">21st cent AUS MET Jobs</a>
+                <a href="https://www.tropmet.res.in/Careers" target="_blank">IITM Career</a>
+                <a href="https://vacancies.incois.gov.in/" target="_blank">INCOIS Career</a>
+                <a href="https://www.niot.res.in/recruitment_details.php/" target="_blank">NIOT Career</a>
+                <a href="j1.html" target="_blank">Others</a>
+            </div>
+        </div>
+        <a href="movies.html">Movies</a>
+        <a href="series.html">Series</a>
+    </nav>
+
+    <div id="searchContainer">
+        <input type="text" id="movieTitle" placeholder="Enter movie title..." oninput="autoSuggest()">
+        <div id="suggestions"></div>
+    </div>
+
+    <div class="error" id="errorMessage"></div>
+
+    <div id="iframeContainer">
+        <iframe id="myIframe" src="" style="width: 90%; height: 600px;" frameborder="2" referrerpolicy="origin" allowfullscreen></iframe>
+    </div>
+
+    <div id="serverButtons">
+        <button class="server-button" id="server1Button" onclick="selectServer('vidbinge')">Vidbinge</button>
+        <button class="server-button" id="server2Button" onclick="selectServer('vidlink')">Vidlink</button>
+        <button class="server-button" id="server3Button" onclick="selectServer('vidsrc_xyz')">Vidsrc.xyz</button>
+        <button class="server-button" id="server4Button" onclick="selectServer('vidsrc_cc')">Vidsrc.cc</button>
+        <button class="server-button" id="server5Button" onclick="selectServer('embed_su')">Embed.su</button>
+        <button class="server-button" id="server6Button" onclick="selectServer('moviesapi')">MoviesAPI</button>
+        <button class="server-button" id="server7Button" onclick="selectServer('smashy')">Smashy</button>
+        <button class="server-button" id="server8Button" onclick="selectServer('vidsrc_pro')">Vidsrc.pro</button>
+        <button class="server-button" id="server9Button" onclick="selectServer('autoembed')">Autoembed</button>
+        <button class="server-button" id="server10Button" onclick="selectServer('multiembed')">Multiembed</button>
+        <button class="server-button" id="server11Button" onclick="selectServer('multiembed_direct')">Multiembed (Direct)</button>
+        <button class="server-button" id="server12Button" onclick="selectServer('2embed')">2Embed</button>
+        <button class="server-button" id="server13Button" onclick="selectServer('frembed')">Frembed</button>
+        <button class="server-button" onclick="selectServer('streamtape')">Streamtape</button>
+        <button class="server-button" onclick="selectServer('vidcloud')">Vidcloud</button>
+        <button class="server-button" onclick="selectServer('mixdrop')">Mixdrop</button>
+        <button class="server-button" onclick="selectServer('upcloud')">Upcloud</button>
+        <button class="server-button" onclick="selectServer('doodstream')">Doodstream</button>
+        <button class="server-button" onclick="selectServer('filemoon')">Filemoon</button>
+        <button class="server-button" onclick="selectServer('vidplay')">Vidplay</button>
+        <button class="server-button" onclick="selectServer('vidstream')">Vidstream</button>
+
+    </div>
+
+    <script>
+        const apiKey = "c06ea2d9";
+        let selectedServer = "vidbinge";
+        let debounceTimeout;
+        let cache = {};
+
+        function autoSuggest() {
+            let title = document.getElementById("movieTitle").value.trim();
+            const suggestionsBox = document.getElementById("suggestions");
+
+            if (title.length < 3) {
+                suggestionsBox.innerHTML = "";
+                return;
+            }
+
+            if (cache[title]) {
+                displaySuggestions(cache[title]);
+                return;
+            }
+
+            clearTimeout(debounceTimeout);
+            debounceTimeout = setTimeout(() => {
+                const url = `https://www.omdbapi.com/?s=${encodeURIComponent(title)}&apikey=${apiKey}`;
+
+                fetch(url)
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.Response === "True") {
+                            cache[title] = data.Search;
+                            displaySuggestions(data.Search);
+                        } else {
+                            suggestionsBox.innerHTML = "<div>No suggestions found.</div>";
+                        }
+                    })
+                    .catch(error => {
+                        console.error("Error fetching suggestions from OMDb API:", error);
+                    });
+            }, 300);
+        }
+
+        function displaySuggestions(suggestions) {
+            const suggestionsBox = document.getElementById("suggestions");
+            suggestionsBox.innerHTML = "";
+            suggestions.sort((a, b) => parseInt(b.Year) - parseInt(a.Year));
+
+            suggestions.forEach(movie => {
+                const suggestion = document.createElement("div");
+                suggestion.style.display = "flex";
+                suggestion.style.alignItems = "center";
+
+                const posterImg = document.createElement("img");
+                posterImg.src = movie.Poster !== "N/A" ? movie.Poster : "placeholder.jpg";
+                posterImg.alt = `${movie.Title} Poster`;
+                posterImg.style.width = "50px";
+                posterImg.style.marginRight = "10px";
+
+                const movieText = document.createElement("span");
+                movieText.textContent = `${movie.Title} (${movie.Year})`;
+
+                suggestion.appendChild(posterImg);
+                suggestion.appendChild(movieText);
+
+                suggestion.onclick = () => selectSuggestion(movie.Title);
+                suggestionsBox.appendChild(suggestion);
+            });
+        }
+
+        function selectSuggestion(title) {
+            document.getElementById("movieTitle").value = title;
+            document.getElementById("suggestions").innerHTML = "";
+            searchMovie();
+        }
+
+        function selectServer(server) {
+    selectedServer = server;
+    searchMovie();
+}
+
+function searchMovie() {
+    const title = document.getElementById("movieTitle").value.trim();
+    const errorMessage = document.getElementById("errorMessage");
+
+    if (title === "") {
+        errorMessage.textContent = "";
+        return;
+    }
+
+    const url = `https://www.omdbapi.com/?t=${encodeURIComponent(title)}&apikey=${apiKey}`;
+
+    fetch(url)
+        .then(response => response.json())
+        .then(data => {
+            if (data.Response === "True") {
+                const imdbId = data.imdbID;
+                const iframe = document.getElementById("myIframe");
+
+                switch (selectedServer) {
+                    case "vidbinge":
+                        iframe.src = `https://vidbinge.dev/embed/movie/${imdbId}`;
+                        break;
+                    case "vidlink":
+                        iframe.src = `https://vidlink.pro/movie/${imdbId}`;
+                        break;
+                    case "vidsrc_xyz":
+                        iframe.src = `https://vidsrc.xyz/embed/movie/${imdbId}`;
+                        break;
+                    case "vidsrc_cc":
+                        iframe.src = `https://vidsrc.cc/v2/embed/movie/${imdbId}`;
+                        break;
+                    case "embed_su":
+                        iframe.src = `https://embed.su/embed/movie/${imdbId}`;
+                        break;
+                    case "moviesapi":
+                        iframe.src = `https://moviesapi.club/movie/${imdbId}`;
+                        break;
+                    case "smashy":
+                        iframe.src = `https://player.smashy.stream/movie/${imdbId}`;
+                        break;
+                    case "vidsrc_pro":
+                        iframe.src = `https://vidsrc.pro/embed/movie/${imdbId}`;
+                        break;
+                    case "autoembed":
+                        iframe.src = `https://autoembed.co/movie/tmdb/${imdbId}`;
+                        break;
+                    case "multiembed":
+                        iframe.src = `https://multiembed.mov/?video_id=${imdbId}`;
+                        break;
+                    case "multiembed_direct":
+                        iframe.src = `https://multiembed.mov/directstream.php?video_id=${imdbId}`;
+                        break;
+                    case "2embed":
+                        iframe.src = `https://www.2embed.cc/embed/${imdbId}`;
+                        break;
+                    case "frembed":
+                        iframe.src = `https://frembed.pro/api/film.php?id=${imdbId}`;
+                        break;
+                    case "streamtape":
+                        iframe.src = `https://streamtape.com/e/${imdbId}`;
+                        break;
+                    case "vidcloud":
+                        iframe.src = `https://vidcloud.co/embed/${imdbId}`;
+                        break;
+                    case "mixdrop":
+                        iframe.src = `https://mixdrop.co/e/${imdbId}`;
+                        break;
+                    case "upcloud":
+                        iframe.src = `https://upcloud.pro/embed/${imdbId}`;
+                        break;
+                    case "doodstream":
+                        iframe.src = `https://doodstream.com/e/${imdbId}`;
+                        break;
+                    case "filemoon":
+                        iframe.src = `https://filemoon.sx/e/${imdbId}`;
+                        break;
+                    case "vidplay":
+                        iframe.src = `https://vidplay.co/embed-${imdbId}.html`;
+                        break;
+                    case "vidstream":
+                        iframe.src = `https://vidstream.pro/embed-${imdbId}.html`;
+                        break;
+                    default:
+                        iframe.src = "";
+                        break;
+                }
+
+                errorMessage.textContent = "";
+            } else {
+                document.getElementById("myIframe").src = "";
+                errorMessage.textContent = "Movie not found: " + data.Error;
+            }
+        })
+        .catch(error => {
+            console.error("Error fetching data from OMDb API:", error);
+            errorMessage.textContent = "An error occurred. Please try again.";
+        });
+}
+
+        window.onload = function() {
+            selectServer('vidbinge');
+        };
+    </script>
+</body>
+</html>
