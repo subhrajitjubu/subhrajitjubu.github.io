@@ -51,7 +51,7 @@ jobs:
           git config --global user.email "66462700+subhrajitjubu@users.noreply.github.com"
           git pull origin main
           mv *.json srcc/
-          git add -u srcc/
+          git add srcc/*.json
           if [ -n "$(git status --porcelain)" ]; then
             git commit -m "Update files created by Jupyter Notebook"
             git push origin main
