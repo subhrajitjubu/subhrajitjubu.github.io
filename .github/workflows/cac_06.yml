@@ -42,7 +42,7 @@ jobs:
       - name: Run Jupyter Notebook
         run: |
           source venv/bin/activate
-          rm src/*.json
+          find src/* -type f -name "*.json" ! -name "IND.json" -exec rm {} \;          
           ipython -c "%run src/singlelevel_06.ipynb"
           rm atms.grib2*
           mv *.json src/
