@@ -49,7 +49,8 @@ jobs:
 
       - name: Clean up original JSON files
         run: |
-          rm src/*.json  # Delete the original JSON files
+          find src/* -type f -name "*.json" ! -name "IND.json" -exec rm {} \;
+
 
       - name: Commit and push compressed files
         run: |
