@@ -1,3 +1,7 @@
+# Ignore zip files
+*.zip
+# Ignore netCDF files
+*.nc
 *grib2
 .index.html
 venv/
