@@ -45,11 +45,16 @@ jobs:
           rm srcc/*.json
           ipython -c "%run srcc/plott.ipynb"
           
+          
       - name: Commit and push changes
         run: |
           git config --global user.name "subhrajitjubu"
           git config --global user.email "66462700+subhrajitjubu@users.noreply.github.com"
           git pull origin main
+          git rm --cached *.zip *.nc
+          git add .gitignore
+          
+
           mv *.json srcc/
           git add srcc/*.json
           if [ -n "$(git status --porcelain)" ]; then
