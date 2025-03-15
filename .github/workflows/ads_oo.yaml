@@ -51,7 +51,7 @@ jobs:
           git config --global user.name "subhrajitjubu"
           git config --global user.email "66462700+subhrajitjubu@users.noreply.github.com"
           git pull origin main
-          git rm --cached *.zip *.nc
+          # git rm --cached *.zip *.nc
           git add .gitignore
           
 
