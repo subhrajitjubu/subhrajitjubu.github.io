@@ -43,7 +43,7 @@ jobs:
         run: |
           source venv/bin/activate
           find srcc -type f -name '*.json' ! -name 'IND.json' -exec rm {} +
-          ipython -c "%run srcc/plott.ipynb"
+          ipython -c "%run srcc/plott_12.ipynb"
           
       - name: Commit and push changes
         run: |
