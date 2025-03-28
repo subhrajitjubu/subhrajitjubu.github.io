@@ -42,7 +42,7 @@ jobs:
       - name: Run Jupyter Notebook
         run: |
           source venv/bin/activate
-          rm srcc/*.json
+          find srcc -type f -name '*.json' ! -name 'IND.json' -exec rm {} +
           ipython -c "%run srcc/plott.ipynb"
           
       - name: Commit and push changes
