@@ -43,7 +43,7 @@ jobs:
         run: |
           source venv/bin/activate
           rm srcc/*.json
-          ipython -c "%run srcc/plott.ipynb"
+          ipython -c "%run srcc/plott_00.ipynb"
           
           
       - name: Commit and push changes
