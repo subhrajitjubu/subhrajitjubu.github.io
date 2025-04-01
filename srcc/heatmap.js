@@ -11,10 +11,27 @@ function daysSince1800ToCalendar(days) {
 }
 
 async function fetchData(dataType) {
-    const response = await fetch(`${dataType}.json`);
-    console.log(dataType);
-    return response.json();
-    
+    try {
+        // Construct the URL
+        const url = `${dataType}.json`;
+        console.log(`Fetching data from: ${url}`);
+
+        // Fetch the data
+        const response = await fetch(url);
+
+        // Check if the response is OK (status code 200-299)
+        if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+
+        // Parse the response as JSON
+        const data = await response.json();
+        return data;
+    } catch (error) {
+        // Log and handle any errors
+        console.error('Error fetching or parsing JSON:', error.message);
+        throw error; // Re-throw the error if needed
+    }
 }
 
 
