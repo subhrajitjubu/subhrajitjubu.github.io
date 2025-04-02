@@ -354,7 +354,7 @@ async function searchLocation(location) {
 
 function fetchAerosolData(lat, lon) {
     const proxy = "https://cors-anywhere.herokuapp.com/";
-    const url = `${proxy}https://sweatherapi.vercel.app/aod?lat=${lat}&lon=${lon}&aod_types=sea,dust,nitrate,sulfate,total`;
+    const url = `https://sweatherapi.vercel.app/aod?lat=${lat}&lon=${lon}&aod_types=sea,dust,nitrate,sulfate,total`;
 
     // const url = `https://sweatherapi.vercel.app/aod?lat=${lat}&lon=${lon}&aod_types=sea,dust,nitrate,sulfate,total`;
     console.log("Fetching data from:", url); // Log the URL
