@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>OpenStreetMap with Google Maps Layers</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    
+    <!-- Leaflet JavaScript -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+    <style>
+        #map {
+            height: 100vh;
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+    <div id="map"></div>
+    <script>
+        // Initialize the map
+        var map = L.map('map').setView([20, 80], 5); // Centered over India
+        
+        // Function to add marker with weather data
+        function addMarker(lat, lon, stationName, id, elevation, start_year, end_year) {
+            var marker = L.marker([lat, lon]).addTo(map);
+            
+            // Create a unique URL for each station
+            var date = new Date().toISOString().split('T')[0];
+            var url = `https://weather.uwyo.edu/upperair/imgs/${date.replace(/-/g, '')}00.${id}.skewt.png`;
+            
+            marker.bindPopup(`Station: ${stationName}<br>
+                            Elevation: ${elevation}m<br>
+                            Period: ${start_year}-${end_year}<br>
+                            <a href="${url}" target="_blank">View weather data</a>`);
+            
+            marker.on('click', function() {
+                window.open(url, '_blank');
+            });
+        }
+        
+        
+        
+        
+        
+        // Read and parse the CSV file
+        var xhr = new XMLHttpRequest();
+        xhr.open('GET', 'https://github.com/subhrajitjubu/api_weather/blob/main/loc.csv', true);
+        xhr.onload = function() {
+            if (xhr.status === 200) {
+                console.log('CSV loaded successfully');
+                
+                // Split the text into lines
+                const lines = xhr.responseText.split('\n');
+                
+                // Process each line (skip header row)
+                for (let i = 1; i < lines.length; i++) {
+                    const line = lines[i].trim();
+                    if (line) { // Skip empty lines
+                        // Handle CSV with proper parsing (accounting for quoted fields with commas)
+                        const fields = line.match(/(".*?"|[^",\s]+)(?=\s*,|\s*$)/g);
+                        
+                        if (fields && fields.length >= 7) {
+                            // Clean fields by removing quotes if present
+                            const cleanedFields = fields.map(field => 
+                                field.startsWith('"') && field.endsWith('"') ? 
+                                field.slice(1, -1) : field
+                            );
+                            
+                            const id = cleanedFields[0];
+                            const lat = parseFloat(cleanedFields[1]);
+                            const lon = parseFloat(cleanedFields[2]);
+                            const elevation = parseInt(cleanedFields[3]);
+                            const stationName = cleanedFields[4];
+                            const startYear = cleanedFields[5];
+                            const endYear = cleanedFields[6];
+                            
+                            console.log('Adding marker:', stationName, 'at', lat, lon);
+                            
+                            if (!isNaN(lat) && !isNaN(lon)) {
+                                addMarker(lat, lon, stationName, id, elevation, startYear, endYear);
+                            }
+                        }
+                    }
+                }
+            } else {
+                console.error('Error loading CSV:', xhr.status);
+            }
+        };
+        xhr.onerror = function() {
+            console.error('Error loading CSV');
+        };
+        xhr.send();
+        
+        // Add a test marker to verify the map is working
+        var testMarker = L.marker([20, 80]).addTo(map);
+        testMarker.bindPopup('Test Marker');
+        
+        // Add OpenStreetMap base layer
+        var osmLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '© OpenStreetMap contributors'
+        }).addTo(map);
+        
+        // Add Google Maps layers as overlays
+        var googleRoadmap = L.tileLayer('http://mt0.google.com/vt/lyrs=m&hl=en&x={x}&y={y}&z={z}', {
+            attribution: 'Google Maps'
+        });
+        
+        var googleTerrain = L.tileLayer('http://mt0.google.com/vt/lyrs=p&hl=en&x={x}&y={y}&z={z}', {
+            attribution: 'Google Maps'
+        });
+        
+        var googleAlteredRoadmap = L.tileLayer('http://mt0.google.com/vt/lyrs=r&hl=en&x={x}&y={y}&z={z}', {
+            attribution: 'Google Maps'
+        });
+        
+        var googleSatellite = L.tileLayer('http://mt0.google.com/vt/lyrs=s&hl=en&x={x}&y={y}&z={z}', {
+            attribution: 'Google Maps'
+        });
+        
+        var googleTerrainOnly = L.tileLayer('http://mt0.google.com/vt/lyrs=t&hl=en&x={x}&y={y}&z={z}', {
+            attribution: 'Google Maps'
+        });
+        
+        var googleHybrid = L.tileLayer('http://mt0.google.com/vt/lyrs=y&hl=en&x={x}&y={y}&z={z}', {
+            attribution: 'Google Maps'
+        });
+        
+        // Add layer control
+        L.control.layers(
+            {'OpenStreetMap': osmLayer},
+            {
+                'Google Roadmap': googleRoadmap,
+                'Google Terrain': googleTerrain,
+                'Google Altered Roadmap': googleAlteredRoadmap,
+                'Google Satellite': googleSatellite,
+                'Google Terrain Only': googleTerrainOnly,
+                'Google Hybrid': googleHybrid
+            }
+        ).addTo(map);
+    </script>
+</body>
+</html>
