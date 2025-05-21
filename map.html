@@ -1,137 +1,197 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>OpenStreetMap with Google Maps Layers</title>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    
-    <!-- Leaflet CSS -->
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-    
-    <!-- Leaflet JavaScript -->
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-
-    <style>
-        #map {
-            height: 100vh;
-            width: 100%;
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Leaflet Map with Skew-T Plot Popups</title>
+  <!-- Leaflet CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css " />
+  <style>
+    body, html {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      font-family: Arial, sans-serif;
+      background-color: #0a8676;
+    }
+    .controls {
+      padding: 10px;
+      background-color: #ffffff;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      display: flex;
+      gap: 15px;
+      align-items: center;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+    input[type="date"], select {
+      padding: 6px 12px;
+      font-size: 16px;
+      border-radius: 4px;
+      border: 1px solid #ccc;
+    }
+    #map {
+      width: 100%;
+      height: calc(100vh - 60px);
+    }
+    .leaflet-popup img {
+      width: 500px;
+      height: 400px;
+    }
+  </style>
 </head>
 <body>
-    <div id="map"></div>
-    <script>
-        // Initialize the map
-        var map = L.map('map').setView([20, 80], 5); // Centered over India
-        
-        // Function to add marker with weather data
-        function addMarker(lat, lon, stationName, id, elevation, start_year, end_year) {
-            var marker = L.marker([lat, lon]).addTo(map);
-            
-            // Create a unique URL for each station
-            var date = new Date().toISOString().split('T')[0];
-            var url = `https://weather.uwyo.edu/upperair/imgs/${date.replace(/-/g, '')}00.${id}.skewt.png`;
-            
-            marker.bindPopup(`Station: ${stationName}<br>
-                            Elevation: ${elevation}m<br>
-                            Period: ${start_year}-${end_year}<br>
-                            <a href="${url}" target="_blank">View weather data</a>`);
-            
-            marker.on('click', function() {
-                window.open(url, '_blank');
-            });
-        }
-        
-        
-        
-        
-        
-        // Read and parse the CSV file
-        var xhr = new XMLHttpRequest();
-        xhr.open('GET', 'https://github.com/subhrajitjubu/api_weather/blob/main/loc.csv', true);
-        xhr.onload = function() {
-            if (xhr.status === 200) {
-                console.log('CSV loaded successfully');
-                
-                // Split the text into lines
-                const lines = xhr.responseText.split('\n');
-                
-                // Process each line (skip header row)
-                for (let i = 1; i < lines.length; i++) {
-                    const line = lines[i].trim();
-                    if (line) { // Skip empty lines
-                        // Handle CSV with proper parsing (accounting for quoted fields with commas)
-                        const fields = line.match(/(".*?"|[^",\s]+)(?=\s*,|\s*$)/g);
-                        
-                        if (fields && fields.length >= 7) {
-                            // Clean fields by removing quotes if present
-                            const cleanedFields = fields.map(field => 
-                                field.startsWith('"') && field.endsWith('"') ? 
-                                field.slice(1, -1) : field
-                            );
-                            
-                            const id = cleanedFields[0];
-                            const lat = parseFloat(cleanedFields[1]);
-                            const lon = parseFloat(cleanedFields[2]);
-                            const elevation = parseInt(cleanedFields[3]);
-                            const stationName = cleanedFields[4];
-                            const startYear = cleanedFields[5];
-                            const endYear = cleanedFields[6];
-                            
-                            console.log('Adding marker:', stationName, 'at', lat, lon);
-                            
-                            if (!isNaN(lat) && !isNaN(lon)) {
-                                addMarker(lat, lon, stationName, id, elevation, startYear, endYear);
-                            }
-                        }
-                    }
-                }
-            } else {
-                console.error('Error loading CSV:', xhr.status);
-            }
-        };
-        xhr.onerror = function() {
-            console.error('Error loading CSV');
-        };
-        xhr.send();
-        
-        // Add a test marker to verify the map is working
-        var testMarker = L.marker([20, 80]).addTo(map);
-        testMarker.bindPopup('Test Marker');
-        
-        // Add OpenStreetMap base layer
-        var osmLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            attribution: '© OpenStreetMap contributors'
-        }).addTo(map);
-        
-        // Add Google Maps layers as overlays
-        var googleRoadmap = L.tileLayer('http://mt0.google.com/vt/lyrs=m&hl=en&x={x}&y={y}&z={z}', {
-            attribution: 'Google Maps'
-        });
-        
-        var googleTerrain = L.tileLayer('http://mt0.google.com/vt/lyrs=p&hl=en&x={x}&y={y}&z={z}', {
-            attribution: 'Google Maps'
-        });
-        
-        var googleAlteredRoadmap = L.tileLayer('http://mt0.google.com/vt/lyrs=r&hl=en&x={x}&y={y}&z={z}', {
-            attribution: 'Google Maps'
-        });
-        
-        var googleSatellite = L.tileLayer('http://mt0.google.com/vt/lyrs=s&hl=en&x={x}&y={y}&z={z}', {
-            attribution: 'Google Maps'
-        });
-        
-        var googleTerrainOnly = L.tileLayer('http://mt0.google.com/vt/lyrs=t&hl=en&x={x}&y={y}&z={z}', {
-            attribution: 'Google Maps'
-        });
-        
-        var googleHybrid = L.tileLayer('http://mt0.google.com/vt/lyrs=y&hl=en&x={x}&y={y}&z={z}', {
-            attribution: 'Google Maps'
-        });
-        
-        // Add layer control
-        L.control.layers(
-            {'OpenStreetMap': osmLayer},
+
+<div class="controls">
+  <label>Select Date:
+    <input type="date" id="datePicker" value="2024-09-20">
+  </label>
+  <label>Select Time:
+    <select id="timePicker">
+      <option value="00">00 UTC</option>
+      <option value="12">12 UTC</option>
+    </select>
+  </label>
+</div>
+
+<div id="map"></div>
+
+<!-- Leaflet JS -->
+<script src="https://unpkg.com/leaflet/dist/leaflet.js "></script>
+<script>
+  // CSV Data (simulated from uploaded file)
+  const csvData = `42027,34.0833,74.8333,1585,SRINAGAR,1962,2018,24467
+42056,32.6667,74.8333,318,JAMMU,2015,2018,1203
+42071,31.6333,74.8667,229,AMRITSAR,1957,2016,2563
+42079,31.5333,76.9,874,SUNDERNAGAR,2016,2018,961
+42101,30.3333,76.4667,251,PATIALA,1975,2018,23293
+42103,30.3833,76.7667,273,AMBALA,1928,2018,18569
+42111,30.3167,78.0333,683,DEHRADUN,1973,2018,11453
+42123,29.9167,73.8833,172,GANGANAGAR,2015,2018,1614
+42165,28,73.3,223,BIKANER,1973,2018,15376
+42170,28.25,74.9167,290,CHURU,2015,2018,1996
+42182,28.5833,77.2,211,NEW DELHI/SAFDARJUNG,1930,2018,67526
+42189,28.3667,79.4,167,BAREILLY,1973,2018,5908
+42260,27.15,77.9667,168,AGRA,1926,2018,7790
+42273,27.5667,81.6,123,BAHRAICH,1973,2018,8668
+42299,27.3333,88.6167,1756,GANGTOK,2016,2018,1019
+42314,27.4833,95.0167,110,DIBRUGARH /MOHANBARI,1945,2018,32224
+42328,26.9,70.9167,231,JAISALMER,2015,2018,1750
+42339,26.3,73.0167,217,JODHPUR,1935,2018,61212
+42348,26.8167,75.8,383,JAIPUR / SANGANER,1973,2018,17492
+42361,26.2333,78.25,205,GWALIOR,1938,2018,43119
+42369,26.75,80.8833,122,LUCKNOW/AMAUSI,1967,2018,46737
+42379,26.75,83.3667,78.3,GORAKHPUR,1973,2018,30725
+42382,26.983,84.85,79,RAXAUL,1973,1978,1140
+42397,26.6667,88.3667,123,SILIGURI,1973,2015,19334
+42399,26.5333,88.7167,83,JALPAIGURI,2015,2018,1303
+42410,26.1,91.5833,54,GUWAHATI,1956,2018,52153
+42416,26.717,92.8,75,TEZPUR/BINDUKURI,1973,1975,424
+42435,25.75,71.3833,193,BARMER,2015,2018,1774
+42452,25.15,75.85,273,KOTA AERODROME,2015,2018,1157
+42475,25.45,81.733,98,ALLAHABAD/BAMHRAULI,1930,2018,22124
+42492,25.6,85.1667,51,PATNA,1928,2018,21369
+42498,25.2333,86.95,44,BHAGALPUR,1973,2018,5860
+42516,25.5667,91.8833,1500,SHILLONG S06 03Z,1953,1954,280
+42539,24.2,72.2,135,DEESA,1973,2018,1500
+42542,24.6167,73.8833,509,UDAIPUR DABOK,1976,2018,9016
+42543,24.583,73.7,582,UDAIPUR,1973,1975,1174
+42591,24.75,84.95,116,GAYA,1938,2018,23321
+42623,24.7667,93.9,781,IMPHAL/TULIHAL,1973,2018,19682
+42634,23.25,69.8,78,BHUJ-RUDRAMATA,1973,2017,12200
+42647,23.0667,72.6333,55,AHMADABAD,1928,2018,57859
+42667,23.2833,77.35,522,BHOPAL/BAIRAGHAR,1973,2018,35495
+42675,23.2,79.95,397,JABALPUR,1928,2018,18138
+42701,23.3167,85.3167,646,M.O. RANCHI,1929,2018,11696
+42706,23.3833,87.0833,100,BANKURA,2015,2018,838
+42724,23.8833,91.25,16,AGARTALA,1973,2018,37252
+42734,22.45,70.083,20,JAMNAGAR,1973,1975,895
+42779,22.767,81.9,625,PENDRA ROAD,1981,1993,5308
+42798,22.8167,86.1833,142,JAMSHEDPUR,1941,2018,7255
+42809,22.65,88.45,6,KOLKATA/DUM DUM,1938,2018,63954
+42840,21.2,72.8333,10,SURAT,1973,2018,2278
+42867,21.1,79.05,310,NAGPUR SONEGAON,1946,2018,59307
+42874,21.2333,81.65,296,PBO RAIPUR,1973,2018,17592
+42886,21.9167,84.0833,228,JHARSIGUDA,1973,2018,8095
+42895,21.5167,86.9333,18.8,BALASORE,1979,2018,1320
+42909,20.9,70.367,6,VERAVAL,1941,2008,17106
+42970,20.48,85.87,26,CUTTACK,1945,1946,318
+42971,20.25,85.8333,45,BHUBANESHWAR,1971,2018,46683
+43003,19.1167,72.85,14.2,BOMBAY / SANTACRUZ,1938,2018,62059
+43014,19.85,75.4,585,AURANGABAD CHIKALTHANA AERODRO,1973,2018,33895
+43041,19.0833,82.0333,554,JAGDALPUR,1973,2018,26054
+43049,19.2667,84.8833,16.4,GOPALPUR,1973,2017,8817
+43063,18.5333,73.85,555,PUNE,1926,2018,22070
+43110,16.9833,73.3333,90.5,RATNAGIRI,1973,2018,2434
+43128,17.45,78.4667,530,HYDERABAD AIRPORT,1929,2018,49214
+43150,17.6833,83.3,69.9,VISHAKHAPATNAM/WALTAIR,1938,2018,57825
+43181,16.533,80.8,24,VIJAYAWADA/GANNAVA,1973,1982,8012
+43185,16.2,81.15,3,MACHILIPATNAM/FRANCHPET,1983,2018,32737
+43192,15.4833,73.8167,58.4,GOA/PANJIM,1954,2018,24399
+43194,15.383,73.817,52,GOA/DABOLIM AIRPORT,1956,1975,1902
+43201,15.4167,75.6333,670,GADAG,1973,2018,11936
+43237,14.6833,77.6167,349,ANANTAPUR,1973,2010,10993
+43279,13,80.1833,13.7,CHENNAI/MINAMBAKKAM,1926,2018,67660
+43284,12.917,74.883,102,MANGALORE/BAJPE,1973,1978,2209
+43285,12.95,74.8333,30.8,MANGALORE/PANAMBUR,1973,2018,24141
+43295,12.9667,77.5833,917,BANGALORE,1926,2018,50841
+43311,11.1167,72.7333,2.7,AMINIDIVI,1973,2018,26301
+43333,11.6667,92.7167,79,PORT BLAIR,1926,2018,49567
+43344,10.7667,78.7167,85,TIRUCHCHIRAPALLI,1938,2009,12612
+43346,10.9167,79.8333,6.9,KARAIKAL,1973,2018,40502
+43353,9.9333,76.2333,1,COCHIN (IN-NAVY),1967,2018,16530
+43368,9.15,92.81,10,CAR NICOBAR,1940,1990,1627
+43369,8.3,73.15,0.9,MINICOY,1965,2018,39607
+43371,8.4833,76.95,59.9,THIRUVANANTHAPURAM,1928,2018,56533`;
+
+  // Parse CSV
+  function parseCSV(data) {
+    return data.split('\n').map(row => {
+      const cols = row.trim().split(',');
+      return {
+        sid: cols[0].trim(),
+        lat: parseFloat(cols[1]),
+        lon: parseFloat(cols[2]),
+        name: cols[4].trim()
+      };
+    });
+  }
+
+  // Initialize map
+  var map = L.map('map').setView([20, 80], 5); 
+
+  // Add OpenStreetMap tile layer
+  var osmlayer=L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '&copy; OpenStreetMap contributors'
+  });
+
+    var googleRoadmap = L.tileLayer('http://mt0.google.com/vt/lyrs=m&hl=en&x={x}&y={y}&z={z}', {
+        attribution: 'Google Maps'
+    }).addTo(map);
+    
+    var googleTerrain = L.tileLayer('http://mt0.google.com/vt/lyrs=p&hl=en&x={x}&y={y}&z={z}', {
+        attribution: 'Google Maps'
+    });
+    
+    var googleAlteredRoadmap = L.tileLayer('http://mt0.google.com/vt/lyrs=r&hl=en&x={x}&y={y}&z={z}', {
+        attribution: 'Google Maps'
+    });
+    
+    var googleSatellite = L.tileLayer('http://mt0.google.com/vt/lyrs=s&hl=en&x={x}&y={y}&z={z}', {
+        attribution: 'Google Maps'
+    });
+    
+    var googleTerrainOnly = L.tileLayer('http://mt0.google.com/vt/lyrs=t&hl=en&x={x}&y={y}&z={z}', {
+        attribution: 'Google Maps'
+    });
+    
+    var googleHybrid = L.tileLayer('http://mt0.google.com/vt/lyrs=y&hl=en&x={x}&y={y}&z={z}', {
+        attribution: 'Google Maps'
+    });
+
+
+L.control.layers(
+            {'OpenStreetMap': osmlayer},
             {
                 'Google Roadmap': googleRoadmap,
                 'Google Terrain': googleTerrain,
@@ -141,6 +201,45 @@
                 'Google Hybrid': googleHybrid
             }
         ).addTo(map);
-    </script>
+
+
+
+  let markers = [];
+
+  // Function to update markers
+  function updateMarkers() {
+    const dateInput = document.getElementById("datePicker").value;
+    const timeInput = document.getElementById("timePicker").value;
+
+    const [year, month, day] = dateInput.split('-');
+
+    // Remove existing markers
+    markers.forEach(marker => map.removeLayer(marker));
+    markers = [];
+
+    parsedData.forEach(station => {
+      const marker = L.marker([station.lat, station.lon]).addTo(map);
+      const imageUrl = `https://skewt-plot.onrender.com/skewt?year= ${year}&month=${month}&day=${day}&sid=${station.sid}&time=${timeInput}`;
+        marker.bindPopup(`<strong>${station.name}</strong><br/><img src="${imageUrl}" alt="Skew-T Plot" style="width: 600px; height: 500px; " />`, {
+          maxWidth: 900,
+          minWidth: 600,
+          maxHeight: 900,
+          minHeight: 300
+
+         
+});      markers.push(marker);
+    });
+  }
+
+  // Initial parsing of CSV
+  const parsedData = parseCSV(csvData);
+
+  // Initial load of markers
+  updateMarkers();
+
+  // Event listener for date and time change
+  document.getElementById("datePicker").addEventListener("change", updateMarkers);
+  document.getElementById("timePicker").addEventListener("change", updateMarkers);
+</script>
 </body>
 </html>
