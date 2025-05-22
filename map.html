@@ -43,22 +43,54 @@
 <body>
 
 <div class="controls">
+  <label>Select Data:
+    <select type="string" id="dataPicker">
+    <option value="NOMADS">NOMADS</option>
+    <option value="Wyoming">Wyoming</option>
+
+  </label>
+
   <label>Select Date:
-    <input type="date" id="datePicker" value="2024-09-20">
+    <input type="date" id="datePicker" value="2025-05-21">
   </label>
   <label>Select Time:
     <select id="timePicker">
       <option value="00">00 UTC</option>
+      <option value="06">06 UTC</option>
       <option value="12">12 UTC</option>
+      <option value="18">18 UTC</option>
     </select>
   </label>
+  <label>Select Forecast Hour (fcsthr):
+  <select id="fcsthrPicker">
+    <!-- Dynamically generated options from 0 to 10 -->
+  </select>
+</label
+  
 </div>
+
+
+
+
 
 <div id="map"></div>
 
 <!-- Leaflet JS -->
 <script src="https://unpkg.com/leaflet/dist/leaflet.js "></script>
 <script>
+
+const fcsthrSelect = document.getElementById("fcsthrPicker");
+
+for (let i = 0; i <= 72; i++) {
+  const option = document.createElement("option");
+  option.value = i;
+  option.textContent = `${i} hr`;
+  fcsthrSelect.appendChild(option);
+}
+
+
+
+
   // CSV Data (simulated from uploaded file)
   const csvData = `42027,34.0833,74.8333,1585,SRINAGAR,1962,2018,24467
 42056,32.6667,74.8333,318,JAMMU,2015,2018,1203
@@ -204,42 +236,167 @@ L.control.layers(
 
 
 
-  let markers = [];
+
+
+  markers = [];
+
+
+function updateMarkers() {
+  const dateInput = document.getElementById("datePicker").value;
+  const timeInput = document.getElementById("timePicker").value;
+  const dataSource = document.getElementById("dataPicker").value;
+  const fcsthrSelect = document.getElementById("fcsthrPicker").value ;
+
+  const [year, month, day] = dateInput.split('-');
+
+  // Remove existing markers
+  markers.forEach(marker => map.removeLayer(marker));
+  markers = [];
+
+  parsedData.forEach(station => {
+    let apiUrl;
+
+    if (dataSource === "Wyoming") {
+      // Wyoming uses skewtw with sid
+      apiUrl = `https://skewt-plot.onrender.com/skewtw?year=${year}&month=${month}&day=${day}&sid=${station.sid}&time=${timeInput}`;
+    } else {
+      // NOMADS uses skewtn with lat/lon and other params
+      apiUrl = `https://skewt-plot.onrender.com/skewtn?yy=${year}&mm=${month}&dd=${day}&utc=${timeInput}&ft=${fcsthrSelect}&lon=${station.lon}&lat=${station.lat}`;
+    }
+    const marker = L.marker([station.lat, station.lon]).addTo(map);
+    const popupContent = `<strong>${station.name}</strong><br/>
+                          <img src="${apiUrl}" alt="Skew-T Plot" 
+                               style="width: 600px; height: 500px; "/>`;
+
+    marker.bindPopup(popupContent, {
+      maxWidth: 900,
+      minWidth: 300,
+      maxHeight: 800,
+      minHeight: 200
+    });
+
+    markers.push(marker);
+  });
+  
+}
+
+const redMarker = new L.DivIcon({
+  className: 'custom-red-marker',
+  html: '&#127880;',
+  iconSize: [256, 256],      
+  iconAnchor: [16, 32]     
+});
+
+
+
+
+let dynamicPointMarker = null;
+
+map.on('click', function(e) {
+  const lat = e.latlng.lat.toFixed(4);
+  const lon = e.latlng.lng.toFixed(4);
+
+  // Remove previous dynamic point if exists
+  if (dynamicPointMarker) {
+    map.removeLayer(dynamicPointMarker);
+  }
+
+  // Add a temporary marker at clicked location
+  dynamicPointMarker = L.marker([lat, lon]).addTo(map);
+  dynamicPointMarker.bindPopup("Loading Skew-T Plot...");
+
+  // Now fetch Skew-T image using NOMADS API
+  updateDynamicPointPopup(dynamicPointMarker, lat, lon);
+});
+
+
+function updateDynamicPointPopup(marker, lat, lon) {
+  const dateInput = document.getElementById("datePicker").value;
+  const timeInput = document.getElementById("timePicker").value;
+  const dataSource = document.getElementById("dataPicker").value;
+
+  const fcsthrSelect = document.getElementById("fcsthrPicker")?.value || "0";
+
+  const [year, month, day] = dateInput.split('-');
+
+  if (dataSource === "Wyoming") {
+    marker.setPopupContent("Clicking map only works for NOMADS dataset.");
+    return;
+  }
+
+  const apiUrl = `https://skewt-plot.onrender.com/skewtn?yy= ${year}&mm=${month}&dd=${day}&utc=${timeInput}&ft=${fcsthrSelect}&lon=${lon}&lat=${lat}`;
+
+  const popupContent = `<strong></strong><br/>
+                        <img src="${apiUrl}" alt="Skew-T Plot"
+                             style="width: 600px; height: 500px; "
+                             onerror="this.src='https://via.placeholder.com/600x400?text=No+Image '; this.onerror=null;">`;
+      marker.bindPopup(popupContent,{
+      maxWidth: 900,
+      minWidth: 300,
+      maxHeight: 800,
+      minHeight: 200
+    }).openPopup();
+// setPopupContent
+  // marker.bindPopup(popupContent, {
+  //     maxWidth: 900,
+  //     minWidth: 300,
+  //     maxHeight: 800,
+  //     minHeight: 200
+  //   });
+  //   markers.push(marker);
+
+  // marker.setPopupContent(popupContent);
+}
+
+
+
+
+
 
   // Function to update markers
-  function updateMarkers() {
-    const dateInput = document.getElementById("datePicker").value;
-    const timeInput = document.getElementById("timePicker").value;
+//   function updateMarkers() {
+//     const dateInput = document.getElementById("datePicker").value;
+//     const timeInput = document.getElementById("timePicker").value;
+//     const fcInput = document.getElementById("fcsthrPicker").value;
+    
 
-    const [year, month, day] = dateInput.split('-');
+//     const [year, month, day] = dateInput.split('-');
 
-    // Remove existing markers
-    markers.forEach(marker => map.removeLayer(marker));
-    markers = [];
+//     // Remove existing markers
+//     markers.forEach(marker => map.removeLayer(marker));
+//     markers = [];
 
-    parsedData.forEach(station => {
-      const marker = L.marker([station.lat, station.lon]).addTo(map);
-      const imageUrl = `https://skewt-plot.onrender.com/skewt?year= ${year}&month=${month}&day=${day}&sid=${station.sid}&time=${timeInput}`;
-        marker.bindPopup(`<strong>${station.name}</strong><br/><img src="${imageUrl}" alt="Skew-T Plot" style="width: 600px; height: 500px; " />`, {
-          maxWidth: 900,
-          minWidth: 600,
-          maxHeight: 900,
-          minHeight: 300
+//     parsedData.forEach(station => {
+//       const marker = L.marker([station.lat, station.lon]).addTo(map);
+//       const imageUrl = `https://skewt-plot.onrender.com/skewtw?year= ${year}&month=${month}&day=${day}&sid=${station.sid}&time=${timeInput}`;
+//         marker.bindPopup(`<strong>${station.name}</strong><br/><img src="${imageUrl}"
+//  alt="Skew-T Plot" style="width: 600px; height: 500px; " />`, {
+//           maxWidth: 900,
+//           minWidth: 600,
+//           maxHeight: 900,
+//           minHeight: 300
 
          
-});      markers.push(marker);
-    });
-  }
+// });      markers.push(marker);
+//     });
+//   }
 
   // Initial parsing of CSV
   const parsedData = parseCSV(csvData);
 
-  // Initial load of markers
   updateMarkers();
 
   // Event listener for date and time change
+    document.getElementById("fcsthrPicker").addEventListener("change", updateMarkers);
+  document.getElementById("dataPicker").addEventListener("change", updateMarkers);
+
   document.getElementById("datePicker").addEventListener("change", updateMarkers);
   document.getElementById("timePicker").addEventListener("change", updateMarkers);
+
+
+
+
+
 </script>
 </body>
 </html>
