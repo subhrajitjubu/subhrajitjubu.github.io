@@ -215,37 +215,46 @@
         }
 
         // Fetch and cache the RSS feed
-        async function fetchAndCacheJobs(retries = 3, delay = 1000) {
-            showLoading(true);
+        async function fetchAndCacheJobs(retries = 3, delay = 5000) {
+    showLoading(true);
+    for (let attempt = 1; attempt <= retries; attempt++) {
+        try {
+            const response = await fetch(rssUrl, {
+                headers: {
+                    'Accept': 'application/xml' // Match browser's accept header
+                }
+            });
+            if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+            const data = await response.text();
+            if (!data) throw new Error('No content returned');
 
-            try {
-                const response = await fetch(`https://api.allorigins.win/get?url=${encodeURIComponent(rssUrl)}`);
-                const data = await response.json();
-                const xmlData = data.contents;
+            // Parse XML
+            const parser = new DOMParser();
+            const xmlDoc = parser.parseFromString(data, 'text/xml');
+            const items = Array.from(xmlDoc.getElementsByTagName('item')).map(item => ({
+                title: item.getElementsByTagName('title')[0]?.textContent || 'No title',
+                link: item.getElementsByTagName('link')[0]?.textContent || '#',
+                pubDate: item.getElementsByTagName('pubDate')[0]?.textContent || 'Unknown date'
+            }));
 
-                // Parse the XML data
-                const parser = new DOMParser();
-                const xmlDoc = parser.parseFromString(xmlData, "text/xml");
-                const items = Array.from(xmlDoc.getElementsByTagName('item')).map(item => ({
-                    title: item.getElementsByTagName('title')[0].textContent,
-                    link: item.getElementsByTagName('link')[0].textContent,
-                    pubDate: item.getElementsByTagName('pubDate')[0].textContent
-                }));
+            // Save to localStorage
+            localStorage.setItem(cacheKey, JSON.stringify(items));
+            localStorage.setItem(cacheExpiryKey, Date.now() + cacheDuration);
 
-                // Save the parsed data to localStorage
-                localStorage.setItem(cacheKey, JSON.stringify(items));
-                localStorage.setItem(cacheExpiryKey, Date.now() + cacheDuration);
-
-                console.log('Jobs fetched and cached successfully.');
-                return items;
-            } catch (error) {
-                console.error('Error fetching the RSS feed:', error);
+            console.log('Jobs fetched successfully.');
+            return items;
+        } catch (error) {
+            console.error(`Attempt ${attempt} failed: ${error.message}`);
+            if (attempt === retries) {
+                console.error('All retries failed.');
                 document.getElementById('rssFeed').innerHTML = '<p>Error fetching job listings. Please try again later.</p>';
                 return null;
-            } finally {
-                showLoading(false);
             }
+            await new Promise(resolve => setTimeout(resolve, delay));
         }
+    }
+    showLoading(false);
+}
 
         // Load jobs from cache or fetch new data if cache is expired
         async function loadJobs() {
