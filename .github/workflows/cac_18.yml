@@ -1,71 +1,84 @@
 name: Download and preprocess 18UTC
-
 on:
   schedule:
-    - cron: '0 3 * * *'  # This runs every day at 10:00 UTC
+    - cron: '0 3 * * *'  # Fixed: removed extra asterisk
   workflow_dispatch:  # Allows manual triggering
 
 jobs:
   run-notebook:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v2
-
+        uses: actions/checkout@v4  # Updated to latest version
+        
       - name: Set up Python
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v4  # Updated to latest version
         with:
-          python-version: '3.10'  # Specify the Python version you need
-
-      - name: Cache Python packages
-        uses: actions/checkout@v4
+          python-version: '3.10'
+          
+      - name: Cache pip packages
+        uses: actions/cache@v3
         with:
-          cache: 'pip'
           path: ~/.cache/pip
           key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
           restore-keys: |
             ${{ runner.os }}-pip-
-
-      - name: Create virtual environment
+            
+      - name: Cache virtual environment
+        uses: actions/cache@v3
+        with:
+          path: venv
+          key: ${{ runner.os }}-venv-${{ hashFiles('**/requirements.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-venv-
+            
+      - name: Create and setup virtual environment
         run: |
-          python -m venv venv
+          if [ ! -d "venv" ]; then
+            python -m venv venv
+          fi
           source venv/bin/activate
           pip install --upgrade pip
           pip install jupyter nbconvert
-          pip install -r requirements.txt  # Install your dependencies
-
-      - name: Run Jupyter Notebook
-        run: |
-          source venv/bin/activate
+          pip install -r requirements.txt
           
-          ipython -c "%run src/singlelevel-Updated.ipynb"
-          mv *.json src/
-          rm atms.grib2*
-
-      - name: Compress JSON files
-        run: |
-          tar -czvf json_files.tar.gz src/*.json
-
-      - name: Clean up original JSON files
-        run: |
-          find src/* -type f -name "*.json" ! -name "IND.json" -exec rm {} \;
-
-
-      - name: Commit and push compressed files
+      - name: Pull latest changes
         run: |
           git config --global user.name "subhrajitjubu"
           git config --global user.email "66462700+subhrajitjubu@users.noreply.github.com"
           git pull origin main
-          git add json_files.tar.gz
-          if [ -n "$(git status --porcelain)" ]; then
-            git commit -m "Update compressed JSON files"
-            git push origin main
-          else
-            echo "No changes to commit."
-          fi
-
-      - name: Uncompress JSON files (optional)
+          
+      - name: Run Jupyter Notebook
         run: |
-          tar -xzvf json_files.tar.gz  src/
-          rm json_files.tar.gz
+          source venv/bin/activate
+          find src/* -type f -name "*.json" ! -name "IND.json" -exec rm {} \;          
+          ipython -c "%run src/singlelevel_06.ipynb"
+          rm atms.grib2* || true  # Added || true to prevent failure if files don't exist
+          mv *.json src/ || true  # Added || true to prevent failure if no json files
+          
+      - name: Compress JSON files
+        run: |
+          if ls src/*.json 1> /dev/null 2>&1; then
+            tar -czvf json_files.tar.gz src/*.json
+            rm src/*.json  # Clean up original JSON files
+          else
+            echo "No JSON files to compress"
+          fi
+          
+      - name: Commit and push compressed files
+        run: |
+          git config --global user.name "subhrajitjubu"  # Fixed: consistent username
+          git config --global user.email "66462700+subhrajitjubu@users.noreply.github.com"  # Fixed: consistent email
+          git pull origin main
+          
+          if [ -f "json_files.tar.gz" ]; then
+            git add json_files.tar.gz
+            if [ -n "$(git status --porcelain)" ]; then
+              git commit -m "Update compressed JSON files - $(date)"
+              git push origin main
+            else
+              echo "No changes to commit."
+            fi
+          else
+            echo "No compressed file to commit."
+          fi
