@@ -24,13 +24,7 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-pip-
             
-      - name: Cache virtual environment
-        uses: actions/cache@v3
-        with:
-          path: venv
-          key: ${{ runner.os }}-venv-${{ hashFiles('**/requirements.txt') }}
-          restore-keys: |
-            ${{ runner.os }}-venv-
+
             
       - name: Create and setup virtual environment
         run: |
