@@ -82,8 +82,9 @@ async function loadData() {
 }
 
 async function createGeoHeatmapForTime(timeIndex, sstData, latData, lonData, topology, timeData) {
-    const sstForTime = sstData.data[timeIndex];
+    const sstForTime = sstData[timeIndex];
     // console.log(timeData[timeIndex]);
+    console.log(sstData[timeIndex])
 
     const formattedData = [];
 
