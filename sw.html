@@ -532,7 +532,7 @@
         async function fetchWeather(lat, lon, locationName) {
             try {
                 const apiUrl = `https://sweatherapi.vercel.app/timeseries?lat=${lat}&lon=${lon}`;
-                const response = await fetch(CORS_PROXY + encodeURIComponent(apiUrl));
+                const response = await fetch(encodeURIComponent(apiUrl));
                 const data = await response.json();
                 const weatherData = JSON.parse(data.contents);
 
