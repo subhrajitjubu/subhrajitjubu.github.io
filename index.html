@@ -3,740 +3,367 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>About - Subhrajit Rath | Atmospheric Researcher</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Source+Sans+Pro:wght@300;400;600&display=swap" rel="stylesheet">
-    <style>
-        :root {
-            --primary-blue: #0f97c0;
-            --secondary-gold: #a1610d;
-            --dark-blue: #0d1e30;
-            --light-blue: #bee3f8;
-            --text-dark: #2d3748;
-            --text-light: #f7fafc;
-            --card-bg: #ffffff;
-            --shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
-            --transition: all 0.3s ease;
-        }
+    <meta name="description" content="Subhrajit Rath - Researcher in Atmospheric Science, Radiation Modeling, HITRAN data curation, NWP, and cloud microphysics.">
+    <title>About - Subhrajit Rath</title>
 
+    <!-- Google Fonts: Inter (clean & modern) -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Georgia:ital,wght@0,700;1,700&display=swap" rel="stylesheet">
+
+    <!-- Font Awesome 6 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+    <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
 
+        html {
+            scroll-behavior: smooth;
+        }
+
         body {
-            font-family: 'Source Sans Pro', sans-serif;
-            background: linear-gradient(135deg, var(--light-blue), var(--dark-blue));
-            color: var(--text-dark);
+            font-family: 'Inter', system-ui, sans-serif;
+            background: linear-gradient(135deg, #e6f0fa, #c3d8ef);
+            color: #1e293b;
             line-height: 1.6;
-            min-height: 100vh;
-            transition: background 1.5s ease;
         }
 
-        h1, h2, h3, h4 {
-            font-family: 'Poppins', sans-serif;
-            font-weight: 600;
-        }
-
-        /* Header */
         header {
-            background: linear-gradient(135deg, var(--primary-blue), var(--secondary-gold));
+            position: relative;
+            min-height: 50vh;
+            background: linear-gradient(135deg, #1e40af, #3b82f6);
             color: white;
-            padding: 2rem 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             text-align: center;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-            position: relative;
-            overflow: hidden;
+            padding: 4rem 1.5rem;
         }
 
-        header::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" preserveAspectRatio="none"><path d="M0,0 L100,0 L100,100 Z" fill="white" opacity="0.05"/></svg>');
-            pointer-events: none;
+        .hero-glass {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            border-radius: 20px;
+            padding: 3rem 4rem;
+            max-width: 900px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
         }
 
-        .header-content {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 2rem;
-            position: relative;
-            z-index: 2;
-        }
-
-        h1 {
+        .hero-glass h1 {
             font-size: 2.8rem;
-            margin-bottom: 0.5rem;
-            letter-spacing: -0.5px;
+            font-weight: 700;
+            margin-bottom: 0.8rem;
         }
 
-        .subtitle {
-            font-size: 1.2rem;
-            opacity: 0.9;
+        .hero-glass p {
+            font-size: 1.3rem;
             font-weight: 300;
-            max-width: 800px;
-            margin: 0 auto;
+            opacity: 0.95;
         }
 
-        /* Navigation */
         nav {
-            background: rgba(74, 85, 104, 0.95);
-            backdrop-filter: blur(10px);
-            padding: 0.8rem 0;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(8px);
+            padding: 1.2rem 0;
             position: sticky;
             top: 0;
             z-index: 100;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            text-align: center;
         }
 
-        .nav-container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 1.5rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .nav-links {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 0.5rem;
-        }
-
-        nav a {
-            color: #cbd5e0;
+        nav a, .dropbtn {
+            color: #1e40af;
+            margin: 0 1.1rem;
             text-decoration: none;
-            padding: 0.5rem 1rem;
-            border-radius: 6px;
             font-weight: 500;
-            transition: var(--transition);
-            font-size: 0.95rem;
-        }
-
-        nav a:hover, nav a.active {
-            color: white;
-            background: rgba(99, 179, 237, 0.2);
-        }
-
-        .dropdown {
+            transition: color 0.3s ease;
             position: relative;
         }
 
-        .dropbtn {
-            display: flex;
-            align-items: center;
-            gap: 5px;
+        nav a::after, .dropbtn::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2.5px;
+            bottom: -6px;
+            left: 50%;
+            background: #3b82f6;
+            transition: width 0.35s ease, left 0.35s ease;
+            transform: translateX(-50%);
         }
 
-        .dropbtn::after {
-            content: '▾';
-            font-size: 0.8rem;
+        nav a:hover::after, .dropbtn:hover::after,
+        nav a:focus::after, .dropbtn:focus::after {
+            width: 70%;
+        }
+
+        nav a:hover, .dropbtn:hover {
+            color: #3b82f6;
+        }
+
+        /* Dropdown Improvements */
+        .dropdown {
+            position: relative;
+            display: inline-block;
         }
 
         .dropdown-content {
+            display: none;
             position: absolute;
-            top: 100%;
-            left: 0;
             background: white;
-            min-width: 220px;
-            box-shadow: var(--shadow);
-            border-radius: 8px;
-            opacity: 0;
-            visibility: hidden;
-            transform: translateY(10px);
-            transition: var(--transition);
-            z-index: 10;
-        }
-
-        .dropdown:hover .dropdown-content {
-            opacity: 1;
-            visibility: visible;
-            transform: translateY(0);
+            min-width: 340px;          /* <-- Increased for longer job links */
+            max-width: 420px;          /* Prevents extreme stretching on ultra-wide screens */
+            box-shadow: 0 10px 25px rgba(0,0,0,0.18);
+            border-radius: 10px;
+            z-index: 1;
+            top: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            overflow: hidden;
+            padding: 8px 0;
         }
 
         .dropdown-content a {
-            color: var(--text-dark);
-            padding: 0.8rem 1.2rem;
+            color: #1e293b;
+            padding: 12px 20px;        /* More horizontal padding for comfort */
             display: block;
-            border-bottom: 1px solid #f1f1f1;
-        }
-
-        .dropdown-content a:last-child {
-            border-bottom: none;
+            text-decoration: none;
+            transition: background 0.2s;
+            white-space: nowrap;       /* Prevents wrapping inside items */
+            overflow: hidden;
+            text-overflow: ellipsis;   /* Adds ... for very long items if needed */
         }
 
         .dropdown-content a:hover {
-            background: #f7fafc;
-            color: var(--primary-blue);
+            background: #eff6ff;
+            color: #1e40af;
         }
 
-        .mobile-toggle {
-            display: none;
-            background: none;
-            border: none;
-            color: white;
-            font-size: 1.5rem;
-            cursor: pointer;
+        .dropdown:hover .dropdown-content {
+            display: block;
         }
 
-        /* Main Content */
         .container {
-            max-width: 1200px;
-            margin: 3rem auto;
+            max-width: 1100px;
+            margin: 4rem auto;
             padding: 0 1.5rem;
-        }
-
-        .profile-card {
-            background: var(--card-bg);
-            border-radius: 16px;
-            box-shadow: var(--shadow);
-            overflow: hidden;
             display: flex;
             flex-wrap: wrap;
-            transition: var(--transition);
-        }
-
-        .profile-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.12);
-        }
-
-        .image-section {
-            flex: 1;
-            min-width: 300px;
-            padding: 2rem;
-            display: flex;
-            flex-direction: column;
+            gap: 3rem;
             align-items: center;
-            justify-content: center;
-            background: linear-gradient(135deg, #f8fafc, #e2e8f0);
         }
 
-        .profile-image {
-            width: 280px;
-            height: 280px;
-            border-radius: 80%;
-            object-fit: contain;
-            border: 8px solid white;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
-            margin-bottom: 1.5rem;
+        .image-container {
+            flex: 1 1 320px;
+            text-align: center;
         }
 
-        .location {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            color: #4a5568;
-            font-size: 1.1rem;
-            margin-bottom: 1.5rem;
+        .image-container img {
+            width: 100%;
+            max-width: 360px;
+            border-radius: 50%;
+            border: 6px solid rgba(59, 130, 246, 0.2);
+            box-shadow: 0 10px 30px rgba(30, 64, 175, 0.15);
+            transition: transform 0.4s ease;
+        }
+
+        .image-container img:hover {
+            transform: scale(1.05);
         }
 
         .social-links {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 1rem;
-            width: 100%;
-            max-width: 350px;
-        }
-
-        .social-link {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 0.8rem 1rem;
-            background: white;
-            border-radius: 10px;
-            color: var(--text-dark);
-            text-decoration: none;
-            transition: var(--transition);
-            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.05);
-        }
-
-        .social-link:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
-            color: var(--primary-blue);
-        }
-
-        .social-link i {
-            font-size: 1.2rem;
-            width: 24px;
-            text-align: center;
-        }
-
-        /* Text Section */
-        .text-section {
-            flex: 1.2;
-            min-width: 300px;
-            padding: 2.5rem;
-        }
-
-        .section-title {
-            color: var(--primary-blue);
-            margin-bottom: 1.5rem;
-            font-size: 1.8rem;
-            position: relative;
-            padding-bottom: 0.8rem;
-        }
-
-        .section-title::after {
-            content: '';
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            width: 60px;
-            height: 4px;
-            background: var(--secondary-gold);
-            border-radius: 2px;
-        }
-
-        .bio-text {
-            font-size: 1.1rem;
-            line-height: 1.7;
-            color: #4a5568;
-            margin-bottom: 2rem;
-        }
-
-        .expertise-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-            gap: 1.5rem;
             margin-top: 2rem;
-        }
-
-        .expertise-item {
-            background: #f8fafc;
-            padding: 1.5rem;
-            border-radius: 10px;
-            border-left: 4px solid var(--primary-blue);
-            transition: var(--transition);
-        }
-
-        .expertise-item:hover {
-            background: #edf2f7;
-            transform: translateX(5px);
-        }
-
-        .expertise-title {
-            font-weight: 600;
-            color: var(--dark-blue);
-            margin-bottom: 0.5rem;
             display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .expertise-title i {
-            color: var(--secondary-gold);
-        }
-
-        .expertise-desc {
-            font-size: 0.95rem;
-            color: #718096;
-        }
-
-        /* Gradient Controls */
-        .gradient-controls {
-            display: flex;
+            flex-wrap: wrap;
             justify-content: center;
             gap: 1rem;
-            margin: 2rem auto;
-            flex-wrap: wrap;
         }
 
-        .gradient-btn {
-            padding: 0.6rem 1.2rem;
-            border: none;
-            border-radius: 30px;
-            background: white;
-            color: var(--text-dark);
-            font-weight: 500;
-            cursor: pointer;
-            transition: var(--transition);
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.08);
-        }
-
-        .gradient-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.12);
-        }
-
-        .gradient-btn.active {
-            background: var(--primary-blue);
-            color: white;
-        }
-
-        /* Footer */
-        footer {
-            background: linear-gradient(135deg, var(--dark-blue), #2d3748);
-            color: var(--text-light);
-            text-align: center;
-            padding: 2.5rem 0;
-            margin-top: 4rem;
-        }
-
-        .footer-content {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 1.5rem;
-        }
-
-        .footer-links {
+        .social-links a {
             display: flex;
-            justify-content: center;
-            gap: 2rem;
-            margin: 1.5rem 0;
-            flex-wrap: wrap;
-        }
-
-        .footer-links a {
-            color: #cbd5e0;
+            align-items: center;
+            gap: 10px;
+            color: #1e293b;
             text-decoration: none;
-            transition: var(--transition);
-        }
-
-        .footer-links a:hover {
-            color: white;
-        }
-
-        .copyright {
-            margin-top: 1.5rem;
-            opacity: 0.8;
+            padding: 10px 16px;
+            border-radius: 50px;
+            background: rgba(59, 130, 246, 0.08);
+            transition: all 0.3s ease;
             font-size: 0.95rem;
         }
 
-        /* Responsive Design */
-        @media (max-width: 992px) {
-            .nav-links {
-                display: none;
-                position: absolute;
-                top: 100%;
-                left: 0;
-                width: 100%;
-                background: rgba(74, 85, 104, 0.98);
-                flex-direction: column;
-                padding: 1rem;
-                box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
-            }
+        .social-links a:hover {
+            background: #3b82f6;
+            color: white;
+            transform: translateY(-3px);
+        }
 
-            .nav-links.active {
-                display: flex;
-            }
+        .social-links i {
+            font-size: 1.3rem;
+        }
 
-            .mobile-toggle {
-                display: block;
-            }
+        .text-container {
+            flex: 2 1 500px;
+        }
 
-            .dropdown-content {
-                position: static;
-                opacity: 1;
-                visibility: visible;
-                transform: none;
-                box-shadow: none;
-                background: rgba(255, 255, 255, 0.05);
-                margin-left: 1rem;
-                display: none;
-            }
+        .text-container p {
+            font-size: 1.1rem;
+            margin-bottom: 1.4rem;
+            color: #334155;
+        }
 
-            .dropdown.active .dropdown-content {
-                display: block;
-            }
+        .highlight {
+            font-family: 'Georgia', serif;
+            font-style: italic;
+            font-weight: bold;
+            color: #1e40af;
+            font-size: 1.25rem;
+            margin: 1.5rem 0;
+            display: block;
+        }
 
-            h1 {
-                font-size: 2.2rem;
-            }
+        footer {
+            background: linear-gradient(135deg, #1e293b, #334155);
+            color: white;
+            text-align: center;
+            padding: 2rem 1rem;
+            margin-top: 5rem;
         }
 
         @media (max-width: 768px) {
-            .profile-card {
+            .container {
                 flex-direction: column;
+                text-align: center;
             }
 
-            .image-section, .text-section {
-                padding: 1.5rem;
+            .hero-glass {
+                padding: 2.5rem 2rem;
             }
 
-            .profile-image {
-                width: 220px;
-                height: 220px;
+            .hero-glass h1 { font-size: 2.3rem; }
+            .hero-glass p  { font-size: 1.15rem; }
+
+            nav {
+                padding: 1rem 0;
             }
 
-            .social-links {
-                grid-template-columns: 1fr;
+            nav a, .dropbtn {
+                margin: 0.6rem 0.8rem;
+                font-size: 0.95rem;
             }
 
-            .expertise-grid {
-                grid-template-columns: 1fr;
+            .dropdown-content {
+                left: 0;
+                transform: none;
+                width: 90vw;              /* Full-width-ish on mobile for readability */
+                max-width: none;
+                min-width: auto;
+                text-align: left;
             }
 
-            .gradient-controls {
-                flex-direction: column;
-                align-items: center;
+            .dropdown-content a {
+                white-space: normal;      /* Allow wrapping on small screens */
             }
         }
     </style>
 </head>
 <body>
-    <!-- Header -->
+
     <header>
-        <div class="header-content">
+        <div class="hero-glass">
             <h1>Subhrajit Rath</h1>
-            <p class="subtitle">Atmospheric Researcher | Radiation Modeling  | AI/ML enthusiast</p>
+            <p>Researcher | Atmospheric Science • Radiation Modeling • NWP</p>
         </div>
     </header>
 
-    <!-- Navigation -->
     <nav>
-        <div class="nav-container">
-            <button class="mobile-toggle" id="mobileToggle">
-                <i class="fas fa-bars"></i>
-            </button>
-            <div class="nav-links" id="navLinks">
-                <a href="index.html" class="active">Home</a>
-                <a href="education.html">Education</a>
-                <a href="experience.html">Skills</a>
-                <a href="publications.html">Publications</a>
+        <a href="index.html">Home</a>
+        <a href="education.html">Education</a>
+        <a href="experience.html">Skills</a>
+        <a href="publications.html">Publications</a>
+        <a href="contact.html">Contact</a>
+        <a href="nwp_imd.html">NWP_IMD</a>
 
-                <!-- Weather Forecast Dropdown -->
-                <div class="dropdown">
-                    <a href="#" class="dropbtn">Weather Forecast</a>
-                    <div class="dropdown-content">
-                        <a href="sw.html">Weather Card</a>
-                        <a href="src/weatherchart.html">Weather Chart</a>
-                        <a href="srcc/geomap_multiple.html">Weather GeoHEATMap</a>
-                        <a href="AQI.html">AQI HEATMap</a>
-                        <a href="Weather_web.html">Weather Websites</a>
-                        <a href="meteogram.html">Meteogram</a>
-                    </div>
-                </div>
-
-                <!-- Satellite View Dropdown -->
-                <div class="dropdown">
-                    <a href="#" class="dropbtn">Satellite View</a>
-                    <div class="dropdown-content">
-                        <a href="mosdac_live.html">Mosdac/ISRO</a>
-                        <a href="gibs.html">GIBS/NASA</a>
-                    </div>
-                </div>
-
-                <!-- Climatic Info Dropdown -->
-                <div class="dropdown">
-                    <a href="#" class="dropbtn">Climatic Info</a>
-                    <div class="dropdown-content">
-                        <a href="climate/monavg/chloro.html">Monthly Statistic</a>
-                        <a href="climate/Dailyavg/chloro.html">Daily Average</a>
-                    </div>
-                </div>
-
-                <!-- Jobs Dropdown -->
-                <div class="dropdown">
-                    <a href="#" class="dropbtn">Jobs</a>
-                    <div class="dropdown-content">
-                        <a href="Jobs.html" target="_blank">MET Jobs</a>
-                        <a href="https://www.earthworks-jobs.com/" target="_blank">Earth-Works Jobs</a>
-                        <a href="https://www.egu.eu/jobs/" target="_blank">EGU Jobs</a>
-                        <a href="https://jobs.rmets.org/" target="_blank">rmets Jobs</a>
-                        <a href="https://careercenter.ametsoc.org/" target="_blank">AMS-carrer Jobs</a>
-                        <a href="https://www.21centuryweather.org.au/about-us/positions-vacant/" target="_blank">21st cent AUS MET Jobs</a>
-                        <a href="https://www.tropmet.res.in/Careers" target="_blank">IITM Career</a>
-                        <a href="https://vacancies.incois.gov.in/" target="_blank">INCOIS Career</a>
-                        <a href="https://ucar.wd5.myworkdayjobs.com/UCAR_Careers" target="_blank">UCAR_Careers</a>
-                        <a href="j1.html" target="_blank">Others</a>
-                    </div>
-                </div>
-
-                <a href="contact.html">Contact</a>
-                <a href="nwp_imd.html">NWP_IMD</a>
-                <a href="movies.html">Movies</a>
-                <a href="series.html">Series</a>
+        <div class="dropdown">
+            <a href="#" class="dropbtn">Weather forecast</a>
+            <div class="dropdown-content">
+                <a href="sw.html">Weather Card</a>
+                <a href="src/weatherchart.html">Weather Chart</a>
+                <a href="srcc/geomap_multiple.html">Weather GeoHEATMap</a>
+                <a href="AQI.html">AQI HEATMap</a>
+                <a href="Weather_web.html">Weather websites</a>
+                <a href="meteogram.html">Meteogram_ others</a>
             </div>
         </div>
+
+        <div class="dropdown">
+            <a href="#" class="dropbtn">Satellite view</a>
+            <div class="dropdown-content">
+                <a href="mosdac_live.html">Mosdac/ISRO</a>
+                <a href="gibs.html">GIBS/NASA</a>
+            </div>
+        </div>
+
+        <div class="dropdown">
+            <a href="#" class="dropbtn">Climatic info.</a>
+            <div class="dropdown-content">
+                <a href="climate/monavg/chloro.html">Monthly statistic</a>
+                <a href="climate/Dailyavg/chloro.html">Daily average</a>
+            </div>
+        </div>
+
+        <div class="dropdown">
+            <a href="#" class="dropbtn">Jobs</a>
+            <div class="dropdown-content">
+                <a href="Jobs.html" target="_blank">MET Jobs</a>
+                <a href="https://www.earthworks-jobs.com/" target="_blank">Earth-Works Jobs</a>
+                <a href="https://www.egu.eu/jobs/" target="_blank">EGU Jobs</a>
+                <a href="https://jobs.rmets.org/" target="_blank">RMetS Jobs</a>
+                <a href="https://careercenter.ametsoc.org/" target="_blank">AMS Careers</a>
+                <a href="https://www.21centuryweather.org.au/about-us/positions-vacant/" target="_blank">21st Century AUS MET Jobs</a>
+                <a href="https://www.tropmet.res.in/Careers" target="_blank">IITM Career</a>
+                <a href="https://vacancies.incois.gov.in/" target="_blank">INCOIS Career</a>
+                <a href="https://ucar.wd5.myworkdayjobs.com/UCAR_Careers" target="_blank">UCAR Careers</a>
+                <a href="j1.html" target="_blank">Others</a>
+            </div>
+        </div>
+
+        <a href="movies.html">Movies</a>
+        <a href="series.html">Series</a>
     </nav>
 
-    <!-- Main Content -->
     <div class="container">
-        <div class="profile-card">
-            <!-- Image Section -->
-            <div class="image-section">
-                <img src="subhrajit.JPEG" alt="Subhrajit Rath" class="profile-image">
-                <div class="location">
-                    <i class="fas fa-map-marker-alt"></i>
-                    <span>Pune, India</span>
-                </div>
+        <div class="image-container">
+            <img src="subhrajit.JPEG" alt="Subhrajit Rath - Atmospheric Science Researcher" loading="lazy">
 
-                <div class="social-links">
-                    <a href="https://scholar.google.com/citations?user=ORZunJoAAAAJ&hl=en" class="social-link" target="_blank">
-                        <i class="fas fa-graduation-cap"></i>
-                        <span>Google Scholar</span>
-                    </a>
-                    <a href="https://www.researchgate.net/profile/Subhrajit-Rath" class="social-link" target="_blank">
-                        <i class="fab fa-researchgate"></i>
-                        <span>ResearchGate</span>
-                    </a>
-                    <a href="https://github.com/subhrajitjubu" class="social-link" target="_blank">
-                        <i class="fab fa-github"></i>
-                        <span>GitHub</span>
-                    </a>
-                    <a href="https://linkedin.com/in/subhrajit-rath" class="social-link" target="_blank">
-                        <i class="fab fa-linkedin-in"></i>
-                        <span>LinkedIn</span>
-                    </a>
-                </div>
-            </div>
-
-            <!-- Text Section -->
-            <div class="text-section">
-                <h2 class="section-title">About Me</h2>
-                <p class="bio-text">
-                I am an atmospheric researcher specializing in AI-driven climate and weather modeling with a focus on integrating deep learning into radiative and cloud parameterizations.
-                I develop end-to-end machine learning pipelines—primarily convolutional neural networks (CNNs)—for rainfall and cloud-fraction forecasting using multi-dimensional inputs: thermodynamic variables, dynamical fields (e.g., geopotential height, divergence), and cloud microphysical parameters.
-                Model architectures are ResNet-inspired and tuned via SPC-based hyperparameter searches, and planning to be deployed within operational NWP systems through a bespoke Fortran–PyTorch interface for tight coupling with global models.
-                My computational expertise includes designing high-performance Fortran solvers for radiative transfer leveraging HITRAN datasets, and implementing numerical solutions to advection–diffusion equations using finite-difference,
-                . I use Python (PyTorch, NumPy, Xarray, SciPy) and MATLAB for predictive modeling, numerical experiments, and large-scale data preprocessing, and run HPC workflows on Linux.
-                    <br><br>
-                    My research sits at the intersection of atmospheric physics, machine learning, and scientific computing,
-                    with active interests in AI for cloud microphysics, deep-learning emulation of radiative transfer, hybrid physics–ML parameterizations,
-                    large-scale Earth-system modeling, ML interpretability in climate models.
-                     My technical toolbox includes Fortran, Python, MATLAB, and radiative-transfer models such as MODTRAN and RRTM, deployed on Linux and Windows.
-                </p>
-
-                <h2 class="section-title">Areas of Expertise</h2>
-                <div class="expertise-grid">
-                    <div class="expertise-item">
-                        <h3 class="expertise-title"><i class="fas fa-atom"></i> Radiation Modeling</h3>
-                        <p class="expertise-desc">HITRAN data curation, infrared radiative transfer, MODTRAN, ARTS</p>
-                    </div>
-                    <div class="expertise-item">
-                        <h3 class="expertise-title"><i class="fas fa-atom"></i> Machine learning</h3>
-                        <p class="expertise-desc">Tensorflow, scikit-learn,pytorch,Downscaling ,data curation</p>
-                    </div>
-
-                    <div class="expertise-item">
-                        <h3 class="expertise-title"><i class="fas fa-code"></i> Computational Methods</h3>
-                        <p class="expertise-desc">Fortran, Python, MATLAB, numerical algorithms, high-performance computing</p>
-                    </div>
-                    <div class="expertise-item">
-                        <h3 class="expertise-title"><i class="fas fa-cloud"></i> Atmospheric Physics</h3>
-                        <p class="expertise-desc">Cloud microphysics, meteorological factor analysis, predictive modeling</p>
-                    </div>
-                    <div class="expertise-item">
-                        <h3 class="expertise-title"><i class="fas fa-calculator"></i> Numerical Techniques</h3>
-                        <p class="expertise-desc">Finite difference, finite element, spectral methods, advective diffusion equations</p>
-                    </div>
-                </div>
+            <div class="social-links">
+                <a href="#"><i class="fas fa-globe"></i> Pune, India</a>
+                <a href="https://scholar.google.com/citations?user=ORZunJoAAAAJ&hl=en"><i class="fas fa-graduation-cap"></i> Google Scholar</a>
+                <a href="https://www.researchgate.net/profile/Subhrajit-Rath" target="_blank"><i class="fab fa-researchgate"></i> ResearchGate</a>
+                <a href="https://github.com/subhrajitjubu"><i class="fab fa-github"></i> GitHub</a>
+                <a href="https://linkedin.com/in/subhrajit-rath" target="_blank"><i class="fab fa-linkedin-in"></i> LinkedIn</a>
             </div>
         </div>
 
-        <!-- Gradient Controls -->
-        <div class="gradient-controls">
-            <button class="gradient-btn active" data-gradient="blue">Blue Theme</button>
-            <button class="gradient-btn" data-gradient="purple">Purple Theme</button>
-            <button class="gradient-btn" data-gradient="teal">Teal Theme</button>
-            <button class="gradient-btn" data-gradient="sunset">Sunset Theme</button>
-            <button class="gradient-btn" data-gradient="forest">Forest Theme</button>
+        <div class="text-container">
+            <span class="highlight">Bridging molecular spectroscopy and atmospheric modeling</span>
+
+            <p>As a researcher, I specialize in curating and processing HITRAN molecular spectroscopic data for accurate integration into radiation transfer models. This involves meticulous cleaning, organization, formatting, and validation of line-by-line parameters to support high-fidelity simulations in atmospheric and climate science.</p>
+
+            <p>Proficient in Fortran, I develop advanced numerical methods and algorithms to solve infrared radiative transfer equations. My work also explores key relationships between meteorological variables (temperature, humidity, wind shear) and cloud microphysical processes, improving predictive accuracy in NWP and remote sensing applications.</p>
+
+            <p>I implement the advective diffusion equation using finite difference, finite element, and spectral methods for modeling substance transport in fluids. My technical toolkit includes Fortran, Python, MATLAB, and radiation models such as MODTRAN and ARTS, with experience across Linux and Windows environments.</p>
         </div>
     </div>
 
-    <!-- Footer -->
     <footer>
-        <div class="footer-content">
-            <p>Atmospheric Researcher & Computational Scientist</p>
-            <div class="footer-links">
-                <a href="index.html">Home</a>
-                <a href="publications.html">Publications</a>
-                <a href="contact.html">Contact</a>
-                <a href="nwp_imd.html">NWP Resources</a>
-            </div>
-            <p class="copyright">© 2024 Subhrajit Rath - Personal Portfolio. All rights reserved.</p>
-        </div>
+        <p>© <script>document.write(new Date().getFullYear());</script> Subhrajit Rath – Personal & Research Portfolio</p>
     </footer>
 
-    <script>
-        // Mobile navigation toggle
-        const mobileToggle = document.getElementById('mobileToggle');
-        const navLinks = document.getElementById('navLinks');
-
-        mobileToggle.addEventListener('click', () => {
-            navLinks.classList.toggle('active');
-            mobileToggle.innerHTML = navLinks.classList.contains('active')
-                ? '<i class="fas fa-times"></i>'
-                : '<i class="fas fa-bars"></i>';
-        });
-
-        // Dropdown handling for mobile
-        const dropdowns = document.querySelectorAll('.dropdown > a');
-        dropdowns.forEach(dropdown => {
-            dropdown.addEventListener('click', (e) => {
-                if (window.innerWidth <= 992) {
-                    e.preventDefault();
-                    const parent = dropdown.parentElement;
-                    parent.classList.toggle('active');
-                }
-            });
-        });
-
-        // Gradient backgrounds
-        const gradients = {
-            blue: ['#bee3f8', '#0d1e30'],
-            purple: ['#a3bffa', '#1a5276'],
-            teal: ['#81e6d9', '#2c7a7b'],
-            sunset: ['#fed7e2', '#9f7aea'],
-            forest: ['#fefcbf', '#ed8936']
-        };
-
-        const gradientBtns = document.querySelectorAll('.gradient-btn');
-        let activeGradient = 'blue';
-
-        gradientBtns.forEach(btn => {
-            btn.addEventListener('click', () => {
-                const gradient = btn.dataset.gradient;
-
-                // Update active button
-                gradientBtns.forEach(b => b.classList.remove('active'));
-                btn.classList.add('active');
-
-                // Apply gradient
-                document.body.style.background = `linear-gradient(135deg, ${gradients[gradient][0]}, ${gradients[gradient][1]})`;
-                activeGradient = gradient;
-            });
-        });
-
-        // Auto-rotate gradients (optional)
-        let gradientIndex = 0;
-        const gradientKeys = Object.keys(gradients);
-
-        function rotateGradient() {
-            gradientIndex = (gradientIndex + 1) % gradientKeys.length;
-            const gradient = gradientKeys[gradientIndex];
-
-            // Update active button
-            gradientBtns.forEach(b => {
-                b.classList.toggle('active', b.dataset.gradient === gradient);
-            });
-
-            // Apply gradient
-            document.body.style.background = `linear-gradient(135deg, ${gradients[gradient][0]}, ${gradients[gradient][1]})`;
-            activeGradient = gradient;
-        }
-
-        // Uncomment to enable auto-rotation every 10 seconds
-        // setInterval(rotateGradient, 10000);
-
-        // Close mobile menu when clicking outside
-        document.addEventListener('click', (e) => {
-            if (window.innerWidth <= 992 &&
-                !e.target.closest('.nav-container') &&
-                navLinks.classList.contains('active')) {
-                navLinks.classList.remove('active');
-                mobileToggle.innerHTML = '<i class="fas fa-bars"></i>';
-            }
-        });
-    </script>
 </body>
 </html>
