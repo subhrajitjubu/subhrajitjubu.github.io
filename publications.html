@@ -3,281 +3,815 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Research Publications</title>
+    <title>Publications - Subhrajit Rath</title>
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Fontsource Inter -->
+    <link href="https://fontsource.org/inter/index.css" rel="stylesheet">
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
     <style>
         body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            background: linear-gradient(135deg, #e2e8f0, #0d1e30);
-            color: #333;
-        }
-        header {
-            background: linear-gradient(135deg, #0f97c0, #a1610d);
-            color: #fff;
-            padding: 1rem 0;
-            text-align: center;
-        }
-        nav {
-            background: #4a5568;
-            padding: 1rem 0;
-            text-align: center;
-            position: sticky;
-            top: 0;
-            z-index: 10;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            font-family: 'Inter', sans-serif;
+            scroll-behavior: smooth;
         }
 
-        nav a {
-            color: #63b3ed;
-            margin: 0 1.2rem;
-            text-decoration: none;
-            font-weight: 500;
-            transition: color 0.3s ease;
+        .hero-bg {
+            background-image: url('https://image.qwenlm.ai/public_source/dabdad38-e7f1-438d-be14-12c4c31c7a58/1d9dc8965-59fa-45d5-84fd-4833fde0c669.png');
+            background-size: cover;
+            background-position: center;
         }
 
-        nav a:hover {
-            color: #fff;
+        .gradient-text {
+            background: linear-gradient(135deg, #3b82f6, #06b6d4);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
         }
-        .dropdown {
-            display: inline-flex;
+
+        .glass-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .reveal {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.8s ease-out;
+        }
+        .reveal.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .nav-link {
             position: relative;
         }
-
-        .dropbtn {
-            padding: 14px 16px;
-            color: #63b3ed;
-            text-decoration: none;
-            font-weight: 500;
-            transition: color 0.3s ease;
-        }
-
-        .dropdown-content {
-            display: none;
+        .nav-link::after {
+            content: '';
             position: absolute;
-            top: 100%;
-            background-color: #fff;
-            min-width: 160px;
-            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
-            border-radius: 8px;
-            z-index: 1;
+            width: 0;
+            height: 2px;
+            bottom: -4px;
+            left: 50%;
+            background: #3b82f6;
+            transition: all 0.3s ease;
+            transform: translateX(-50%);
         }
-
-        .dropdown-content a {
-            color: #1461e6;
-            padding: 10px 16px;
-            text-decoration: none;
-            display: block;
-            transition: background-color 0.3s ease;
-        }
-
-        .dropdown-content a:hover {
-            background-color: #c2192765;
-        }
-
-        .dropdown:hover .dropdown-content {
-            display: block;
-        }
-
-        .dropdown:hover .dropbtn {
-            color: #fff;
-        }
-        .container {
-            width: 80%;
-            margin: 2rem auto;
-            background-color: #fff;
-            padding: 2rem;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-        }
-        footer {
-            position: relative;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            text-align: center;
-        }
-        h5 {
-            font-family: 'Times New Roman', Times, serif;
-            font-weight: bold;
-            font-size: 120%;
-            color: #dddddd;
-            margin: 0;
+        .nav-link:hover::after {
+            width: 70%;
         }
 
         /* Tab Styles */
-        .tab {
-            overflow: hidden;
-            border-bottom: 1px solid #704545;
+        .tab-btn {
+            transition: all 0.3s ease;
         }
-        .tab button {
-            background-color: #f1f1f1;
-            float: left;
-            border: none;
-            outline: none;
-            cursor: pointer;
-            padding: 14px 16px;
-            transition: 0.3s;
-            font-size: 16px;
-            color: #0056b3;
+        .tab-btn.active {
+            background: linear-gradient(135deg, #3b82f6, #06b6d4);
+            color: white;
+            transform: scale(1.02);
+            box-shadow: 0 10px 25px -5px rgba(59, 130, 246, 0.4);
         }
-        .tab button:hover {
-            background-color: #25b8b0;
+
+        /* Publication Card Hover */
+        .pub-card {
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
         }
-        .tab button.active {
-            background-color: #2850be2a;
-            border-bottom: 2px solid #007BFF;
-            color: #007BFF;
+        .pub-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px -10px rgba(59, 130, 246, 0.2);
         }
-        .tabcontent {
-            display: none;
-            padding: 20px;
-            border: 1px solid #ccc;
-            border-top: none;
+
+        /* DOI Link Hover */
+        .doi-link {
+            position: relative;
         }
-        h1 {
-            text-align: center;
-            color: #007BFF;
-            margin-bottom: 30px;
+        .doi-link::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: -2px;
+            left: 0;
+            background: #3b82f6;
+            transition: width 0.3s ease;
         }
-        ol {
-            margin-left: 20px;
+        .doi-link:hover::after {
+            width: 100%;
         }
-        li {
-            margin-bottom: 10px;
-        }
-       
     </style>
 </head>
-<body>
-    <nav>
-        <a href="index.html">Home</a>
-        <a href="education.html">Education</a>
-        <a href="experience.html">Skills</a>
-        <a href="publications.html">Publications</a>
-        <a href="contact.html">Contact</a>
-        <a href="nwp_imd.html">NWP_IMD</a>
-        <div class="dropdown">
-            <a href="#" class="dropbtn">Weather forecast</a>
-            <div class="dropdown-content">
-                <a href="sw.html">Weather Card</a>
-                <a href="src/weatherchart.html">Weather Chart</a>
-                <a href="srcc/geomap_multiple.html">Weather GeoHEATMap</a>    
-                <a href="AQI.html">AQI HEATMap</a>    
-                <a href="Weather_web.html">Weather websites</a>    
-                <a href="meteogram.html">Meteogram_ others</a>    
+<body class="bg-slate-50 text-slate-800 antialiased">
 
+    <!-- Navigation -->
+    <nav class="fixed w-full z-50 glass-card shadow-sm transition-all duration-300" id="navbar">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-20">
+                <div class="flex-shrink-0 flex items-center">
+                    <span class="text-2xl font-bold gradient-text tracking-tighter">S.<span class="text-slate-800">Rath</span></span>
+                </div>
 
+                <!-- Desktop Menu -->
+                <div class="hidden lg:block">
+                    <div class="ml-10 flex items-baseline space-x-6">
+                        <a href="index.html" class="nav-link text-slate-600 hover:text-blue-600 px-3 py-2 text-sm font-medium transition-colors">Home</a>
+                        <a href="education.html" class="nav-link text-slate-600 hover:text-blue-600 px-3 py-2 text-sm font-medium transition-colors">Education</a>
+                        <a href="experience.html" class="nav-link text-slate-600 hover:text-blue-600 px-3 py-2 text-sm font-medium transition-colors">Skills</a>
+                        <a href="publications.html" class="nav-link text-blue-600 px-3 py-2 text-sm font-medium transition-colors">Publications</a>
+
+                        <!-- Dropdown: Weather Forecast -->
+                        <div class="relative group">
+                            <button class="nav-link text-slate-600 hover:text-blue-600 px-3 py-2 text-sm font-medium transition-colors flex items-center">
+                                Weather <i class="fas fa-chevron-down ml-1 text-xs"></i>
+                            </button>
+                            <div class="absolute left-0 mt-2 w-56 rounded-xl shadow-xl bg-white ring-1 ring-slate-200 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 transform origin-top-left z-50">
+                                <div class="py-2">
+                                    <a href="sw.html" class="block px-4 py-2.5 text-sm text-slate-700 hover:bg-blue-50 hover:text-blue-600 transition-colors"><i class="fas fa-cloud-sun mr-2"></i>Weather Card</a>
+                                    <a href="src/weatherchart.html" class="block px-4 py-2.5 text-sm text-slate-700 hover:bg-blue-50 hover:text-blue-600 transition-colors"><i class="fas fa-chart-line mr-2"></i>Weather Chart</a>
+                                    <a href="srcc/geomap_multiple.html" class="block px-4 py-2.5 text-sm text-slate-700 hover:bg-blue-50 hover:text-blue-600 transition-colors"><i class="fas fa-map mr-2"></i>GeoHEATMap</a>
+                                    <a href="AQI.html" class="block px-4 py-2.5 text-sm text-slate-700 hover:bg-blue-50 hover:text-blue-600 transition-colors"><i class="fas fa-wind mr-2"></i>AQI HEATMap</a>
+                                    <a href="meteogram.html" class="block px-4 py-2.5 text-sm text-slate-700 hover:bg-blue-50 hover:text-blue-600 transition-colors"><i class="fas fa-chart-area mr-2"></i>Meteogram</a>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Dropdown: Satellite -->
+                        <div class="relative group">
+                            <button class="nav-link text-slate-600 hover:text-blue-600 px-3 py-2 text-sm font-medium transition-colors flex items-center">
+                                Satellite <i class="fas fa-chevron-down ml-1 text-xs"></i>
+                            </button>
+                            <div class="absolute left-0 mt-2 w-48 rounded-xl shadow-xl bg-white ring-1 ring-slate-200 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 transform origin-top-left z-50">
+                                <div class="py-2">
+                                    <a href="mosdac_live.html" class="block px-4 py-2.5 text-sm text-slate-700 hover:bg-blue-50 hover:text-blue-600 transition-colors"><i class="fas fa-satellite mr-2"></i>Mosdac/ISRO</a>
+                                    <a href="gibs.html" class="block px-4 py-2.5 text-sm text-slate-700 hover:bg-blue-50 hover:text-blue-600 transition-colors"><i class="fas fa-globe mr-2"></i>GIBS/NASA</a>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Dropdown: Jobs -->
+                        <div class="relative group">
+                            <button class="nav-link text-slate-600 hover:text-blue-600 px-3 py-2 text-sm font-medium transition-colors flex items-center">
+                                Jobs <i class="fas fa-chevron-down ml-1 text-xs"></i>
+                            </button>
+                            <div class="absolute left-0 mt-2 w-64 rounded-xl shadow-xl bg-white ring-1 ring-slate-200 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 transform origin-top-left z-50 max-h-96 overflow-y-auto">
+                                <div class="py-2">
+                                    <a href="Jobs.html" target="_blank" class="block px-4 py-2.5 text-sm text-slate-700 hover:bg-blue-50 hover:text-blue-600 transition-colors"><i class="fas fa-briefcase mr-2"></i>MET Jobs</a>
+                                    <a href="https://www.21centuryweather.org.au/about-us/positions-vacant/" target="_blank" class="block px-4 py-2.5 text-sm text-slate-700 hover:bg-blue-50 hover:text-blue-600 transition-colors"><i class="fas fa-globe mr-2"></i>21st Century AUS</a>
+                                    <a href="https://www.tropmet.res.in/Careers" target="_blank" class="block px-4 py-2.5 text-sm text-slate-700 hover:bg-blue-50 hover:text-blue-600 transition-colors"><i class="fas fa-university mr-2"></i>IITM Career</a>
+                                    <a href="https://vacancies.incois.gov.in/" target="_blank" class="block px-4 py-2.5 text-sm text-slate-700 hover:bg-blue-50 hover:text-blue-600 transition-colors"><i class="fas fa-building mr-2"></i>INCOIS Career</a>
+                                    <a href="https://www.niot.res.in/recruitment_details.php/" target="_blank" class="block px-4 py-2.5 text-sm text-slate-700 hover:bg-blue-50 hover:text-blue-600 transition-colors"><i class="fas fa-ship mr-2"></i>NIOT Career</a>
+                                </div>
+                            </div>
+                        </div>
+
+                        <a href="contact.html" class="bg-gradient-to-r from-blue-600 to-cyan-500 text-white hover:from-blue-700 hover:to-cyan-600 px-6 py-2.5 rounded-full text-sm font-semibold transition-all shadow-lg shadow-blue-500/30 hover:shadow-blue-500/50">Contact</a>
+                    </div>
+                </div>
+
+                <!-- Mobile menu button -->
+                <div class="-mr-2 flex lg:hidden">
+                    <button type="button" onclick="document.getElementById('mobile-menu').classList.toggle('hidden')" class="inline-flex items-center justify-center p-2 rounded-lg text-slate-400 hover:text-slate-500 hover:bg-slate-100 focus:outline-none">
+                        <svg class="h-6 w-6" stroke="currentColor" fill="none" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                        </svg>
+                    </button>
+                </div>
             </div>
         </div>
-        <div class="dropdown">
-            <a href="#" class="dropbtn">Satellite view</a>
-            <div class="dropdown-content">
-                <a href="../mosdac_live.html">Mosdac/ISRO</a>
-                <a href="../gibs.html">GIBS/NASA</a>
-                   
 
-            </div>
-        </div>
-        <div class="dropdown">
-            <a href="#" class="dropbtn">Climatic info.</a>
-            <div class="dropdown-content">
-                <a href="climate\monavg/chloro.html">Monthly statistic</a>
-                <a href="climate/Dailyavg/chloro.html">Daily average</a>    
-            </div>
-        </div>
-        <div class="dropdown">
-            <a href="#" class="dropbtn">Jobs</a>
-            <div class="dropdown-content">
-                <a href="Jobs.html" target="_blank">MET Jobs</a>
-                <a href="https://www.21centuryweather.org.au/about-us/positions-vacant/" target="_blank">21st cent AUS MET Jobs</a>
-                <a href="https://www.tropmet.res.in/Careers" target="_blank">IITM Career</a>
-                <a href="https://vacancies.incois.gov.in/" target="_blank">INCOIS Career</a>
-                <a href="https://www.niot.res.in/recruitment_details.php/" target="_blank">NIOT Career</a>
-                <a href="j1.html" target="_blank">Others</a>
+        <!-- Mobile Menu -->
+        <div class="hidden lg:hidden bg-white border-t" id="mobile-menu">
+            <div class="px-4 py-4 space-y-3">
+                <a href="index.html" class="block px-4 py-3 rounded-xl text-base font-medium text-slate-700 hover:text-blue-600 hover:bg-blue-50 transition-colors">Home</a>
+                <a href="education.html" class="block px-4 py-3 rounded-xl text-base font-medium text-slate-700 hover:text-blue-600 hover:bg-blue-50 transition-colors">Education</a>
+                <a href="experience.html" class="block px-4 py-3 rounded-xl text-base font-medium text-slate-700 hover:text-blue-600 hover:bg-blue-50 transition-colors">Skills</a>
+                <a href="publications.html" class="block px-4 py-3 rounded-xl text-base font-medium text-blue-600 bg-blue-50 font-semibold">Publications</a>
+                <a href="contact.html" class="block px-4 py-3 rounded-xl text-base font-medium text-blue-600 bg-blue-50 font-semibold">Contact</a>
 
+                <div class="border-t border-slate-100 pt-4 mt-4">
+                    <p class="px-4 text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3">Tools & Resources</p>
+                    <a href="sw.html" class="block px-4 py-3 rounded-xl text-base font-medium text-slate-600 hover:bg-slate-50 transition-colors"><i class="fas fa-cloud-sun mr-2 text-blue-500"></i>Weather Tools</a>
+                    <a href="mosdac_live.html" class="block px-4 py-3 rounded-xl text-base font-medium text-slate-600 hover:bg-slate-50 transition-colors"><i class="fas fa-satellite mr-2 text-blue-500"></i>Satellite View</a>
+                    <a href="Jobs.html" class="block px-4 py-3 rounded-xl text-base font-medium text-slate-600 hover:bg-slate-50 transition-colors"><i class="fas fa-briefcase mr-2 text-blue-500"></i>Job Board</a>
+                </div>
             </div>
         </div>
-        <a href="movies.html">Movies</a>
-        <a href="series.html">Series</a>
     </nav>
 
-    <div class="container">
-        <h1>Research Publications</h1>
-
-        <!-- Tab Links -->
-        <div class="tab">
-            <button class="tablinks" onclick="openTab(event, 'Journal')" id="defaultOpen">Journal Publications</button>
-            <button class="tablinks" onclick="openTab(event, 'Conference')">Conference Abstracts</button>
+    <!-- Hero Section -->
+    <section class="relative pt-32 pb-20 flex items-center justify-center hero-bg">
+        <div class="absolute inset-0 bg-gradient-to-b from-slate-900/70 via-slate-900/60 to-slate-900/80"></div>
+        <div class="relative z-10 text-center px-4 max-w-4xl mx-auto reveal active">
+            <div class="mb-6 inline-block">
+                <span class="bg-blue-500/20 text-blue-100 border border-blue-400/30 px-5 py-2 rounded-full text-sm font-semibold tracking-wide uppercase backdrop-blur-sm">
+                    <i class="fas fa-book mr-2"></i>Research Output
+                </span>
+            </div>
+            <h1 class="text-5xl md:text-6xl font-extrabold text-white mb-6 tracking-tight leading-tight">
+                Research <span class="gradient-text">Publications</span>
+            </h1>
+            <p class="text-xl text-slate-200 max-w-2xl mx-auto font-light">
+                Peer-reviewed journal articles and conference presentations advancing atmospheric science through innovative research in radiation modeling, cloud microphysics, and numerical weather prediction.
+            </p>
         </div>
+    </section>
 
-        <!-- Tab Content -->
-        <div id="Journal" class="tabcontent">
-            <ol>
-                <li>Rath, S., Kesarkar, A., Patnaik, K. et al. Infrared heating/cooling-induced perturbation in vertical velocity inside convective clouds.<i>J Earth Syst Sci</i> 134, 179 (2025). <a href="https://doi.org/10.1007/s12040-025-02636-9">https://doi.org/10.1007/s12040-025-02636-9</a></li>
-                <li>Rath, S., Kesarkar, A., Patnaik, K. et al. Infrared heating/cooling-induced perturbation in vertical velocity inside stratiform clouds. <i>J Earth Syst Sci</i> 134, 29 (2025). <a href="https://doi.org/10.1007/s12040-024-02486-x">https://doi.org/10.1007/s12040-024-02486-x</a></li>
-                <li>Patnaik, K., Kesarkar, A. P., Rath, S., Bhate, J. N., Panchal, A., Chandrasekar, A., & Giri, R. (2023). A 1-D model to retrieve the vertical profiles of minor atmospheric constituents for cloud microphysical modelling: I. Formulation and validation. *Science of The Total Environment*, 881, 163360.</li>
-                <li>Patnaik, K., Kesarkar, A. P., Rath, S., Bhate, J. N., & Chandrasekar, A. (2023). A 1-D model to retrieve the vertical profiles of minor atmospheric constituents for cloud microphysical modeling: II. Simulation of diurnal cycle. *Science of The Total Environment*, 167377.</li>
-                <li>Patnaik, Kavita, et al. "A 1-D model to retrieve the vertical profiles of minor atmospheric constituents for cloud microphysical modelling: III. Disturbed weather situations." *Science of The Total Environment*, 907 (2024): 167959.</li>
-            </ol>
+    <!-- Publications Section -->
+    <section class="py-20 bg-gradient-to-br from-slate-50 via-blue-50 to-cyan-50">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+
+            <!-- Stats Overview -->
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-6 mb-16 reveal">
+                <div class="bg-white rounded-2xl p-6 text-center shadow-lg border border-blue-100">
+                    <div class="w-14 h-14 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-xl flex items-center justify-center mx-auto mb-3">
+                        <i class="fas fa-file-alt text-white text-2xl"></i>
+                    </div>
+                    <div class="text-3xl font-bold gradient-text mb-1">5</div>
+                    <div class="text-sm text-slate-600">Journal Papers</div>
+                </div>
+                <div class="bg-white rounded-2xl p-6 text-center shadow-lg border border-purple-100">
+                    <div class="w-14 h-14 bg-gradient-to-br from-purple-500 to-blue-500 rounded-xl flex items-center justify-center mx-auto mb-3">
+                        <i class="fas fa-microphone-alt text-white text-2xl"></i>
+                    </div>
+                    <div class="text-3xl font-bold gradient-text mb-1">6</div>
+                    <div class="text-sm text-slate-600">Conference Papers</div>
+                </div>
+                <div class="bg-white rounded-2xl p-6 text-center shadow-lg border border-green-100">
+                    <div class="w-14 h-14 bg-gradient-to-br from-green-500 to-teal-500 rounded-xl flex items-center justify-center mx-auto mb-3">
+                        <i class="fas fa-quote-right text-white text-2xl"></i>
+                    </div>
+                    <div class="text-3xl font-bold gradient-text mb-1">2025</div>
+                    <div class="text-sm text-slate-600">Latest Publication</div>
+                </div>
+                <div class="bg-white rounded-2xl p-6 text-center shadow-lg border border-orange-100">
+                    <div class="w-14 h-14 bg-gradient-to-br from-orange-500 to-yellow-500 rounded-xl flex items-center justify-center mx-auto mb-3">
+                        <i class="fas fa-globe text-white text-2xl"></i>
+                    </div>
+                    <div class="text-3xl font-bold gradient-text mb-1">JESS</div>
+                    <div class="text-sm text-slate-600">Top Journal</div>
+                </div>
+            </div>
+
+            <!-- Tab Buttons -->
+            <div class="flex flex-wrap justify-center gap-4 mb-12 reveal">
+                <button onclick="openTab('journal')" class="tab-btn active px-8 py-4 rounded-xl text-sm font-semibold bg-gradient-to-r from-blue-600 to-cyan-500 text-white shadow-lg flex items-center gap-2">
+                    <i class="fas fa-book-open"></i>
+                    <span>Journal Publications</span>
+                    <span class="bg-white/20 px-2 py-0.5 rounded-full text-xs">5</span>
+                </button>
+                <button onclick="openTab('conference')" class="tab-btn px-8 py-4 rounded-xl text-sm font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200 shadow flex items-center gap-2">
+                    <i class="fas fa-microphone-alt"></i>
+                    <span>Conference Abstracts</span>
+                    <span class="bg-slate-200 px-2 py-0.5 rounded-full text-xs">6</span>
+                </button>
+            </div>
+
+            <!-- Journal Publications Tab -->
+            <div id="journal" class="tab-content reveal active">
+                <div class="space-y-6">
+
+                    <!-- Publication 1 -->
+                    <div class="pub-card bg-white rounded-2xl p-6 md:p-8 shadow-lg border border-slate-100 hover:border-blue-200">
+                        <div class="flex flex-col md:flex-row gap-6">
+                            <div class="flex-shrink-0">
+                                <div class="w-16 h-16 bg-gradient-to-br from-blue-600 to-cyan-500 rounded-xl flex items-center justify-center">
+                                    <i class="fas fa-file-alt text-white text-2xl"></i>
+                                </div>
+                            </div>
+                            <div class="flex-1">
+                                <div class="flex flex-wrap items-center gap-3 mb-3">
+                                    <span class="bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-xs font-semibold uppercase tracking-wide">Journal Article</span>
+                                    <span class="bg-green-100 text-green-700 px-3 py-1 rounded-full text-xs font-semibold">2025</span>
+                                    <span class="bg-purple-100 text-purple-700 px-3 py-1 rounded-full text-xs font-semibold">J Earth Syst Sci</span>
+                                </div>
+                                <h3 class="text-xl font-bold text-slate-900 mb-3 leading-relaxed">
+                                    Infrared heating/cooling-induced perturbation in vertical velocity inside convective clouds
+                                </h3>
+                                <p class="text-slate-600 mb-4 leading-relaxed">
+                                    <strong class="text-blue-600">Rath, S.</strong>, Kesarkar, A., Patnaik, K. et al.
+                                </p>
+                                <p class="text-slate-500 text-sm mb-4">
+                                    <i class="fas fa-book mr-2"></i>Journal of Earth System Science, Volume 134, Article 179 (2025)
+                                </p>
+                                <div class="flex flex-wrap gap-3">
+                                    <a href="https://doi.org/10.1007/s12040-025-02636-9" target="_blank" class="doi-link inline-flex items-center gap-2 px-4 py-2 bg-blue-50 hover:bg-blue-100 text-blue-600 rounded-lg text-sm font-medium transition-colors">
+                                        <i class="fas fa-link"></i>
+                                        <span>View DOI</span>
+                                    </a>
+                                    <a href="https://doi.org/10.1007/s12040-025-02636-9" target="_blank" class="inline-flex items-center gap-2 px-4 py-2 bg-slate-50 hover:bg-slate-100 text-slate-600 rounded-lg text-sm font-medium transition-colors">
+                                        <i class="fas fa-external-link-alt"></i>
+                                        <span>Read Online</span>
+                                    </a>
+                                    <button class="inline-flex items-center gap-2 px-4 py-2 bg-slate-50 hover:bg-slate-100 text-slate-600 rounded-lg text-sm font-medium transition-colors">
+                                        <i class="fas fa-quote-right"></i>
+                                        <span>Cite</span>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Publication 2 -->
+                    <div class="pub-card bg-white rounded-2xl p-6 md:p-8 shadow-lg border border-slate-100 hover:border-blue-200">
+                        <div class="flex flex-col md:flex-row gap-6">
+                            <div class="flex-shrink-0">
+                                <div class="w-16 h-16 bg-gradient-to-br from-cyan-600 to-blue-500 rounded-xl flex items-center justify-center">
+                                    <i class="fas fa-file-alt text-white text-2xl"></i>
+                                </div>
+                            </div>
+                            <div class="flex-1">
+                                <div class="flex flex-wrap items-center gap-3 mb-3">
+                                    <span class="bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-xs font-semibold uppercase tracking-wide">Journal Article</span>
+                                    <span class="bg-green-100 text-green-700 px-3 py-1 rounded-full text-xs font-semibold">2025</span>
+                                    <span class="bg-purple-100 text-purple-700 px-3 py-1 rounded-full text-xs font-semibold">J Earth Syst Sci</span>
+                                </div>
+                                <h3 class="text-xl font-bold text-slate-900 mb-3 leading-relaxed">
+                                    Infrared heating/cooling-induced perturbation in vertical velocity inside stratiform clouds
+                                </h3>
+                                <p class="text-slate-600 mb-4 leading-relaxed">
+                                    <strong class="text-blue-600">Rath, S.</strong>, Kesarkar, A., Patnaik, K. et al.
+                                </p>
+                                <p class="text-slate-500 text-sm mb-4">
+                                    <i class="fas fa-book mr-2"></i>Journal of Earth System Science, Volume 134, Article 29 (2025)
+                                </p>
+                                <div class="flex flex-wrap gap-3">
+                                    <a href="https://doi.org/10.1007/s12040-024-02486-x" target="_blank" class="doi-link inline-flex items-center gap-2 px-4 py-2 bg-blue-50 hover:bg-blue-100 text-blue-600 rounded-lg text-sm font-medium transition-colors">
+                                        <i class="fas fa-link"></i>
+                                        <span>View DOI</span>
+                                    </a>
+                                    <a href="https://doi.org/10.1007/s12040-024-02486-x" target="_blank" class="inline-flex items-center gap-2 px-4 py-2 bg-slate-50 hover:bg-slate-100 text-slate-600 rounded-lg text-sm font-medium transition-colors">
+                                        <i class="fas fa-external-link-alt"></i>
+                                        <span>Read Online</span>
+                                    </a>
+                                    <button class="inline-flex items-center gap-2 px-4 py-2 bg-slate-50 hover:bg-slate-100 text-slate-600 rounded-lg text-sm font-medium transition-colors">
+                                        <i class="fas fa-quote-right"></i>
+                                        <span>Cite</span>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Publication 3 -->
+                    <div class="pub-card bg-white rounded-2xl p-6 md:p-8 shadow-lg border border-slate-100 hover:border-blue-200">
+                        <div class="flex flex-col md:flex-row gap-6">
+                            <div class="flex-shrink-0">
+                                <div class="w-16 h-16 bg-gradient-to-br from-purple-600 to-blue-500 rounded-xl flex items-center justify-center">
+                                    <i class="fas fa-file-alt text-white text-2xl"></i>
+                                </div>
+                            </div>
+                            <div class="flex-1">
+                                <div class="flex flex-wrap items-center gap-3 mb-3">
+                                    <span class="bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-xs font-semibold uppercase tracking-wide">Journal Article</span>
+                                    <span class="bg-green-100 text-green-700 px-3 py-1 rounded-full text-xs font-semibold">2023</span>
+                                    <span class="bg-orange-100 text-orange-700 px-3 py-1 rounded-full text-xs font-semibold">Sci Total Environ</span>
+                                </div>
+                                <h3 class="text-xl font-bold text-slate-900 mb-3 leading-relaxed">
+                                    A 1-D model to retrieve the vertical profiles of minor atmospheric constituents for cloud microphysical modelling: I. Formulation and validation
+                                </h3>
+                                <p class="text-slate-600 mb-4 leading-relaxed">
+                                    Patnaik, K., Kesarkar, A. P., <strong class="text-blue-600">Rath, S.</strong>, Bhate, J. N., Panchal, A., Chandrasekar, A., & Giri, R.
+                                </p>
+                                <p class="text-slate-500 text-sm mb-4">
+                                    <i class="fas fa-book mr-2"></i>Science of The Total Environment, Volume 881, Article 163360 (2023)
+                                </p>
+                                <div class="flex flex-wrap gap-3">
+                                    <a href="https://doi.org/10.1016/j.scitotenv.2023.163360"  target="_blank" class="doi-link inline-flex items-center gap-2 px-4 py-2 bg-blue-50 hover:bg-blue-100 text-blue-600 rounded-lg text-sm font-medium transition-colors">
+                                        <i class="fas fa-link"></i>
+                                        <span>View DOI</span>
+                                    </a>
+                                    <a href="https://doi.org/10.1016/j.scitotenv.2023.163360" target="_blank"  class="inline-flex items-center gap-2 px-4 py-2 bg-slate-50 hover:bg-slate-100 text-slate-600 rounded-lg text-sm font-medium transition-colors">
+                                        <i class="fas fa-external-link-alt"></i>
+                                        <span>Read Online</span>
+                                    </a>
+                                    <button class="inline-flex items-center gap-2 px-4 py-2 bg-slate-50 hover:bg-slate-100 text-slate-600 rounded-lg text-sm font-medium transition-colors">
+                                        <i class="fas fa-quote-right"></i>
+                                        <span>Cite</span>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Publication 4 -->
+                    <div class="pub-card bg-white rounded-2xl p-6 md:p-8 shadow-lg border border-slate-100 hover:border-blue-200">
+                        <div class="flex flex-col md:flex-row gap-6">
+                            <div class="flex-shrink-0">
+                                <div class="w-16 h-16 bg-gradient-to-br from-green-600 to-teal-500 rounded-xl flex items-center justify-center">
+                                    <i class="fas fa-file-alt text-white text-2xl"></i>
+                                </div>
+                            </div>
+                            <div class="flex-1">
+                                <div class="flex flex-wrap items-center gap-3 mb-3">
+                                    <span class="bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-xs font-semibold uppercase tracking-wide">Journal Article</span>
+                                    <span class="bg-green-100 text-green-700 px-3 py-1 rounded-full text-xs font-semibold">2023</span>
+                                    <span class="bg-orange-100 text-orange-700 px-3 py-1 rounded-full text-xs font-semibold">Sci Total Environ</span>
+                                </div>
+                                <h3 class="text-xl font-bold text-slate-900 mb-3 leading-relaxed">
+                                    A 1-D model to retrieve the vertical profiles of minor atmospheric constituents for cloud microphysical modeling: II. Simulation of diurnal cycle
+                                </h3>
+                                <p class="text-slate-600 mb-4 leading-relaxed">
+                                    Patnaik, K., Kesarkar, A. P., <strong class="text-blue-600">Rath, S.</strong>, Bhate, J. N., & Chandrasekar, A.
+                                </p>
+                                <p class="text-slate-500 text-sm mb-4">
+                                    <i class="fas fa-book mr-2"></i>Science of The Total Environment, Article 167377 (2023)
+                                </p>
+                                <div class="flex flex-wrap gap-3">
+                                    <a href="https://doi.org/10.1016/j.scitotenv.2023.167377" target="_blank" class="doi-link inline-flex items-center gap-2 px-4 py-2 bg-blue-50 hover:bg-blue-100 text-blue-600 rounded-lg text-sm font-medium transition-colors">
+                                        <i class="fas fa-link"></i>
+                                        <span>View DOI</span>
+                                    </a>
+                                    <a href="https://doi.org/10.1016/j.scitotenv.2023.167377" target="_blank"  class="inline-flex items-center gap-2 px-4 py-2 bg-slate-50 hover:bg-slate-100 text-slate-600 rounded-lg text-sm font-medium transition-colors">
+                                        <i class="fas fa-external-link-alt"></i>
+                                        <span>Read Online</span>
+                                    </a>
+                                    <button class="inline-flex items-center gap-2 px-4 py-2 bg-slate-50 hover:bg-slate-100 text-slate-600 rounded-lg text-sm font-medium transition-colors">
+                                        <i class="fas fa-quote-right"></i>
+                                        <span>Cite</span>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Publication 5 -->
+                    <div class="pub-card bg-white rounded-2xl p-6 md:p-8 shadow-lg border border-slate-100 hover:border-blue-200">
+                        <div class="flex flex-col md:flex-row gap-6">
+                            <div class="flex-shrink-0">
+                                <div class="w-16 h-16 bg-gradient-to-br from-orange-600 to-yellow-500 rounded-xl flex items-center justify-center">
+                                    <i class="fas fa-file-alt text-white text-2xl"></i>
+                                </div>
+                            </div>
+                            <div class="flex-1">
+                                <div class="flex flex-wrap items-center gap-3 mb-3">
+                                    <span class="bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-xs font-semibold uppercase tracking-wide">Journal Article</span>
+                                    <span class="bg-green-100 text-green-700 px-3 py-1 rounded-full text-xs font-semibold">2024</span>
+                                    <span class="bg-orange-100 text-orange-700 px-3 py-1 rounded-full text-xs font-semibold">Sci Total Environ</span>
+                                </div>
+                                <h3 class="text-xl font-bold text-slate-900 mb-3 leading-relaxed">
+                                    A 1-D model to retrieve the vertical profiles of minor atmospheric constituents for cloud microphysical modelling: III. Disturbed weather situations
+                                </h3>
+                                <p class="text-slate-600 mb-4 leading-relaxed">
+                                    Patnaik, Kavita, et al. (including <strong class="text-blue-600">Rath, S.</strong>)
+                                </p>
+                                <p class="text-slate-500 text-sm mb-4">
+                                    <i class="fas fa-book mr-2"></i>Science of The Total Environment, Volume 907, Article 167959 (2024)
+                                </p>
+                                <div class="flex flex-wrap gap-3">
+                                    <a href="https://doi.org/10.1016/j.scitotenv.2023.167959"  target="_blank"  class="doi-link inline-flex items-center gap-2 px-4 py-2 bg-blue-50 hover:bg-blue-100 text-blue-600 rounded-lg text-sm font-medium transition-colors">
+                                        <i class="fas fa-link"></i>
+                                        <span>View DOI</span>
+                                    </a>
+                                    <a href="https://doi.org/10.1016/j.scitotenv.2023.167959" target="_blank" class="inline-flex items-center gap-2 px-4 py-2 bg-slate-50 hover:bg-slate-100 text-slate-600 rounded-lg text-sm font-medium transition-colors">
+                                        <i class="fas fa-external-link-alt"></i>
+                                        <span>Read Online</span>
+                                    </a>
+                                    <button class="inline-flex items-center gap-2 px-4 py-2 bg-slate-50 hover:bg-slate-100 text-slate-600 rounded-lg text-sm font-medium transition-colors">
+                                        <i class="fas fa-quote-right"></i>
+                                        <span>Cite</span>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- Conference Publications Tab -->
+            <div id="conference" class="tab-content hidden reveal">
+                <div class="space-y-6">
+
+                    <!-- Conference 1 -->
+                    <div class="pub-card bg-white rounded-2xl p-6 md:p-8 shadow-lg border border-slate-100 hover:border-purple-200">
+                        <div class="flex flex-col md:flex-row gap-6">
+                            <div class="flex-shrink-0">
+                                <div class="w-16 h-16 bg-gradient-to-br from-purple-600 to-blue-500 rounded-xl flex items-center justify-center">
+                                    <i class="fas fa-microphone-alt text-white text-2xl"></i>
+                                </div>
+                            </div>
+                            <div class="flex-1">
+                                <div class="flex flex-wrap items-center gap-3 mb-3">
+                                    <span class="bg-purple-100 text-purple-700 px-3 py-1 rounded-full text-xs font-semibold uppercase tracking-wide">Conference Paper</span>
+                                    <span class="bg-green-100 text-green-700 px-3 py-1 rounded-full text-xs font-semibold">2025</span>
+                                    <span class="bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-xs font-semibold">IWM8</span>
+                                </div>
+                                <h3 class="text-xl font-bold text-slate-900 mb-3 leading-relaxed">
+                                    AI in the Atmosphere: Transforming Cloud Fraction Parametrization for Better Predictions
+                                </h3>
+                                <p class="text-slate-600 mb-4 leading-relaxed">
+                                    <strong class="text-blue-600">Subhrajit Rath</strong>, Deepesh Kumar Jain, Suryachandra A. Rao
+                                </p>
+                                <p class="text-slate-500 text-sm mb-4">
+                                    <i class="fas fa-calendar mr-2"></i>8th International Workshop on Mesoscale Processes (IWM8-2025)
+                                </p>
+                                <div class="flex flex-wrap gap-3">
+                                    <a href="iwm8_subhrajit.pdf" target="_blank" class="inline-flex items-center gap-2 px-4 py-2 bg-purple-50 hover:bg-purple-100 text-purple-600 rounded-lg text-sm font-medium transition-colors">
+                                        <i class="fas fa-file-pdf"></i>
+                                        <span>Download PDF</span>
+                                    </a>
+                                    <button class="inline-flex items-center gap-2 px-4 py-2 bg-slate-50 hover:bg-slate-100 text-slate-600 rounded-lg text-sm font-medium transition-colors">
+                                        <i class="fas fa-quote-right"></i>
+                                        <span>Cite</span>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Conference 2 -->
+                    <div class="pub-card bg-white rounded-2xl p-6 md:p-8 shadow-lg border border-slate-100 hover:border-purple-200">
+                        <div class="flex flex-col md:flex-row gap-6">
+                            <div class="flex-shrink-0">
+                                <div class="w-16 h-16 bg-gradient-to-br from-cyan-600 to-purple-500 rounded-xl flex items-center justify-center">
+                                    <i class="fas fa-microphone-alt text-white text-2xl"></i>
+                                </div>
+                            </div>
+                            <div class="flex-1">
+                                <div class="flex flex-wrap items-center gap-3 mb-3">
+                                    <span class="bg-purple-100 text-purple-700 px-3 py-1 rounded-full text-xs font-semibold uppercase tracking-wide">Conference Paper</span>
+                                    <span class="bg-green-100 text-green-700 px-3 py-1 rounded-full text-xs font-semibold">2024</span>
+                                    <span class="bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-xs font-semibold">NSSS</span>
+                                </div>
+                                <h3 class="text-xl font-bold text-slate-900 mb-3 leading-relaxed">
+                                    Simulation of impact of surface infrared heating on growth of the cloud
+                                </h3>
+                                <p class="text-slate-600 mb-4 leading-relaxed">
+                                    <strong class="text-blue-600">Subhrajit Rath</strong>, Kavita Patnaik, Amit Kesarkar, Jyoti Bhate, and Govindan Kutty
+                                </p>
+                                <p class="text-slate-500 text-sm mb-4">
+                                    <i class="fas fa-calendar mr-2"></i>National Symposium on Space Science (NSSS-2024)
+                                </p>
+                                <div class="flex flex-wrap gap-3">
+                                    <button class="inline-flex items-center gap-2 px-4 py-2 bg-slate-50 hover:bg-slate-100 text-slate-600 rounded-lg text-sm font-medium transition-colors">
+                                        <i class="fas fa-quote-right"></i>
+                                        <span>Cite</span>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Conference 3 -->
+                    <div class="pub-card bg-white rounded-2xl p-6 md:p-8 shadow-lg border border-slate-100 hover:border-purple-200">
+                        <div class="flex flex-col md:flex-row gap-6">
+                            <div class="flex-shrink-0">
+                                <div class="w-16 h-16 bg-gradient-to-br from-blue-600 to-cyan-500 rounded-xl flex items-center justify-center">
+                                    <i class="fas fa-microphone-alt text-white text-2xl"></i>
+                                </div>
+                            </div>
+                            <div class="flex-1">
+                                <div class="flex flex-wrap items-center gap-3 mb-3">
+                                    <span class="bg-purple-100 text-purple-700 px-3 py-1 rounded-full text-xs font-semibold uppercase tracking-wide">Conference Paper</span>
+                                    <span class="bg-green-100 text-green-700 px-3 py-1 rounded-full text-xs font-semibold">2023</span>
+                                    <span class="bg-red-100 text-red-700 px-3 py-1 rounded-full text-xs font-semibold">AGU</span>
+                                </div>
+                                <h3 class="text-xl font-bold text-slate-900 mb-3 leading-relaxed">
+                                    A Case Study on Infrared Heating-Induced Turbulence Inside the Warm Cloud and Its Impact on Vertical Velocity
+                                </h3>
+                                <p class="text-slate-600 mb-4 leading-relaxed">
+                                    <strong class="text-blue-600">Rath Subhrajit</strong>, Kavita Patnaik, and Amit P. Kesarkar
+                                </p>
+                                <p class="text-slate-500 text-sm mb-4">
+                                    <i class="fas fa-calendar mr-2"></i>American Geophysical Union Fall Meeting (AGU23)
+                                </p>
+                                <div class="flex flex-wrap gap-3">
+                                    <button class="inline-flex items-center gap-2 px-4 py-2 bg-slate-50 hover:bg-slate-100 text-slate-600 rounded-lg text-sm font-medium transition-colors">
+                                        <i class="fas fa-quote-right"></i>
+                                        <span>Cite</span>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Conference 4 -->
+                    <div class="pub-card bg-white rounded-2xl p-6 md:p-8 shadow-lg border border-slate-100 hover:border-purple-200">
+                        <div class="flex flex-col md:flex-row gap-6">
+                            <div class="flex-shrink-0">
+                                <div class="w-16 h-16 bg-gradient-to-br from-green-600 to-teal-500 rounded-xl flex items-center justify-center">
+                                    <i class="fas fa-microphone-alt text-white text-2xl"></i>
+                                </div>
+                            </div>
+                            <div class="flex-1">
+                                <div class="flex flex-wrap items-center gap-3 mb-3">
+                                    <span class="bg-purple-100 text-purple-700 px-3 py-1 rounded-full text-xs font-semibold uppercase tracking-wide">Conference Paper</span>
+                                    <span class="bg-green-100 text-green-700 px-3 py-1 rounded-full text-xs font-semibold">2022</span>
+                                    <span class="bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-xs font-semibold">NSSS</span>
+                                </div>
+                                <h3 class="text-xl font-bold text-slate-900 mb-3 leading-relaxed">
+                                    Simulation of impact of surface infrared heating on growth of the cloud
+                                </h3>
+                                <p class="text-slate-600 mb-4 leading-relaxed">
+                                    <strong class="text-blue-600">Subhrajit Rath</strong>, Kavita Patnaik, Amit Kesarkar, Jyoti Bhate, and Govindan Kutty
+                                </p>
+                                <p class="text-slate-500 text-sm mb-4">
+                                    <i class="fas fa-calendar mr-2"></i>National Symposium on Space Science (NSSS-2022)
+                                </p>
+                                <div class="flex flex-wrap gap-3">
+                                    <button class="inline-flex items-center gap-2 px-4 py-2 bg-slate-50 hover:bg-slate-100 text-slate-600 rounded-lg text-sm font-medium transition-colors">
+                                        <i class="fas fa-quote-right"></i>
+                                        <span>Cite</span>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Conference 5 -->
+                    <div class="pub-card bg-white rounded-2xl p-6 md:p-8 shadow-lg border border-slate-100 hover:border-purple-200">
+                        <div class="flex flex-col md:flex-row gap-6">
+                            <div class="flex-shrink-0">
+                                <div class="w-16 h-16 bg-gradient-to-br from-orange-600 to-yellow-500 rounded-xl flex items-center justify-center">
+                                    <i class="fas fa-microphone-alt text-white text-2xl"></i>
+                                </div>
+                            </div>
+                            <div class="flex-1">
+                                <div class="flex flex-wrap items-center gap-3 mb-3">
+                                    <span class="bg-purple-100 text-purple-700 px-3 py-1 rounded-full text-xs font-semibold uppercase tracking-wide">Conference Paper</span>
+                                    <span class="bg-green-100 text-green-700 px-3 py-1 rounded-full text-xs font-semibold">2020</span>
+                                    <span class="bg-orange-100 text-orange-700 px-3 py-1 rounded-full text-xs font-semibold">TROPMET</span>
+                                </div>
+                                <h3 class="text-xl font-bold text-slate-900 mb-3 leading-relaxed">
+                                    Simulation of the impact of infrared heating on the growth of the cloud
+                                </h3>
+                                <p class="text-slate-600 mb-4 leading-relaxed">
+                                    <strong class="text-blue-600">Subhrajit Rath</strong>, Kavita Patnaik, Amit Kesarkar, Jyoti Bhate, and Govindan Kutty
+                                </p>
+                                <p class="text-slate-500 text-sm mb-4">
+                                    <i class="fas fa-calendar mr-2"></i>TROPMET-2020, Bhopal, India
+                                </p>
+                                <div class="flex flex-wrap gap-3">
+                                    <button class="inline-flex items-center gap-2 px-4 py-2 bg-slate-50 hover:bg-slate-100 text-slate-600 rounded-lg text-sm font-medium transition-colors">
+                                        <i class="fas fa-quote-right"></i>
+                                        <span>Cite</span>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Conference 6 -->
+                    <div class="pub-card bg-white rounded-2xl p-6 md:p-8 shadow-lg border border-slate-100 hover:border-purple-200">
+                        <div class="flex flex-col md:flex-row gap-6">
+                            <div class="flex-shrink-0">
+                                <div class="w-16 h-16 bg-gradient-to-br from-red-600 to-pink-500 rounded-xl flex items-center justify-center">
+                                    <i class="fas fa-microphone-alt text-white text-2xl"></i>
+                                </div>
+                            </div>
+                            <div class="flex-1">
+                                <div class="flex flex-wrap items-center gap-3 mb-3">
+                                    <span class="bg-purple-100 text-purple-700 px-3 py-1 rounded-full text-xs font-semibold uppercase tracking-wide">Conference Paper</span>
+                                    <span class="bg-green-100 text-green-700 px-3 py-1 rounded-full text-xs font-semibold">2022</span>
+                                    <span class="bg-orange-100 text-orange-700 px-3 py-1 rounded-full text-xs font-semibold">TROPMET</span>
+                                </div>
+                                <h3 class="text-xl font-bold text-slate-900 mb-3 leading-relaxed">
+                                    Retrieval of vertical profiles of minor atmospheric Constituents for cloud microphysical modelling
+                                </h3>
+                                <p class="text-slate-600 mb-4 leading-relaxed">
+                                    Kavita Patnaik, <strong class="text-blue-600">Subhrajit Rath</strong>, Amit Kesarkar, Jyoti Bhate, and Govindan Kutty
+                                </p>
+                                <p class="text-slate-500 text-sm mb-4">
+                                    <i class="fas fa-calendar mr-2"></i>TROPMET-2022, Bhopal, India
+                                </p>
+                                <div class="flex flex-wrap gap-3">
+                                    <button class="inline-flex items-center gap-2 px-4 py-2 bg-slate-50 hover:bg-slate-100 text-slate-600 rounded-lg text-sm font-medium transition-colors">
+                                        <i class="fas fa-quote-right"></i>
+                                        <span>Cite</span>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- Research Topics -->
+            <div class="mt-20 bg-white rounded-3xl p-8 md:p-12 shadow-xl border border-slate-100 reveal">
+                <h2 class="text-3xl font-bold text-slate-900 text-center mb-4">Research Focus Areas</h2>
+                <p class="text-slate-600 text-center mb-10 max-w-2xl mx-auto">My publications span multiple interconnected domains in atmospheric science</p>
+
+                <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+                    <div class="bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl p-4 text-center border border-blue-200">
+                        <i class="fas fa-cloud text-3xl text-blue-500 mb-2"></i>
+                        <p class="font-semibold text-slate-700 text-sm">Cloud Microphysics</p>
+                    </div>
+                    <div class="bg-gradient-to-br from-purple-50 to-purple-100 rounded-xl p-4 text-center border border-purple-200">
+                        <i class="fas fa-sun text-3xl text-purple-500 mb-2"></i>
+                        <p class="font-semibold text-slate-700 text-sm">Radiative Transfer</p>
+                    </div>
+                    <div class="bg-gradient-to-br from-cyan-50 to-cyan-100 rounded-xl p-4 text-center border border-cyan-200">
+                        <i class="fas fa-wind text-3xl text-cyan-500 mb-2"></i>
+                        <p class="font-semibold text-slate-700 text-sm">Vertical Velocity</p>
+                    </div>
+                    <div class="bg-gradient-to-br from-green-50 to-green-100 rounded-xl p-4 text-center border border-green-200">
+                        <i class="fas fa-brain text-3xl text-green-500 mb-2"></i>
+                        <p class="font-semibold text-slate-700 text-sm">AI/ML in Met</p>
+                    </div>
+                    <div class="bg-gradient-to-br from-orange-50 to-orange-100 rounded-xl p-4 text-center border border-orange-200">
+                        <i class="fas fa-flask text-3xl text-orange-500 mb-2"></i>
+                        <p class="font-semibold text-slate-700 text-sm">HITRAN Data</p>
+                    </div>
+                    <div class="bg-gradient-to-br from-red-50 to-red-100 rounded-xl p-4 text-center border border-red-200">
+                        <i class="fas fa-chart-line text-3xl text-red-500 mb-2"></i>
+                        <p class="font-semibold text-slate-700 text-sm">NWP Models</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Google Scholar CTA -->
+            <div class="mt-12 bg-gradient-to-r from-blue-600 to-cyan-500 rounded-3xl p-8 md:p-12 text-center text-white shadow-xl reveal">
+                <i class="fas fa-graduation-cap text-5xl mb-6"></i>
+                <h2 class="text-3xl font-bold mb-4">View Complete Publication List</h2>
+                <p class="text-blue-100 mb-8 max-w-2xl mx-auto">
+                    Access my complete publication history, citation metrics, and research impact on Google Scholar
+                </p>
+                <a href="https://scholar.google.com/citations?user=ORZunJoAAAAJ&hl=en" target="_blank" class="inline-flex items-center gap-3 px-8 py-4 bg-white text-blue-600 rounded-full font-semibold hover:bg-blue-50 transition-all transform hover:scale-105 shadow-lg">
+                    <i class="fas fa-external-link-alt"></i>
+                    <span>Google Scholar Profile</span>
+                </a>
+            </div>
         </div>
+    </section>
 
-        <div id="Conference" class="tabcontent">
-            <ol>
-                <li>Subhrajit Rath, Deepesh Kumar Jain, Suryachandra A. Rao,AI in the Atmosphere: Transforming Cloud Fraction Parametrization for Better Predictions, IWM8-2025.<a href="iwm8_subhrajit.pdf">iwm8_subhrajit</a>
-                <li>Subhrajit Rath, Kavita Patnaik, Amit Kesarkar, Jyoti Bhate, and Govindan Kutty, Simulation of impact of surface infrared heating on growth of the cloud, NSSS-2024.</li>
-                <li>Rath Subhrajit, Kavita Patnaik, and Amit P. Kesarkar. "A Case Study on Infrared Heating-Induced Turbulence Inside the Warm Cloud and Its Impact on Vertical Velocity." AGU23 (2023).</li>
-                <li>Subhrajit Rath, Kavita Patnaik, Amit Kesarkar, Jyoti Bhate, and Govindan Kutty, Simulation of impact of surface infrared heating on growth of the cloud, NSSS-2022.</li>
-                <li>Subhrajit Rath, Kavita Patnaik, Amit Kesarkar, Jyoti Bhate, and Govindan Kutty, Simulation of the impact of infrared heating on the growth of the cloud, TROPMET-2020, Bhopal, India.</li>
-                <li>Kavita Patnaik, Subhrajit Rath, Amit Kesarkar, Jyoti Bhate, and Govindan Kutty, Retrieval of vertical profiles of minor atmospheric Constituents for cloud microphysical modelling, TROPMET-2022, Bhopal, India.</li>
-            </ol>
+    <!-- Footer -->
+    <footer class="bg-slate-900 py-12 border-t border-slate-800">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <h3 class="text-2xl font-bold gradient-text mb-4">S.<span class="text-white">Rath</span></h3>
+            <p class="text-slate-400 mb-8">Personal & Research Portfolio</p>
+            <div class="flex justify-center space-x-6 mb-8">
+                <a href="index.html" class="text-slate-400 hover:text-white transition-colors">Home</a>
+                <a href="contact.html" class="text-slate-400 hover:text-white transition-colors">Contact</a>
+                <a href="publications.html" class="text-slate-400 hover:text-white transition-colors">Publications</a>
+            </div>
+            <p class="text-slate-600 text-sm">
+                &copy; <script>document.write(new Date().getFullYear());</script> Subhrajit Rath. All rights reserved.
+            </p>
         </div>
-    </div>
-
+    </footer>
 
     <script>
-              const gradients = [
-            { start: '#bee3f8', end: '#2d3748' }, // Blue to dark gray
-            { start: '#a3bffa', end: '#1a5276' }, // Purple-blue to teal
-            { start: '#81e6d9', end: '#2c7a7b' }, // Teal to dark teal
-            { start: '#fed7e2', end: '#9f7aea' }, // Pink to purple
-            { start: '#fefcbf', end: '#ed8936' }  // Yellow to orange
-        ];
-        let gradientIndex = 0;
+        // Tab Functionality
+        function openTab(tabName) {
+            // Hide all tab contents
+            var contents = document.getElementsByClassName('tab-content');
+            for (var i = 0; i < contents.length; i++) {
+                contents[i].classList.add('hidden');
+                contents[i].classList.remove('active');
+            }
 
-        // Function to change gradient
-        function changeGradient() {
-            const { start, end } = gradients[gradientIndex];
-            document.body.style.background = `linear-gradient(135deg, ${start}, ${end})`;
-            gradientIndex = (gradientIndex + 1) % gradients.length; // Cycle through gradients
+            // Remove active class from all buttons
+            var buttons = document.getElementsByClassName('tab-btn');
+            for (var i = 0; i < buttons.length; i++) {
+                buttons[i].classList.remove('active', 'bg-gradient-to-r', 'from-blue-600', 'to-cyan-500', 'text-white');
+                buttons[i].classList.add('bg-slate-100', 'text-slate-600');
+            }
+
+            // Show selected tab content
+            document.getElementById(tabName).classList.remove('hidden');
+            document.getElementById(tabName).classList.add('active');
+
+            // Add active class to clicked button
+            event.currentTarget.classList.remove('bg-slate-100', 'text-slate-600');
+            event.currentTarget.classList.add('active', 'bg-gradient-to-r', 'from-blue-600', 'to-cyan-500', 'text-white');
+
+            // Trigger reveal animation
+            setTimeout(() => {
+                document.getElementById(tabName).classList.add('active');
+            }, 100);
         }
 
-        // Change gradient every 5 seconds
-        setInterval(changeGradient, 5000);
-
-        function openTab(evt, tabName) {
-            var i, tabcontent, tablinks;
-            tabcontent = document.getElementsByClassName("tabcontent");
-            for (i = 0; i < tabcontent.length; i++) {
-                tabcontent[i].style.display = "none";
+        // Scroll Reveal Animation
+        function reveal() {
+            var reveals = document.querySelectorAll(".reveal");
+            for (var i = 0; i < reveals.length; i++) {
+                var windowHeight = window.innerHeight;
+                var elementTop = reveals[i].getBoundingClientRect().top;
+                var elementVisible = 100;
+                if (elementTop < windowHeight - elementVisible) {
+                    reveals[i].classList.add("active");
+                }
             }
-            tablinks = document.getElementsByClassName("tablinks");
-            for (i = 0; i < tablinks.length; i++) {
-                tablinks[i].className = tablinks[i].className.replace(" active", "");
-            }
-            document.getElementById(tabName).style.display = "block";
-            evt.currentTarget.className += " active";
-            changeGradient()
         }
+        window.addEventListener("scroll", reveal);
+        reveal();
 
-        // Open the default tab on page load
-        document.getElementById("defaultOpen").click();
+        // Navbar blur effect on scroll
+        const navbar = document.getElementById('navbar');
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 20) {
+                navbar.classList.add('shadow-md');
+            } else {
+                navbar.classList.remove('shadow-md');
+            }
+        });
     </script>
-    
-    <footer>
-        <h5>© 2024 Subhrajit Rath - Personal Blog</h5>
-    </footer>
 </body>
-
-
 </html>
 
