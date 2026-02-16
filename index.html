@@ -4,366 +4,439 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Subhrajit Rath - Researcher in Atmospheric Science, Radiation Modeling, HITRAN data curation, NWP, and cloud microphysics.">
-    <title>About - Subhrajit Rath</title>
+    <title>Subhrajit Rath | Atmospheric Science Researcher</title>
 
-    <!-- Google Fonts: Inter (clean & modern) -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Georgia:ital,wght@0,700;1,700&display=swap" rel="stylesheet">
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
 
-    <!-- Font Awesome 6 -->
+    <!-- Fontsource Inter -->
+    <link href="https://fontsource.org/inter/index.css" rel="stylesheet">
+
+    <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        html {
+        body {
+            font-family: 'Inter', sans-serif;
             scroll-behavior: smooth;
         }
 
-        body {
-            font-family: 'Inter', system-ui, sans-serif;
-            background: linear-gradient(135deg, #e6f0fa, #c3d8ef);
-            color: #1e293b;
-            line-height: 1.6;
+        .hero-bg {
+            background-image: url('https://image.qwenlm.ai/public_source/dabdad38-e7f1-438d-be14-12c4c31c7a58/1d9dc8965-59fa-45d5-84fd-4833fde0c669.png');
+            background-size: cover;
+            background-position: center;
         }
 
-        header {
-            position: relative;
-            min-height: 200px;
-            background: linear-gradient(135deg, #1e40af, #3b82f6);
-            color: white;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            text-align: center;
-            padding: 2rem 1rem;
+        .reveal {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.8s ease-out;
+        }
+        .reveal.active {
+            opacity: 1;
+            transform: translateY(0);
         }
 
-        .hero-glass {
-            background: rgba(255, 255, 255, 0.15);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.25);
-            border-radius: 20px;
-            padding: 1rem 2rem;
-            max-width: 9000px;
-            box-shadow: 0 6px 32px rgba(0, 0, 0, 0.15);
+        .gradient-text {
+            background: linear-gradient(135deg, #3b82f6, #06b6d4);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
         }
 
-        .hero-glass h1 {
-            font-size: 2.8rem;
-            font-weight: 700;
-            margin-bottom: 0.8rem;
-        }
-
-        .hero-glass p {
-            font-size: 1.3rem;
-            font-weight: 300;
-            opacity: 0.95;
-        }
-
-        nav {
+        .glass-card {
             background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(8px);
-            padding: 1.2rem 0;
-            position: sticky;
-            top: 0;
-            z-index: 100;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-            text-align: center;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
         }
 
-        nav a, .dropbtn {
-            color: #1e40af;
-            margin: 0 1.1rem;
-            text-decoration: none;
-            font-weight: 500;
-            transition: color 0.3s ease;
+        .nav-link {
             position: relative;
         }
-
-        nav a::after, .dropbtn::after {
+        .nav-link::after {
             content: '';
             position: absolute;
             width: 0;
-            height: 2.5px;
-            bottom: -6px;
+            height: 2px;
+            bottom: -4px;
             left: 50%;
             background: #3b82f6;
-            transition: width 0.35s ease, left 0.35s ease;
-            transform: translateX(-50%);
-        }
-
-        nav a:hover::after, .dropbtn:hover::after,
-        nav a:focus::after, .dropbtn:focus::after {
-            width: 70%;
-        }
-
-        nav a:hover, .dropbtn:hover {
-            color: #3b82f6;
-        }
-
-        /* Dropdown Improvements */
-        .dropdown {
-            position: relative;
-            display: inline-block;
-        }
-
-        .dropdown-content {
-            display: none;
-            position: absolute;
-            background: white;
-            min-width: 340px;          /* <-- Increased for longer job links */
-            max-width: 420px;          /* Prevents extreme stretching on ultra-wide screens */
-            box-shadow: 0 10px 25px rgba(0,0,0,0.18);
-            border-radius: 10px;
-            z-index: 1;
-            top: 100%;
-            left: 50%;
-            transform: translateX(-50%);
-            overflow: hidden;
-            padding: 8px 0;
-        }
-
-        .dropdown-content a {
-            color: #1e293b;
-            padding: 12px 20px;        /* More horizontal padding for comfort */
-            display: block;
-            text-decoration: none;
-            transition: background 0.2s;
-            white-space: nowrap;       /* Prevents wrapping inside items */
-            overflow: hidden;
-            text-overflow: ellipsis;   /* Adds ... for very long items if needed */
-        }
-
-        .dropdown-content a:hover {
-            background: #eff6ff;
-            color: #1e40af;
-        }
-
-        .dropdown:hover .dropdown-content {
-            display: block;
-        }
-
-        .container {
-            max-width: 1100px;
-            margin: 4rem auto;
-            padding: 0 1.5rem;
-            display: flex;
-            flex-wrap: wrap;
-            gap: 3rem;
-            align-items: center;
-        }
-
-        .image-container {
-            flex: 1 1 320px;
-            text-align: center;
-        }
-
-        .image-container img {
-            width: 100%;
-            max-width: 360px;
-            border-radius: 50%;
-            border: 6px solid rgba(59, 130, 246, 0.2);
-            box-shadow: 0 10px 30px rgba(30, 64, 175, 0.15);
-            transition: transform 0.4s ease;
-        }
-
-        .image-container img:hover {
-            transform: scale(1.05);
-        }
-
-        .social-links {
-            margin-top: 2rem;
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            gap: 1rem;
-        }
-
-        .social-links a {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            color: #1e293b;
-            text-decoration: none;
-            padding: 10px 16px;
-            border-radius: 50px;
-            background: rgba(59, 130, 246, 0.08);
             transition: all 0.3s ease;
-            font-size: 0.95rem;
+            transform: translateX(-50%);
         }
-
-        .social-links a:hover {
-            background: #3b82f6;
-            color: white;
-            transform: translateY(-3px);
-        }
-
-        .social-links i {
-            font-size: 1.3rem;
-        }
-
-        .text-container {
-            flex: 2 1 500px;
-        }
-
-        .text-container p {
-            font-size: 1.1rem;
-            margin-bottom: 1.4rem;
-            color: #334155;
-        }
-
-        .highlight {
-            font-family: 'Georgia', serif;
-            font-style: italic;
-            font-weight: bold;
-            color: #1e40af;
-            font-size: 1.25rem;
-            margin: 1.5rem 0;
-            display: block;
-        }
-
-        footer {
-            background: linear-gradient(135deg, #1e293b, #334155);
-            color: white;
-            text-align: center;
-            padding: 2rem 1rem;
-            margin-top: 5rem;
-        }
-
-        @media (max-width: 768px) {
-            .container {
-                flex-direction: column;
-                text-align: center;
-            }
-
-            .hero-glass {
-                padding: 2.5rem 2rem;
-            }
-
-            .hero-glass h1 { font-size: 2.3rem; }
-            .hero-glass p  { font-size: 1.15rem; }
-
-            nav {
-                padding: 1rem 0;
-            }
-
-            nav a, .dropbtn {
-                margin: 0.6rem 0.8rem;
-                font-size: 0.95rem;
-            }
-
-            .dropdown-content {
-                left: 0;
-                transform: none;
-                width: 90vw;              /* Full-width-ish on mobile for readability */
-                max-width: none;
-                min-width: auto;
-                text-align: left;
-            }
-
-            .dropdown-content a {
-                white-space: normal;      /* Allow wrapping on small screens */
-            }
+        .nav-link:hover::after {
+            width: 70%;
         }
     </style>
 </head>
-<body>
+<body class="bg-slate-50 text-slate-800 antialiased">
 
-    <header>
-        <div class="hero-glass">
-            <h1>Subhrajit Rath</h1>
-            <p>Researcher | Atmospheric Science • Radiation Modeling •AI/ML • NWP</p>
-        </div>
-    </header>
+    <!-- Navigation -->
+    <nav class="fixed w-full z-50 glass-card shadow-sm transition-all duration-300" id="navbar">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-20">
+                <div class="flex-shrink-0 flex items-center">
+                    <span class="text-2xl font-bold gradient-text tracking-tighter">S.<span class="text-slate-800">Rath</span></span>
+                </div>
 
-    <nav>
-        <a href="index.html">Home</a>
-        <a href="education.html">Education</a>
-        <a href="experience.html">Skills</a>
-        <a href="publications.html">Publications</a>
-        <a href="contact.html">Contact</a>
-        <a href="nwp_imd.html">NWP_IMD</a>
+                <!-- Desktop Menu -->
+                <div class="hidden lg:block">
+                    <div class="ml-10 flex items-baseline space-x-6">
+                        <a href="index.html" class="nav-link text-slate-600 hover:text-blue-600 px-3 py-2 text-sm font-medium transition-colors">Home</a>
+                        <a href="education.html" class="nav-link text-slate-600 hover:text-blue-600 px-3 py-2 text-sm font-medium transition-colors">Education</a>
+                        <a href="experience.html" class="nav-link text-slate-600 hover:text-blue-600 px-3 py-2 text-sm font-medium transition-colors">Skills</a>
+                        <a href="publications.html" class="nav-link text-slate-600 hover:text-blue-600 px-3 py-2 text-sm font-medium transition-colors">Publications</a>
 
-        <div class="dropdown">
-            <a href="#" class="dropbtn">Weather forecast</a>
-            <div class="dropdown-content">
-                <a href="sw.html">Weather Card</a>
-                <a href="src/weatherchart.html">Weather Chart</a>
-                <a href="srcc/geomap_multiple.html">Weather GeoHEATMap</a>
-                <a href="AQI.html">AQI HEATMap</a>
-                <a href="Weather_web.html">Weather websites</a>
-                <a href="meteogram.html">Meteogram_ others</a>
+                        <!-- Dropdown: Weather Forecast -->
+                        <div class="relative group">
+                            <button class="nav-link text-slate-600 hover:text-blue-600 px-3 py-2 text-sm font-medium transition-colors flex items-center">
+                                Weather <i class="fas fa-chevron-down ml-1 text-xs"></i>
+                            </button>
+                            <div class="absolute left-0 mt-2 w-56 rounded-xl shadow-xl bg-white ring-1 ring-slate-200 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 transform origin-top-left z-50">
+                                <div class="py-2">
+                                    <a href="sw.html" class="block px-4 py-2.5 text-sm text-slate-700 hover:bg-blue-50 hover:text-blue-600 transition-colors"><i class="fas fa-cloud-sun mr-2"></i>Weather Card</a>
+                                    <a href="src/weatherchart.html" class="block px-4 py-2.5 text-sm text-slate-700 hover:bg-blue-50 hover:text-blue-600 transition-colors"><i class="fas fa-chart-line mr-2"></i>Weather Chart</a>
+                                    <a href="srcc/geomap_multiple.html" class="block px-4 py-2.5 text-sm text-slate-700 hover:bg-blue-50 hover:text-blue-600 transition-colors"><i class="fas fa-map mr-2"></i>GeoHEATMap</a>
+                                    <a href="AQI.html" class="block px-4 py-2.5 text-sm text-slate-700 hover:bg-blue-50 hover:text-blue-600 transition-colors"><i class="fas fa-wind mr-2"></i>AQI HEATMap</a>
+                                    <a href="meteogram.html" class="block px-4 py-2.5 text-sm text-slate-700 hover:bg-blue-50 hover:text-blue-600 transition-colors"><i class="fas fa-chart-area mr-2"></i>Meteogram</a>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Dropdown: Satellite -->
+                        <div class="relative group">
+                            <button class="nav-link text-slate-600 hover:text-blue-600 px-3 py-2 text-sm font-medium transition-colors flex items-center">
+                                Satellite <i class="fas fa-chevron-down ml-1 text-xs"></i>
+                            </button>
+                            <div class="absolute left-0 mt-2 w-48 rounded-xl shadow-xl bg-white ring-1 ring-slate-200 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 transform origin-top-left z-50">
+                                <div class="py-2">
+                                    <a href="mosdac_live.html" class="block px-4 py-2.5 text-sm text-slate-700 hover:bg-blue-50 hover:text-blue-600 transition-colors"><i class="fas fa-satellite mr-2"></i>Mosdac/ISRO</a>
+                                    <a href="gibs.html" class="block px-4 py-2.5 text-sm text-slate-700 hover:bg-blue-50 hover:text-blue-600 transition-colors"><i class="fas fa-globe mr-2"></i>GIBS/NASA</a>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Dropdown: Jobs -->
+                        <div class="relative group">
+                            <button class="nav-link text-slate-600 hover:text-blue-600 px-3 py-2 text-sm font-medium transition-colors flex items-center">
+                                Jobs <i class="fas fa-chevron-down ml-1 text-xs"></i>
+                            </button>
+                            <div class="absolute left-0 mt-2 w-64 rounded-xl shadow-xl bg-white ring-1 ring-slate-200 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 transform origin-top-left z-50 max-h-96 overflow-y-auto">
+                                <div class="py-2">
+                                    <a href="Jobs.html" target="_blank" class="block px-4 py-2.5 text-sm text-slate-700 hover:bg-blue-50 hover:text-blue-600 transition-colors"><i class="fas fa-briefcase mr-2"></i>MET Jobs</a>
+                                    <a href="https://www.earthworks-jobs.com/" target="_blank" class="block px-4 py-2.5 text-sm text-slate-700 hover:bg-blue-50 hover:text-blue-600 transition-colors"><i class="fas fa-globe mr-2"></i>Earth-Works</a>
+                                    <a href="https://www.egu.eu/jobs/" target="_blank" class="block px-4 py-2.5 text-sm text-slate-700 hover:bg-blue-50 hover:text-blue-600 transition-colors"><i class="fas fa-globe-europe mr-2"></i>EGU Jobs</a>
+                                    <a href="https://careercenter.ametsoc.org/" target="_blank" class="block px-4 py-2.5 text-sm text-slate-700 hover:bg-blue-50 hover:text-blue-600 transition-colors"><i class="fas fa-cloud mr-2"></i>AMS Careers</a>
+                                    <a href="https://www.tropmet.res.in/Careers" target="_blank" class="block px-4 py-2.5 text-sm text-slate-700 hover:bg-blue-50 hover:text-blue-600 transition-colors"><i class="fas fa-university mr-2"></i>IITM Career</a>
+                                    <a href="https://ucar.wd5.myworkdayjobs.com/UCAR_Careers" target="_blank" class="block px-4 py-2.5 text-sm text-slate-700 hover:bg-blue-50 hover:text-blue-600 transition-colors"><i class="fas fa-building mr-2"></i>UCAR Careers</a>
+                                </div>
+                            </div>
+                        </div>
+
+                        <a href="contact.html" class="bg-gradient-to-r from-blue-600 to-cyan-500 text-white hover:from-blue-700 hover:to-cyan-600 px-6 py-2.5 rounded-full text-sm font-semibold transition-all shadow-lg shadow-blue-500/30 hover:shadow-blue-500/50">Contact</a>
+                    </div>
+                </div>
+
+                <!-- Mobile menu button -->
+                <div class="-mr-2 flex lg:hidden">
+                    <button type="button" onclick="document.getElementById('mobile-menu').classList.toggle('hidden')" class="inline-flex items-center justify-center p-2 rounded-lg text-slate-400 hover:text-slate-500 hover:bg-slate-100 focus:outline-none">
+                        <svg class="h-6 w-6" stroke="currentColor" fill="none" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                        </svg>
+                    </button>
+                </div>
             </div>
         </div>
 
-        <div class="dropdown">
-            <a href="#" class="dropbtn">Satellite view</a>
-            <div class="dropdown-content">
-                <a href="mosdac_live.html">Mosdac/ISRO</a>
-                <a href="gibs.html">GIBS/NASA</a>
+        <!-- Mobile Menu -->
+        <div class="hidden lg:hidden bg-white border-t" id="mobile-menu">
+            <div class="px-4 py-4 space-y-3">
+                <a href="index.html" class="block px-4 py-3 rounded-xl text-base font-medium text-slate-700 hover:text-blue-600 hover:bg-blue-50 transition-colors">Home</a>
+                <a href="education.html" class="block px-4 py-3 rounded-xl text-base font-medium text-slate-700 hover:text-blue-600 hover:bg-blue-50 transition-colors">Education</a>
+                <a href="experience.html" class="block px-4 py-3 rounded-xl text-base font-medium text-slate-700 hover:text-blue-600 hover:bg-blue-50 transition-colors">Skills</a>
+                <a href="publications.html" class="block px-4 py-3 rounded-xl text-base font-medium text-slate-700 hover:text-blue-600 hover:bg-blue-50 transition-colors">Publications</a>
+                <a href="contact.html" class="block px-4 py-3 rounded-xl text-base font-medium text-blue-600 bg-blue-50 font-semibold">Contact</a>
+
+                <div class="border-t border-slate-100 pt-4 mt-4">
+                    <p class="px-4 text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3">Tools & Resources</p>
+                    <a href="sw.html" class="block px-4 py-3 rounded-xl text-base font-medium text-slate-600 hover:bg-slate-50 transition-colors"><i class="fas fa-cloud-sun mr-2 text-blue-500"></i>Weather Tools</a>
+                    <a href="mosdac_live.html" class="block px-4 py-3 rounded-xl text-base font-medium text-slate-600 hover:bg-slate-50 transition-colors"><i class="fas fa-satellite mr-2 text-blue-500"></i>Satellite View</a>
+                    <a href="Jobs.html" class="block px-4 py-3 rounded-xl text-base font-medium text-slate-600 hover:bg-slate-50 transition-colors"><i class="fas fa-briefcase mr-2 text-blue-500"></i>Job Board</a>
+                </div>
             </div>
         </div>
-
-        <div class="dropdown">
-            <a href="#" class="dropbtn">Climatic info.</a>
-            <div class="dropdown-content">
-                <a href="climate/monavg/chloro.html">Monthly statistic</a>
-                <a href="climate/Dailyavg/chloro.html">Daily average</a>
-            </div>
-        </div>
-
-        <div class="dropdown">
-            <a href="#" class="dropbtn">Jobs</a>
-            <div class="dropdown-content">
-                <a href="Jobs.html" target="_blank">MET Jobs</a>
-                <a href="https://www.earthworks-jobs.com/" target="_blank">Earth-Works Jobs</a>
-                <a href="https://www.egu.eu/jobs/" target="_blank">EGU Jobs</a>
-                <a href="https://jobs.rmets.org/" target="_blank">RMetS Jobs</a>
-                <a href="https://careercenter.ametsoc.org/" target="_blank">AMS Careers</a>
-                <a href="https://www.21centuryweather.org.au/about-us/positions-vacant/" target="_blank">21st Century AUS MET Jobs</a>
-                <a href="https://www.tropmet.res.in/Careers" target="_blank">IITM Career</a>
-                <a href="https://vacancies.incois.gov.in/" target="_blank">INCOIS Career</a>
-                <a href="https://ucar.wd5.myworkdayjobs.com/UCAR_Careers" target="_blank">UCAR Careers</a>
-                <a href="j1.html" target="_blank">Others</a>
-            </div>
-        </div>
-
-        <a href="movies.html">Movies</a>
-        <a href="series.html">Series</a>
     </nav>
 
-    <div class="container">
-        <div class="image-container">
-            <img src="subhrajit.JPEG" alt="Subhrajit Rath - Atmospheric Science Researcher" loading="lazy">
+    <!-- Hero Section -->
+    <section class="relative min-h-screen flex items-center justify-center hero-bg">
+        <div class="absolute inset-0 bg-gradient-to-b from-slate-900/70 via-slate-900/60 to-slate-900/80"></div>
+        <div class="relative z-10 text-center px-4 max-w-5xl mx-auto reveal active">
+            <div class="mb-8 inline-block">
+                <span class="bg-blue-500/20 text-blue-100 border border-blue-400/30 px-5 py-2 rounded-full text-sm font-semibold tracking-wide uppercase backdrop-blur-sm">
+                    <i class="fas fa-atom mr-2"></i>Atmospheric Science Researcher
+                </span>
+            </div>
+            <h1 class="text-5xl md:text-7xl lg:text-8xl font-extrabold text-white mb-8 tracking-tight leading-tight">
+                Subhrajit <span class="gradient-text">Rath</span>
+            </h1>
+            <p class="text-xl md:text-2xl text-slate-200 mb-12 max-w-3xl mx-auto font-light leading-relaxed">
+                Bridging molecular spectroscopy and atmospheric modeling. Specializing in Radiation Modeling, HITRAN data curation, NWP, and cloud microphysics.
+            </p>
+            <div class="flex flex-col sm:flex-row gap-5 justify-center">
+                <a href="contact.html" class="px-10 py-4 bg-gradient-to-r from-blue-600 to-cyan-500 hover:from-blue-700 hover:to-cyan-600 text-white rounded-full font-semibold transition-all transform hover:scale-105 shadow-xl shadow-blue-500/40 hover:shadow-blue-500/60">
+                    <i class="fas fa-envelope mr-2"></i>Get in Touch
+                </a>
+                <a href="publications.html" class="px-10 py-4 bg-white/10 hover:bg-white/20 backdrop-blur-md border border-white/30 text-white rounded-full font-semibold transition-all transform hover:scale-105">
+                    <i class="fas fa-file-alt mr-2"></i>View Publications
+                </a>
+            </div>
 
-            <div class="social-links">
-                <a href="#"><i class="fas fa-globe"></i> Pune, India</a>
-                <a href="https://scholar.google.com/citations?user=ORZunJoAAAAJ&hl=en"><i class="fas fa-graduation-cap"></i> Google Scholar</a>
-                <a href="https://www.researchgate.net/profile/Subhrajit-Rath" target="_blank"><i class="fab fa-researchgate"></i> ResearchGate</a>
-                <a href="https://github.com/subhrajitjubu"><i class="fab fa-github"></i> GitHub</a>
-                <a href="https://linkedin.com/in/subhrajit-rath" target="_blank"><i class="fab fa-linkedin-in"></i> LinkedIn</a>
+            <!-- Social Links -->
+            <div class="mt-16 flex flex-wrap justify-center gap-4">
+                <a href="https://scholar.google.com/citations?user=ORZunJoAAAAJ&hl=en" target="_blank" class="group flex items-center gap-3 px-5 py-3 bg-white/10 hover:bg-white/20 backdrop-blur-md border border-white/20 rounded-full text-white transition-all hover:scale-105">
+                    <i class="fas fa-graduation-cap text-blue-400 group-hover:text-blue-300"></i>
+                    <span class="text-sm font-medium">Google Scholar</span>
+                </a>
+                <a href="https://www.researchgate.net/profile/Subhrajit-Rath" target="_blank" class="group flex items-center gap-3 px-5 py-3 bg-white/10 hover:bg-white/20 backdrop-blur-md border border-white/20 rounded-full text-white transition-all hover:scale-105">
+                    <i class="fab fa-researchgate text-blue-400 group-hover:text-blue-300"></i>
+                    <span class="text-sm font-medium">ResearchGate</span>
+                </a>
+                <a href="https://github.com/subhrajitjubu" target="_blank" class="group flex items-center gap-3 px-5 py-3 bg-white/10 hover:bg-white/20 backdrop-blur-md border border-white/20 rounded-full text-white transition-all hover:scale-105">
+                    <i class="fab fa-github text-blue-400 group-hover:text-blue-300"></i>
+                    <span class="text-sm font-medium">GitHub</span>
+                </a>
+                <a href="https://linkedin.com/in/subhrajit-rath" target="_blank" class="group flex items-center gap-3 px-5 py-3 bg-white/10 hover:bg-white/20 backdrop-blur-md border border-white/20 rounded-full text-white transition-all hover:scale-105">
+                    <i class="fab fa-linkedin-in text-blue-400 group-hover:text-blue-300"></i>
+                    <span class="text-sm font-medium">LinkedIn</span>
+                </a>
             </div>
         </div>
 
-        <div class="text-container">
-            <span class="highlight">Bridging molecular spectroscopy and atmospheric modeling</span>
-
-            <p>As a researcher, I specialize in curating and processing HITRAN molecular spectroscopic data for accurate integration into radiation transfer models. This involves meticulous cleaning, organization, formatting, and validation of line-by-line parameters to support high-fidelity simulations in atmospheric and climate science.</p>
-
-            <p>Proficient in Fortran, I develop advanced numerical methods and algorithms to solve infrared radiative transfer equations. My work also explores key relationships between meteorological variables (temperature, humidity, wind shear) and cloud microphysical processes, improving predictive accuracy in NWP and remote sensing applications.</p>
-
-            <p>I implement the advective diffusion equation using finite difference, finite element, and spectral methods for modeling substance transport in fluids. My technical toolkit includes Fortran, Python, MATLAB, and radiation models such as MODTRAN and ARTS, with experience across Linux and Windows environments.</p>
+        <!-- Scroll Indicator -->
+        <div class="absolute bottom-10 left-1/2 transform -translate-x-1/2 animate-bounce text-white/50">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path>
+            </svg>
         </div>
-    </div>
+    </section>
 
-    <footer>
-        <p>© <script>document.write(new Date().getFullYear());</script> Subhrajit Rath – Personal & Research Portfolio</p>
+    <!-- About Section -->
+    <section class="py-32 bg-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-20 items-center">
+                <!-- Image Column -->
+                <div class="relative reveal order-2 lg:order-1">
+                    <div class="absolute -top-6 -left-6 w-32 h-32 bg-gradient-to-br from-blue-100 to-cyan-100 rounded-full blur-2xl opacity-70"></div>
+                    <div class="absolute -bottom-6 -right-6 w-40 h-40 bg-gradient-to-br from-cyan-100 to-blue-100 rounded-full blur-2xl opacity-70"></div>
+                    <div class="relative">
+                        <div class="absolute inset-0 bg-gradient-to-br from-blue-600 to-cyan-500 rounded-3xl transform rotate-3 opacity-20"></div>
+                        <!-- Replace with your actual image: subhrajit.JPEG -->
+                        <img src="subhrajit.JPEG" alt="Subhrajit Rath" class="relative rounded-1xl shadow-2xl w-full object-cover aspect-[9/5] border-4 border-white">
+                    </div>
+
+                    <!-- Location Badge -->
+                    <div class="absolute -bottom-4 -right-4 lg:right-10 bg-white rounded-2xl shadow-xl px-6 py-4 border border-slate-100">
+                        <div class="flex items-center gap-3">
+                            <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
+                                <i class="fas fa-map-marker-alt text-blue-600 text-xl"></i>
+                            </div>
+                            <div>
+                                <p class="text-xs text-slate-500 font-medium">Location</p>
+                                <p class="text-sm font-bold text-slate-800">Pune, India</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Text Column -->
+                <div class="reveal order-1 lg:order-2">
+                    <div class="inline-block mb-6">
+                        <span class="bg-blue-100 text-blue-600 px-4 py-1.5 rounded-full text-sm font-semibold">About Me</span>
+                    </div>
+                    <h2 class="text-4xl md:text-5xl font-bold text-slate-900 mb-8 leading-tight">
+                        Advancing Atmospheric <span class="gradient-text">Science</span> Through Research
+                    </h2>
+
+                    <div class="space-y-6 text-lg text-slate-600 leading-relaxed">
+                        <p>
+                            As a researcher, I specialize in <span class="font-semibold text-blue-600 bg-blue-50 px-2 py-0.5 rounded">curating and processing HITRAN molecular spectroscopic data</span> for accurate integration into radiation transfer models. This involves meticulous cleaning, organization, formatting, and validation of line-by-line parameters to support high-fidelity simulations in atmospheric and climate science.
+                        </p>
+
+                        <div class="bg-gradient-to-r from-blue-50 to-cyan-50 border-l-4 border-blue-500 p-8 rounded-r-2xl my-10">
+                            <p class="italic font-serif text-xl text-slate-800 leading-relaxed">
+                                <i class="fas fa-quote-left text-blue-400 mr-3"></i>
+                                Bridging molecular spectroscopy and atmospheric modeling to improve predictive accuracy in weather and climate systems.
+                            </p>
+                        </div>
+
+                        <p>
+                            Proficient in <span class="font-mono text-sm bg-slate-100 px-2 py-1 rounded text-slate-700 font-semibold">Fortran</span>, I develop advanced numerical methods and algorithms to solve infrared radiative transfer equations. My work also explores key relationships between meteorological variables (temperature, humidity, wind shear) and cloud microphysical processes, improving predictive accuracy in NWP and remote sensing applications.
+                        </p>
+
+                        <p>
+                            I implement the advective diffusion equation using finite difference, finite element, and spectral methods for modeling substance transport in fluids. My technical toolkit includes Fortran, Python, MATLAB, and radiation models such as <span class="font-semibold text-slate-800">MODTRAN</span> and <span class="font-semibold text-slate-800">ARTS</span>, with experience across Linux and Windows environments.
+                        </p>
+                    </div>
+
+                    <!-- Skills Tags -->
+                    <div class="mt-12">
+                        <h3 class="text-sm font-semibold text-slate-500 uppercase tracking-wider mb-4">Technical Expertise</h3>
+                        <div class="flex flex-wrap gap-3">
+                            <span class="px-4 py-2 bg-blue-50 text-blue-600 rounded-full text-sm font-medium">Fortran</span>
+                            <span class="px-4 py-2 bg-blue-50 text-blue-600 rounded-full text-sm font-medium">Python</span>
+                            <span class="px-4 py-2 bg-blue-50 text-blue-600 rounded-full text-sm font-medium">MATLAB</span>
+                            <span class="px-4 py-2 bg-blue-50 text-blue-600 rounded-full text-sm font-medium">MODTRAN</span>
+                            <span class="px-4 py-2 bg-blue-50 text-blue-600 rounded-full text-sm font-medium">ARTS</span>
+                            <span class="px-4 py-2 bg-blue-50 text-blue-600 rounded-full text-sm font-medium">HITRAN</span>
+                            <span class="px-4 py-2 bg-blue-50 text-blue-600 rounded-full text-sm font-medium">NWP</span>
+                            <span class="px-4 py-2 bg-blue-50 text-blue-600 rounded-full text-sm font-medium">Radiation Modeling</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Quick Links Section -->
+    <section class="py-24 bg-gradient-to-br from-slate-50 to-blue-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16 reveal">
+                <h2 class="text-3xl md:text-4xl font-bold text-slate-900 mb-4">Explore My Work</h2>
+                <p class="text-lg text-slate-600 max-w-2xl mx-auto">Access weather tools, satellite data, research publications, and career resources.</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <!-- Card 1 -->
+                <a href="sw.html" class="group bg-white rounded-2xl p-8 shadow-lg hover:shadow-2xl transition-all duration-300 border border-slate-100 hover:border-blue-200 reveal">
+                    <div class="w-14 h-14 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                        <i class="fas fa-cloud-sun text-white text-2xl"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-slate-900 mb-3">Weather Tools</h3>
+                    <p class="text-slate-600 text-sm">Interactive weather cards, charts, and heatmaps for real-time meteorological data visualization.</p>
+                </a>
+
+                <!-- Card 2 -->
+                <a href="mosdac_live.html" class="group bg-white rounded-2xl p-8 shadow-lg hover:shadow-2xl transition-all duration-300 border border-slate-100 hover:border-blue-200 reveal">
+                    <div class="w-14 h-14 bg-gradient-to-br from-cyan-500 to-blue-500 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                        <i class="fas fa-satellite text-white text-2xl"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-slate-900 mb-3">Satellite View</h3>
+                    <p class="text-slate-600 text-sm">Access live satellite imagery from MOSDAC/ISRO and GIBS/NASA platforms.</p>
+                </a>
+
+                <!-- Card 3 -->
+                <a href="publications.html" class="group bg-white rounded-2xl p-8 shadow-lg hover:shadow-2xl transition-all duration-300 border border-slate-100 hover:border-blue-200 reveal">
+                    <div class="w-14 h-14 bg-gradient-to-br from-blue-500 to-indigo-500 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                        <i class="fas fa-file-alt text-white text-2xl"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-slate-900 mb-3">Publications</h3>
+                    <p class="text-slate-600 text-sm">Research papers and publications in atmospheric science and radiation modeling.</p>
+                </a>
+
+                <!-- Card 4 -->
+                <a href="Jobs.html" class="group bg-white rounded-2xl p-8 shadow-lg hover:shadow-2xl transition-all duration-300 border border-slate-100 hover:border-blue-200 reveal">
+                    <div class="w-14 h-14 bg-gradient-to-br from-indigo-500 to-purple-500 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                        <i class="fas fa-briefcase text-white text-2xl"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-slate-900 mb-3">Career Resources</h3>
+                    <p class="text-slate-600 text-sm">Curated job listings from AMS, EGU, UCAR, IITM, and other meteorological organizations.</p>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact CTA Section -->
+    <section class="py-24 bg-slate-900">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center reveal">
+            <h2 class="text-3xl md:text-5xl font-bold text-white mb-6">Let's Connect</h2>
+            <p class="text-xl text-slate-300 mb-10 leading-relaxed">
+                Interested in collaboration, research opportunities, or have questions about atmospheric science? I'd love to hear from you.
+            </p>
+            <div class="flex flex-col sm:flex-row gap-5 justify-center">
+                <a href="contact.html" class="px-10 py-4 bg-gradient-to-r from-blue-600 to-cyan-500 hover:from-blue-700 hover:to-cyan-600 text-white rounded-full font-semibold transition-all transform hover:scale-105 shadow-xl shadow-blue-500/40">
+                    <i class="fas fa-paper-plane mr-2"></i>Send Message
+                </a>
+                <a href="https://linkedin.com/in/subhrajit-rath" target="_blank" class="px-10 py-4 bg-white/10 hover:bg-white/20 backdrop-blur-md border border-white/30 text-white rounded-full font-semibold transition-all transform hover:scale-105">
+                    <i class="fab fa-linkedin mr-2"></i>Connect on LinkedIn
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-slate-950 py-12 border-t border-slate-900">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-12 mb-12">
+                <!-- Brand -->
+                <div>
+                    <span class="text-2xl font-bold gradient-text tracking-tighter">S.<span class="text-white">Rath</span></span>
+                    <p class="text-slate-400 mt-4 text-sm leading-relaxed">
+                        Atmospheric Science Researcher specializing in radiation modeling, HITRAN data curation, and numerical weather prediction.
+                    </p>
+                </div>
+
+                <!-- Quick Links -->
+                <div>
+                    <h4 class="text-white font-semibold mb-4">Quick Links</h4>
+                    <ul class="space-y-3">
+                        <li><a href="index.html" class="text-slate-400 hover:text-blue-400 transition-colors text-sm">Home</a></li>
+                        <li><a href="education.html" class="text-slate-400 hover:text-blue-400 transition-colors text-sm">Education</a></li>
+                        <li><a href="publications.html" class="text-slate-400 hover:text-blue-400 transition-colors text-sm">Publications</a></li>
+                        <li><a href="contact.html" class="text-slate-400 hover:text-blue-400 transition-colors text-sm">Contact</a></li>
+                    </ul>
+                </div>
+
+                <!-- Resources -->
+                <div>
+                    <h4 class="text-white font-semibold mb-4">Resources</h4>
+                    <ul class="space-y-3">
+                        <li><a href="sw.html" class="text-slate-400 hover:text-blue-400 transition-colors text-sm">Weather Tools</a></li>
+                        <li><a href="mosdac_live.html" class="text-slate-400 hover:text-blue-400 transition-colors text-sm">Satellite Data</a></li>
+                        <li><a href="Jobs.html" class="text-slate-400 hover:text-blue-400 transition-colors text-sm">Job Board</a></li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="border-t border-slate-900 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
+                <p class="text-slate-500 text-sm">
+                    &copy; <script>document.write(new Date().getFullYear());</script> Subhrajit Rath. All rights reserved.
+                </p>
+                <div class="flex space-x-6">
+                    <a href="https://scholar.google.com/citations?user=ORZunJoAAAAJ&hl=en" target="_blank" class="text-slate-400 hover:text-blue-400 transition-colors"><i class="fas fa-graduation-cap text-lg"></i></a>
+                    <a href="https://www.researchgate.net/profile/Subhrajit-Rath" target="_blank" class="text-slate-400 hover:text-blue-400 transition-colors"><i class="fab fa-researchgate text-lg"></i></a>
+                    <a href="https://github.com/subhrajitjubu" target="_blank" class="text-slate-400 hover:text-blue-400 transition-colors"><i class="fab fa-github text-lg"></i></a>
+                    <a href="https://linkedin.com/in/subhrajit-rath" target="_blank" class="text-slate-400 hover:text-blue-400 transition-colors"><i class="fab fa-linkedin text-lg"></i></a>
+                </div>
+            </div>
+        </div>
     </footer>
 
+    <script>
+        // Scroll Reveal Animation
+        function reveal() {
+            var reveals = document.querySelectorAll(".reveal");
+            for (var i = 0; i < reveals.length; i++) {
+                var windowHeight = window.innerHeight;
+                var elementTop = reveals[i].getBoundingClientRect().top;
+                var elementVisible = 100;
+                if (elementTop < windowHeight - elementVisible) {
+                    reveals[i].classList.add("active");
+                }
+            }
+        }
+        window.addEventListener("scroll", reveal);
+        reveal();
+
+        // Navbar blur effect on scroll
+        const navbar = document.getElementById('navbar');
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 20) {
+                navbar.classList.add('shadow-md');
+            } else {
+                navbar.classList.remove('shadow-md');
+            }
+        });
+    </script>
 </body>
 </html>
+
