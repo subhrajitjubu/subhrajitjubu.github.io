@@ -545,7 +545,7 @@ function renderHeatmap(timeIndex, sstData, latData, lonData, topology, timeData)
 
         series: [
             {
-                name: 'India',
+                name: 'Equal Earth',
                 nullColor: tc.mapNull,
                 borderColor: tc.mapBorder,
                 interpolation: { enabled: true },
