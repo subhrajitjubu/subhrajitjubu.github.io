@@ -1,230 +1,1190 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Weather Charts - Click to View Forecast</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Weather Analytics Dashboard | Subhrajit</title>
     
-    <!-- Highcharts -->
+    <!-- External Libraries (fixed URLs) -->
     <script src="https://code.highcharts.com/highcharts.js"></script>
     <script src="https://code.highcharts.com/modules/exporting.js"></script>
     <script src="https://code.highcharts.com/modules/export-data.js"></script>
     <script src="https://code.highcharts.com/modules/accessibility.js"></script>
-    
-    <!-- Leaflet -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
     <style>
-        body, html {
-            height: 100%;
-            margin: 0;
-            font-family: Arial, sans-serif;
+        :root {
+            /* Color System */
+            --primary: #1a73e8;
+            --primary-dark: #1557b0;
+            --secondary: #34a853;
+            --warning: #f9ab00;
+            --danger: #ea4335;
+            --surface: #ffffff;
+            --surface-alt: #f8f9fa;
+            --background: #f1f3f4;
+            --text-primary: #202124;
+            --text-secondary: #5f6368;
+            --border: #dadce0;
+            --shadow: 0 1px 2px rgba(0,0,0,0.1), 0 2px 6px rgba(0,0,0,0.1);
+            --shadow-lg: 0 4px 12px rgba(0,0,0,0.15);
+            --radius: 8px;
+            --radius-lg: 12px;
+            --transition: all 0.2s ease;
+            
+            /* Weather-specific colors */
+            --temp-color: #ff531a;
+            --pressure-color: #1a75ff;
+            --rainfall-color: #00cc66;
+            --mslp-low: #e53935;
+            --temp-high: #fb8c00;
         }
-        #map {
-            height: 100%;
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background-color: var(--background);
+            color: var(--text-primary);
+            line-height: 1.5;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+        
+        /* ===== HEADER & NAVIGATION ===== */
+        .app-header {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+            padding: 0.75rem 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: var(--shadow);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-weight: 600;
+            font-size: 1.25rem;
+        }
+        
+        .logo-icon {
+            font-size: 1.5rem;
+        }
+        
+        .nav-container {
+            display: flex;
+            gap: 0.25rem;
+            overflow-x: auto;
+            padding: 0.25rem 0;
+            -webkit-overflow-scrolling: touch;
+        }
+        
+        .nav-container::-webkit-scrollbar {
+            height: 4px;
+        }
+        
+        .nav-container::-webkit-scrollbar-track {
+            background: rgba(255,255,255,0.2);
+            border-radius: 2px;
+        }
+        
+        .nav-container::-webkit-scrollbar-thumb {
+            background: rgba(255,255,255,0.4);
+            border-radius: 2px;
+        }
+        
+        .nav-link {
+            color: rgba(255,255,255,0.9);
+            text-decoration: none;
+            padding: 0.5rem 0.85rem;
+            border-radius: var(--radius);
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: var(--transition);
+            white-space: nowrap;
+        }
+        
+        .nav-link:hover, 
+        .nav-link.active {
+            background: rgba(255,255,255,0.15);
+            color: white;
+        }
+        
+        .nav-link.active {
+            font-weight: 600;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+        
+        /* ===== MAIN LAYOUT ===== */
+        .main-container {
+            display: flex;
+            flex: 1;
+            padding: 1rem;
+            gap: 1rem;
+            max-width: 1800px;
+            margin: 0 auto;
             width: 100%;
         }
-        nav {
-            background: #2c3e50;
-            padding: 1rem;
-            text-align: center;
+        
+        /* ===== MAP SECTION ===== */
+        .map-section {
+            flex: 1;
+            min-width: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
         }
-        nav a {
-            color: white;
-            margin: 0 1rem;
-            text-decoration: none;
-            font-weight: bold;
+        
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.75rem 1rem;
+            background: var(--surface);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
         }
-        nav a:hover {
-            color: #3498db;
+        
+        .section-title {
+            font-weight: 600;
+            font-size: 1.1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
         }
-        .instruction-overlay {
+        
+        .section-title::before {
+            content: "🗺️";
+            font-size: 1.2rem;
+        }
+        
+        .map-container {
+            flex: 1;
+            min-height: 500px;
+            background: var(--surface);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-lg);
+            position: relative;
+            overflow: hidden;
+            border: 1px solid var(--border);
+        }
+        
+        #map {
+            width: 100%;
+            height: 100%;
+            border-radius: var(--radius-lg);
+        }
+        
+        .map-instructions {
             position: absolute;
-            top: 70px;
+            bottom: 1.5rem;
             left: 50%;
             transform: translateX(-50%);
-            background: rgba(0, 0, 0, 0.6);
+            background: rgba(26, 115, 232, 0.95);
             color: white;
-            padding: 10px 20px;
-            border-radius: 8px;
+            padding: 0.75rem 1.25rem;
+            border-radius: 50px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            box-shadow: var(--shadow-lg);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
             z-index: 1000;
-            font-size: 1.1rem;
-            font-weight: bold;
+            animation: pulse 2s infinite;
             pointer-events: none;
         }
+        
+        @keyframes pulse {
+            0% { opacity: 0.9; }
+            50% { opacity: 1; }
+            100% { opacity: 0.9; }
+        }
+        
+        /* ===== CHARTS PANEL ===== */
+        .charts-panel {
+            width: 420px;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            transition: var(--transition);
+        }
+        
+        .charts-panel.collapsed {
+            width: 60px;
+            overflow: hidden;
+        }
+        
+        .panel-toggle {
+            display: none;
+            background: var(--primary);
+            color: white;
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            font-size: 1.2rem;
+            cursor: pointer;
+            box-shadow: var(--shadow);
+            position: fixed;
+            right: 1.5rem;
+            bottom: 1.5rem;
+            z-index: 900;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .chart-card {
+            background: var(--surface);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-lg);
+            padding: 1.25rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            border: 1px solid var(--border);
+        }
+        
+        .chart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-bottom: 0.75rem;
+            border-bottom: 1px solid var(--border);
+        }
+        
+        .chart-title {
+            font-weight: 600;
+            font-size: 1.1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .chart-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+        
+        .chart-btn {
+            background: var(--surface-alt);
+            border: 1px solid var(--border);
+            width: 32px;
+            height: 32px;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: var(--transition);
+            color: var(--text-secondary);
+            font-size: 1rem;
+        }
+        
+        .chart-btn:hover {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+        
+        .chart-container {
+            height: 300px;
+            width: 100%;
+            position: relative;
+        }
+        
+        .chart-placeholder {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            color: var(--text-secondary);
+            text-align: center;
+            padding: 1rem;
+            gap: 0.75rem;
+        }
+        
+        .chart-placeholder-icon {
+            font-size: 2.5rem;
+            opacity: 0.7;
+        }
+        
+        .loading-spinner {
+            width: 32px;
+            height: 32px;
+            border: 3px solid rgba(26, 115, 232, 0.2);
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .error-message {
+            background: #fff2f2;
+            color: var(--danger);
+            padding: 0.75rem;
+            border-radius: var(--radius);
+            font-size: 0.9rem;
+            border-left: 3px solid var(--danger);
+        }
+        
+        /* ===== POPUP STYLING ===== */
+        .leaflet-popup-content-wrapper {
+            border-radius: var(--radius-lg) !important;
+            box-shadow: var(--shadow-lg) !important;
+            padding: 0 !important;
+            overflow: hidden;
+        }
+        
+        .leaflet-popup-content {
+            margin: 0 !important;
+            width: 380px !important;
+            max-width: 95vw !important;
+        }
+        
+        .popup-header {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+            padding: 1rem 1.25rem;
+            font-weight: 600;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .popup-coords {
+            font-family: monospace;
+            background: rgba(255,255,255,0.15);
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.9rem;
+        }
+        
+        .popup-body {
+            padding: 1.25rem;
+        }
+        
+        .popup-chart-container {
+            height: 320px;
+            width: 100%;
+            margin-top: 0.5rem;
+        }
+        
+        /* ===== ALERT BANNER ===== */
+        .alert-banner {
+            background: linear-gradient(135deg, var(--warning), #e69500);
+            color: #202124;
+            padding: 0.75rem 1.5rem;
+            text-align: center;
+            font-weight: 500;
+            display: none;
+            animation: slideDown 0.3s ease;
+            box-shadow: var(--shadow);
+        }
+        
+        .alert-banner.show {
+            display: block;
+        }
+        
+        .alert-banner.danger {
+            background: linear-gradient(135deg, var(--danger), #c5221f);
+            color: white;
+        }
+        
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        /* ===== FOOTER ===== */
+        .app-footer {
+            background: var(--surface);
+            border-top: 1px solid var(--border);
+            padding: 1rem 1.5rem;
+            text-align: center;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            margin-top: auto;
+        }
+        
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 1.5rem;
+            margin-top: 0.5rem;
+            flex-wrap: wrap;
+        }
+        
+        .footer-links a {
+            color: var(--primary);
+            text-decoration: none;
+            transition: var(--transition);
+        }
+        
+        .footer-links a:hover {
+            text-decoration: underline;
+            color: var(--primary-dark);
+        }
+        
+        /* ===== RESPONSIVE DESIGN ===== */
+        @media (max-width: 1100px) {
+            .main-container {
+                flex-direction: column;
+            }
+            
+            .charts-panel {
+                width: 100%;
+                max-height: 450px;
+                overflow-y: auto;
+            }
+            
+            .panel-toggle {
+                display: flex;
+            }
+            
+            .charts-panel.collapsed {
+                display: none;
+            }
+        }
+        
         @media (max-width: 768px) {
-            .instruction-overlay {
-                font-size: 0.9rem;
-                padding: 8px 15px;
-                top: 60px;
+            .app-header {
+                flex-direction: column;
+                gap: 0.75rem;
+                padding: 0.75rem;
+            }
+            
+            .nav-container {
+                width: 100%;
+                justify-content: center;
+            }
+            
+            .section-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 0.75rem;
+            }
+            
+            .map-instructions {
+                font-size: 0.85rem;
+                padding: 0.6rem 1rem;
+                bottom: 1rem;
+            }
+            
+            .leaflet-popup-content {
+                width: 320px !important;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .leaflet-popup-content {
+                width: 280px !important;
+            }
+            
+            .popup-chart-container {
+                height: 280px;
+            }
+            
+            .chart-container {
+                height: 250px;
+            }
+        }
+        
+        /* ===== ACCESSIBILITY ===== */
+        @media (prefers-reduced-motion: reduce) {
+            * {
+                animation: none !important;
+                transition: none !important;
+            }
+        }
+        
+        .sr-only {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border: 0;
+        }
+        
+        /* Focus indicators for keyboard navigation */
+        a:focus, 
+        button:focus, 
+        .chart-btn:focus {
+            outline: 2px solid var(--primary);
+            outline-offset: 2px;
+        }
+        
+        /* High contrast mode support */
+        @media (prefers-contrast: high) {
+            :root {
+                --border: #000;
+                --text-secondary: #000;
+            }
+            .chart-btn {
+                border-width: 2px;
             }
         }
     </style>
 </head>
 <body>
-
-    <nav>
-        <a href="../index.html">Home</a>
-        <a href="../education.html">Education</a>
-        <a href="../experience.html">Skills</a>
-        <a href="../publications.html">Publications</a>
-        <a href="../contact.html">Contact</a>
-        <a href="../nwp_imd.html">NWP_IMD</a>
-        <a href="weatherchart.html">Weather Chart</a>
-        <a href="../Jobs.html">Jobs</a>
-        <a href="https://www.tropmet.res.in/Careers">IITM Career</a>
-        <a href="https://vacancies.incois.gov.in/">INCOIS Career</a>
-        <a href="../movies.html">Movies</a>
-        <a href="../series.html">Series</a>
-    </nav>
-
-    <div id="map"></div>
-
+    <!-- Skip to content link for accessibility -->
+    <a href="#main-content" class="sr-only">Skip to main content</a>
+    
+    <!-- Alert Banner -->
+    <div id="alert-banner" class="alert-banner" role="alert" aria-live="polite">
+        ⚠️ Weather Alert: <span id="alert-message"></span>
+    </div>
+    
+    <!-- Header & Navigation -->
+    <header class="app-header">
+        <div class="logo">
+            <span class="logo-icon">🌤️</span>
+            <span>Weather Analytics Dashboard</span>
+        </div>
+        <nav class="nav-container" aria-label="Main navigation">
+            <a href="../index.html" class="nav-link">Home</a>
+            <a href="../education.html" class="nav-link">Education</a>
+            <a href="../experience.html" class="nav-link">Skills</a>
+            <a href="../publications.html" class="nav-link">Publications</a>
+            <a href="../contact.html" class="nav-link">Contact</a>
+            <a href="../nwp_imd.html" class="nav-link">NWP_IMD</a>
+            <a href="weatherchart.html" class="nav-link active">Weather Charts</a>
+            <a href="../Jobs.html" class="nav-link">Jobs</a>
+            <a href="https://www.tropmet.res.in/Careers" class="nav-link" target="_blank" rel="noopener">IITM Careers</a>
+            <a href="https://vacancies.incois.gov.in/" class="nav-link" target="_blank" rel="noopener">Incois Careers</a>
+            <a href="../movies.html" class="nav-link">Movies</a>
+            <a href="../series.html" class="nav-link">Series</a>
+        </nav>
+    </header>
+    
+    <!-- Main Content -->
+    <main id="main-content" class="main-container">
+        <!-- Map Section -->
+        <section class="map-section" aria-labelledby="map-heading">
+            <div class="section-header">
+                <h1 id="map-heading" class="section-title">Interactive Weather Map</h1>
+                <div class="map-controls">
+                    <button id="reset-view" class="chart-btn" title="Reset map view" aria-label="Reset map view">🔄</button>
+                </div>
+            </div>
+            <div class="map-container">
+                <div id="map" role="application" aria-label="Interactive weather map. Click any location to view weather data."></div>
+                <div class="map-instructions" id="map-instructions">
+                    <span>👆</span> Click anywhere on the map to view temperature, rainfall & pressure data
+                </div>
+            </div>
+        </section>
+        
+        <!-- Charts Panel -->
+        <aside class="charts-panel" aria-labelledby="charts-heading">
+            <button class="panel-toggle" id="panel-toggle" aria-expanded="true" aria-controls="charts-container">
+                <span id="toggle-icon">▼</span>
+            </button>
+            
+            <div id="charts-container">
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <h2 id="charts-heading" class="chart-title">📊 Weather Forecast</h2>
+                        <div class="chart-actions">
+                            <button class="chart-btn" id="export-chart" title="Export chart" aria-label="Export chart">📤</button>
+                            <button class="chart-btn" id="refresh-chart" title="Refresh data" aria-label="Refresh data">🔄</button>
+                        </div>
+                    </div>
+                    <div class="chart-container">
+                        <div id="chart-placeholder" class="chart-placeholder">
+                            <div class="chart-placeholder-icon">📈</div>
+                            <p>Click on the map to load weather data for a location</p>
+                            <p style="font-size: 0.85rem; color: var(--text-secondary); margin-top: 0.25rem;">
+                                Data updates every 3 hours • IST timezone
+                            </p>
+                        </div>
+                        <div id="weather-chart" class="chart-container" style="display: none;"></div>
+                        <div id="chart-loading" class="chart-placeholder" style="display: none;">
+                            <div class="loading-spinner"></div>
+                            <p>Loading weather data...</p>
+                        </div>
+                        <div id="chart-error" class="error-message" style="display: none;"></div>
+                    </div>
+                </div>
+                
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <h2 class="chart-title">ℹ️ Data Information</h2>
+                    </div>
+                    <div style="font-size: 0.9rem; color: var(--text-secondary); line-height: 1.6;">
+                        <p><strong>Temperature:</strong> 2m above ground (°C)</p>
+                        <p><strong>Rainfall:</strong> Accumulated precipitation (mm/3hr)</p>
+                        <p><strong>MSLP:</strong> Mean Sea Level Pressure (Pa)</p>
+                        <p style="margin-top: 0.75rem; padding-top: 0.75rem; border-top: 1px solid var(--border);">
+                            <strong>Disclaimer:</strong> This is not an official forecast. Data is for research and informational purposes only. Always consult official meteorological services for critical decisions.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </aside>
+    </main>
+    
+    <!-- Footer -->
+    <footer class="app-footer">
+        <p>Weather Analytics Dashboard • Developed by Subhrajit • Pune, India</p>
+        <div class="footer-links">
+            <a href="https://github.com" target="_blank" rel="noopener">GitHub</a>
+            <a href="https://scholar.google.com" target="_blank" rel="noopener">Google Scholar</a>
+            <a href="https://researchgate.net" target="_blank" rel="noopener">ResearchGate</a>
+            <a href="mailto:your.email@example.com">Contact</a>
+        </div>
+        <p style="margin-top: 0.75rem; font-size: 0.8rem; opacity: 0.8;">
+            Map data © <a href="https://openstreetmap.org" target="_blank" rel="noopener">OpenStreetMap</a> contributors • 
+            Weather data sources: NASA GIBS, IMD, ECMWF
+        </p>
+    </footer>
 
     <script>
-        // Prevent right-click & devtools shortcuts (optional - remove if not needed)
-        document.addEventListener('contextmenu', e => e.preventDefault());
-        document.onkeydown = e => {
-            if (e.key === 'F12' || (e.ctrlKey && e.shiftKey && e.key === 'I')) {
-                e.preventDefault();
-            }
-        };
-
-        // Map setup
-        const map = L.map('map', {
-            minZoom: 4,
-            maxZoom: 10,
-            maxBounds: [[-10, 60], [40, 100]],
-            maxBoundsViscosity: 1.0
-        }).setView([20, 78], 5);  // Centered on India
-
-        // Base layers
-        const googleHybrid = L.tileLayer('https://{s}.google.com/vt/lyrs=s,h&x={x}&y={y}&z={z}', {
-            maxZoom: 20,
-            subdomains: ['mt0','mt1','mt2','mt3'],
-            attribution: '© Google'
-        });
-
-        const osm = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            attribution: '© OpenStreetMap'
-        });
-
-        googleHybrid.addTo(map);
-
-        // Overlays from NASA GIBS (example - add more as needed)
-        const overlays = {
-            'MODIS True Color': L.tileLayer('https://map1.vis.earthdata.nasa.gov/wmts-webmerc/MODIS_Terra_CorrectedReflectance_TrueColor/default/{time}/GoogleMapsCompatible_Level9/{z}/{y}/{x}.jpg', {
-                time: '2024-03-01',  // Update dynamically if needed
-                attribution: 'NASA GIBS'
-            }),
-            'IMERG Precipitation': L.tileLayer('https://map1.vis.earthdata.nasa.gov/wmts-webmerc/IMERG_Precipitation_Rate/default/{time}/GoogleMapsCompatible_Level6/{z}/{y}/{x}.png', {
-                time: '2024-03-01',
-                attribution: 'NASA GIBS'
-            })
-        };
-
-        L.control.layers({
-            'Google Hybrid': googleHybrid,
-            'OpenStreetMap': osm
-        }, overlays).addTo(map);
-
-        let markers = [];
-
-        function findNearestIndex(value, array) {
-            let nearest = 0;
-            let minDiff = Math.abs(value - array[0]);
-            for (let i = 1; i < array.length; i++) {
-                const diff = Math.abs(value - array[i]);
-                if (diff < minDiff) {
-                    minDiff = diff;
-                    nearest = i;
+        // ===== UTILITY FUNCTIONS =====
+        const Utils = {
+            // Format date to IST with readable format
+            formatISTDate: (gmtTime) => {
+                const date = new Date(gmtTime);
+                date.setHours(date.getHours() + 5);
+                date.setMinutes(date.getMinutes() + 30);
+                
+                const days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+                const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", 
+                               "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+                
+                const dayName = days[date.getDay()];
+                const day = date.getDate();
+                const month = months[date.getMonth()];
+                const year = date.getFullYear();
+                let hours = date.getHours();
+                const ampm = hours >= 12 ? 'PM' : 'AM';
+                hours = hours % 12;
+                hours = hours ? hours : 12;
+                
+                return `${dayName}, ${day} ${month} ${year} ${hours}:00 ${ampm}`;
+            },
+            
+            // Find nearest index with reasonable tolerance
+            findNearestIndex: (value, array, tolerance = 0.5) => {
+                let nearestIndex = 0;
+                let minDiff = Math.abs(value - array[0]);
+                
+                for (let i = 1; i < array.length; i++) {
+                    const diff = Math.abs(value - array[i]);
+                    if (diff < minDiff) {
+                        minDiff = diff;
+                        nearestIndex = i;
+                    }
                 }
-            }
-            return (minDiff <= 5) ? nearest : null;
-        }
-
-        async function fetchData(url, targetLat, targetLon, field) {
-            try {
-                const res = await fetch(url);
-                if (!res.ok) throw new Error(`Fetch failed: ${url}`);
-                const data = await res.json();
-                const latIdx = findNearestIndex(targetLat, data.coords.latitude.data);
-                const lonIdx = findNearestIndex(targetLon, data.coords.longitude.data);
-                if (latIdx === null || lonIdx === null) return null;
-
-                return data.data.map(row => row[latIdx][lonIdx]);
-            } catch (err) {
-                console.error(`Error fetching ${field}:`, err);
-                return null;
-            }
-        }
-
-        function createWeatherChart(containerId, lat, lon) {
-            Promise.all([
-                fetchData('2m_temp.json', lat, lon, 'temperature').then(d => d ? d.map(v => (v - 273.15).toFixed(1)) : null),
-                fetchData('rf.json', lat, lon, 'rainfall').then(d => d ? d.map(v => v.toFixed(1)) : null),
-                fetchData('msl.json', lat, lon, 'mslp').then(d => d ? d.map(v => v.toFixed(1)) : null)
-            ]).then(([temps, rain, mslp]) => {
-                if (!temps || !rain || !mslp) {
-                    document.getElementById(containerId).innerHTML = '<p style="color:red;">Data not available for this location.</p>';
-                    return;
-                }
-
-                // Assume time from temp file (adjust if needed)
-                const timeLabels = temps.map((_, i) => `Step ${i+1}`); // Replace with real time if available
-
-                Highcharts.chart(containerId, {
-                    chart: { type: 'line', height: 400 },
-                    title: { text: `Forecast at Lat: ${lat.toFixed(2)}, Lon: ${lon.toFixed(2)}` },
-                    xAxis: { categories: timeLabels, title: { text: 'Forecast Time' } },
-                    yAxis: [
-                        { title: { text: 'Temperature (°C)', style: { color: '#e74c3c' } }, labels: { style: { color: '#e74c3c' } } },
-                        { title: { text: 'MSLP (hPa)', style: { color: '#3498db' } }, opposite: true, labels: { style: { color: '#3498db' } } },
-                        { title: { text: 'Rainfall (mm/3h)', style: { color: '#27ae60' } }, opposite: false, labels: { style: { color: '#27ae60' } } }
-                    ],
-                    series: [
-                        { name: 'Temperature', data: temps.map(Number), color: '#e74c3c', yAxis: 0, marker: { enabled: false } },
-                        { name: 'MSLP', data: mslp.map(Number), color: '#3498db', yAxis: 1, dashStyle: 'ShortDash', marker: { enabled: false } },
-                        { name: 'Rainfall', data: rain.map(Number), color: '#27ae60', type: 'column', yAxis: 2 }
-                    ],
-                    tooltip: { shared: true },
-                    legend: { enabled: true },
-                    credits: { enabled: false },
-                    subtitle: { text: 'Non-official forecast – Informational only' }
-                });
-            });
-        }
-
-        map.on('click', function(e) {
-            const lat = e.latlng.lat.toFixed(2);
-            const lon = e.latlng.lng.toFixed(2);
-
-            markers.forEach(m => map.removeLayer(m));
-            markers = [];
-
-            const marker = L.marker([lat, lon]).addTo(map);
-            markers.push(marker);
-
-            const containerId = 'chart-' + Date.now();
-
-            const popupContent = `
-                <div style="min-width: 800px; max-height: 500px; overflow-y: auto; padding: 10px;">
-                    <h3 style="margin-top:0;">Forecast at ${lat}, ${lon}</h3>
-                    <div id="${containerId}" style="width:100%; height:420px;"></div>
-                </div>`;
-
-            marker.bindPopup(popupContent, { maxWidth: 900 }).openPopup();
-
-            // Wait for popup to render
-            setTimeout(() => {
-                const container = document.getElementById(containerId);
-                if (container) {
-                    createWeatherChart(containerId, lat, lon);
+                
+                return minDiff <= tolerance ? nearestIndex : null;
+            },
+            
+            // Show/hide elements with animation
+            toggleElement: (element, show, duration = 200) => {
+                if (show) {
+                    element.style.display = 'flex';
+                    // Force reflow
+                    void element.offsetWidth;
+                    element.style.opacity = '1';
                 } else {
-                    console.warn("Chart container not found in popup");
+                    element.style.opacity = '0';
+                    setTimeout(() => {
+                        element.style.display = 'none';
+                    }, duration);
                 }
-            }, 400);  // Increased delay for reliability
+            },
+            
+            // Show alert banner
+            showAlert: (message, type = 'warning', duration = 8000) => {
+                const banner = document.getElementById('alert-banner');
+                const alertMsg = document.getElementById('alert-message');
+                
+                alertMsg.textContent = message;
+                banner.className = `alert-banner ${type} show`;
+                
+                setTimeout(() => {
+                    banner.classList.remove('show');
+                }, duration);
+            }
+        };
+        
+        // ===== MAP INITIALIZATION =====
+        document.addEventListener('DOMContentLoaded', () => {
+            // Initialize map centered on India
+            const map = L.map('map', {
+                center: [20.5937, 78.9629],
+                zoom: 5,
+                minZoom: 4,
+                maxZoom: 12,
+                worldCopyJump: true
+            });
+            
+            // Base layers
+            const baseLayers = {
+                'OpenStreetMap': L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                    attribution: '© OpenStreetMap contributors',
+                    maxZoom: 19
+                }),
+                'Satellite': L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+                    attribution: 'Tiles © Esri',
+                    maxZoom: 20
+                }),
+                'Topographic': L.tileLayer('https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png', {
+                    attribution: '© OpenTopoMap',
+                    maxZoom: 17
+                })
+            };
+            
+            // Overlay layers (NASA GIBS)
+            const overlayLayers = {
+                'True Color': L.tileLayer('https://map1.vis.earthdata.nasa.gov/wmts-webmerc/MODIS_Terra_CorrectedReflectance_TrueColor/default/{time}/GoogleMapsCompatible_Level9/{z}/{y}/{x}.jpg', {
+                    attribution: 'NASA GIBS',
+                    maxZoom: 9,
+                    time: ''
+                }),
+                'Precipitation (IMERG)': L.tileLayer('https://map1.vis.earthdata.nasa.gov/wmts-webmerc/IMERG_Precipitation_Rate/default/{time}/GoogleMapsCompatible_Level6/{z}/{y}/{x}.png', {
+                    attribution: 'NASA GIBS',
+                    maxZoom: 6,
+                    time: '',
+                    opacity: 0.8
+                }),
+                'Land Surface Temp': L.tileLayer('https://map1.vis.earthdata.nasa.gov/wmts-webmerc/MODIS_Terra_Land_Surface_Temp_Day/default/{time}/GoogleMapsCompatible_Level7/{z}/{y}/{x}.png', {
+                    attribution: 'NASA GIBS',
+                    maxZoom: 7,
+                    time: '',
+                    opacity: 0.7
+                })
+            };
+            
+            // Add layer control
+            L.control.layers(baseLayers, overlayLayers, {
+                position: 'topright',
+                collapsed: window.innerWidth < 768
+            }).addTo(map);
+            
+            // Add default base layer
+            baseLayers['OpenStreetMap'].addTo(map);
+            
+            // Restrict map bounds to Indian region
+            const southWest = L.latLng(5.0, 65.0);
+            const northEast = L.latLng(40.0, 100.0);
+            const bounds = L.latLngBounds(southWest, northEast);
+            map.setMaxBounds(bounds.pad(0.1));
+            
+            // Reset view button
+            document.getElementById('reset-view').addEventListener('click', () => {
+                map.setView([20.5937, 78.9629], 5, { animate: true });
+            });
+            
+            // ===== CHARTS PANEL TOGGLE =====
+            const panelToggle = document.getElementById('panel-toggle');
+            const chartsPanel = document.querySelector('.charts-panel');
+            const toggleIcon = document.getElementById('toggle-icon');
+            
+            panelToggle.addEventListener('click', () => {
+                const isExpanded = chartsPanel.classList.toggle('collapsed');
+                toggleIcon.textContent = isExpanded ? '►' : '▼';
+                panelToggle.setAttribute('aria-expanded', !isExpanded);
+                
+                // Save preference
+                localStorage.setItem('chartsPanelCollapsed', isExpanded);
+            });
+            
+            // Load saved panel state
+            if (localStorage.getItem('chartsPanelCollapsed') === 'true') {
+                chartsPanel.classList.add('collapsed');
+                toggleIcon.textContent = '►';
+                panelToggle.setAttribute('aria-expanded', 'false');
+            }
+            
+            // ===== MAP CLICK HANDLER =====
+            let currentMarker = null;
+            const chartContainer = document.getElementById('weather-chart');
+            const placeholder = document.getElementById('chart-placeholder');
+            const loading = document.getElementById('chart-loading');
+            const errorEl = document.getElementById('chart-error');
+            
+            map.on('click', async (e) => {
+                const { lat, lng } = e.latlng;
+                const targetLat = parseFloat(lat.toFixed(2));
+                const targetLon = parseFloat(lng.toFixed(2));
+                
+                // Remove previous marker
+                if (currentMarker) {
+                    map.removeLayer(currentMarker);
+                }
+                
+                // Add new marker
+                currentMarker = L.marker([targetLat, targetLon], {
+                    draggable: true
+                }).addTo(map);
+                
+                // Update marker position on drag
+                currentMarker.on('dragend', (event) => {
+                    const newPos = event.target.getLatLng();
+                    loadWeatherData(newPos.lat, newPos.lng);
+                });
+                
+                // Show popup with coordinates
+                const popup = L.popup({
+                    maxWidth: 400,
+                    minWidth: 300,
+                    className: 'weather-popup'
+                })
+                .setLatLng(e.latlng)
+                .setContent(`
+                    <div class="popup-header">
+                        <span>Selected Location</span>
+                        <span class="popup-coords">${targetLat}°, ${targetLon}°</span>
+                    </div>
+                    <div class="popup-body">
+                        <div class="popup-chart-container" id="popup-chart"></div>
+                    </div>
+                `)
+                .openOn(map);
+                
+                // Load and display weather data
+                await loadWeatherData(targetLat, targetLon);
+            });
+            
+            // ===== WEATHER DATA LOADING =====
+            async function loadWeatherData(lat, lon) {
+                // Show loading state
+                placeholder.style.display = 'none';
+                chartContainer.style.display = 'none';
+                errorEl.style.display = 'none';
+                loading.style.display = 'flex';
+                
+                try {
+                    // Fetch all data in parallel
+                    const [tempData, rainData, mslpData] = await Promise.all([
+                        fetchWeatherData('2m_temp.json', lat, lon, true),
+                        fetchWeatherData('rf.json', lat, lon, false),
+                        fetchWeatherData('msl.json', lat, lon, false)
+                    ]);
+                    
+                    // Hide loading, show chart
+                    loading.style.display = 'none';
+                    chartContainer.style.display = 'block';
+                    
+                    // Create the chart
+                    createWeatherChart(tempData, rainData, mslpData, lat, lon);
+                    
+                    // Check for alerts
+                    checkWeatherAlerts(tempData, rainData, mslpData);
+                    
+                } catch (error) {
+                    console.error('Error loading weather data:', error);
+                    loading.style.display = 'none';
+                    errorEl.style.display = 'block';
+                    errorEl.innerHTML = `
+                        <strong>Failed to load data</strong><br>
+                        ${error.message || 'Please try again later'}<br>
+                        <small style="display: block; margin-top: 0.5rem; opacity: 0.8;">
+                            Ensure JSON files are available in the correct directory
+                        </small>
+                    `;
+                }
+            }
+            
+            // Fetch and process weather data from JSON
+            async function fetchWeatherData(filename, lat, lon, isTemperature) {
+                const response = await fetch(filename);
+                if (!response.ok) {
+                    throw new Error(`Failed to load ${filename}: ${response.status}`);
+                }
+                
+                const data = await response.json();
+                if (!data.data || !data.coords) {
+                    throw new Error('Invalid data format');
+                }
+                
+                const { latitude, longitude, valid_time } = data.coords;
+                const latIndex = Utils.findNearestIndex(lat, latitude.data);
+                const lonIndex = Utils.findNearestIndex(lon, longitude.data);
+                
+                if (latIndex === null || lonIndex === null) {
+                    throw new Error('Location outside data coverage area');
+                }
+                
+                // Extract time series data (first 100 points)
+                const timeData = (valid_time.data || []).slice(0, 100);
+                const values = data.data.map(row => {
+                    let value = row[latIndex][lonIndex];
+                    if (isTemperature) {
+                        value = parseFloat((value - 273.15).toFixed(2)); // Kelvin to Celsius
+                    } else {
+                        value = parseFloat(value.toFixed(isTemperature ? 2 : 0));
+                    }
+                    return value;
+                }).slice(0, 100);
+                
+                return {
+                    time: timeData.map(t => Utils.formatISTDate(t)),
+                    values: values,
+                    label: isTemperature ? 'Temperature (°C)' : 
+                           filename.includes('rf') ? 'Rainfall (mm/3hr)' : 'MSLP (Pa)'
+                };
+            }
+            
+            // Create Highcharts weather chart
+            function createWeatherChart(tempData, rainData, mslpData, lat, lon) {
+                // Destroy existing chart if any
+                if (window.weatherChart) {
+                    window.weatherChart.destroy();
+                }
+                
+                window.weatherChart = Highcharts.chart('weather-chart', {
+                    chart: {
+                        type: 'line',
+                        height: 300,
+                        style: { fontFamily: 'Inter, sans-serif' }
+                    },
+                    title: {
+                        text: `Weather Forecast • ${lat}°, ${lon}°`,
+                        style: { fontSize: '14px', fontWeight: '600' },
+                        margin: 15
+                    },
+                    subtitle: {
+                        text: 'Data: IMD • ECMWF • NASA',
+                        style: { fontSize: '11px', color: '#5f6368' }
+                    },
+                    xAxis: {
+                        categories: tempData.time,
+                        labels: {
+                            rotation: -45,
+                            style: { fontSize: '10px' },
+                            step: 2
+                        },
+                        title: { text: 'Time (IST)' },
+                        crosshair: true
+                    },
+                    yAxis: [{
+                        // Temperature axis
+                        title: {
+                            text: 'Temperature (°C)',
+                            style: { color: 'var(--temp-color)' }
+                        },
+                        labels: {
+                            style: { color: 'var(--temp-color)' },
+                            format: '{value}°'
+                        },
+                        opposite: false
+                    }, {
+                        // Pressure axis
+                        title: {
+                            text: 'Pressure (hPa)',
+                            style: { color: 'var(--pressure-color)' }
+                        },
+                        labels: {
+                            style: { color: 'var(--pressure-color)' },
+                            format: '{value}'
+                        },
+                        opposite: true,
+                        min: 980,
+                        max: 1040
+                    }, {
+                        // Rainfall axis
+                        title: {
+                            text: 'Rainfall (mm)',
+                            style: { color: 'var(--rainfall-color)' }
+                        },
+                        labels: {
+                            style: { color: 'var(--rainfall-color)' }
+                        },
+                        opposite: false
+                    }],
+                    tooltip: {
+                        shared: true,
+                        formatter: function() {
+                            let s = `<b>${this.x}</b><br/>`;
+                            this.points.forEach(point => {
+                                const color = point.color;
+                                const name = point.series.name;
+                                const y = point.y;
+                                const unit = name.includes('Temperature') ? '°C' : 
+                                           name.includes('Pressure') ? ' hPa' : ' mm';
+                                s += `<span style="color:${color}">●</span> ${name}: <b>${y}${unit}</b><br/>`;
+                            });
+                            return s;
+                        }
+                    },
+                    legend: {
+                        layout: 'horizontal',
+                        align: 'center',
+                        verticalAlign: 'bottom',
+                        itemStyle: { fontSize: '11px' }
+                    },
+                    plotOptions: {
+                        series: {
+                            marker: { enabled: false },
+                            animation: { duration: 500 }
+                        },
+                        column: {
+                            pointPadding: 0.1,
+                            groupPadding: 0.1
+                        }
+                    },
+                    series: [
+                        {
+                            name: 'Temperature',
+                            data: tempData.values,
+                            color: 'var(--temp-color)',
+                            yAxis: 0,
+                            tooltip: { valueSuffix: '°C' }
+                        },
+                        {
+                            name: 'MSLP',
+                            data: mslpData.values.map(v => v/100), // Pa to hPa
+                            color: 'var(--pressure-color)',
+                            yAxis: 1,
+                            type: 'line',
+                            dashStyle: 'ShortDash',
+                            tooltip: { valueSuffix: ' hPa' }
+                        },
+                        {
+                            name: 'Rainfall',
+                            data: rainData.values,
+                            color: 'var(--rainfall-color)',
+                            yAxis: 2,
+                            type: 'column',
+                            tooltip: { valueSuffix: ' mm' }
+                        }
+                    ],
+                    exporting: {
+                        enabled: true,
+                        buttons: {
+                            contextButton: {
+                                menuItems: ['downloadPNG', 'downloadPDF', 'viewData']
+                            }
+                        }
+                    },
+                    credits: {
+                        enabled: false
+                    },
+                    responsive: {
+                        rules: [{
+                            condition: { maxWidth: 400 },
+                            chartOptions: {
+                                legend: { enabled: false },
+                                xAxis: { labels: { rotation: -30, step: 3 } }
+                            }
+                        }]
+                    }
+                });
+            }
+            
+            // Check for weather alerts
+            function checkWeatherAlerts(tempData, rainData, mslpData) {
+                const alerts = [];
+                
+                // Temperature alert (>35°C)
+                const highTemp = tempData.values.filter(t => t > 35);
+                if (highTemp.length > 0) {
+                    alerts.push(`High temperature alert: ${Math.max(...highTemp).toFixed(1)}°C recorded`);
+                }
+                
+                // Heavy rainfall alert (>15mm/3hr)
+                const heavyRain = rainData.values.filter(r => r > 15);
+                if (heavyRain.length > 0) {
+                    alerts.push(`Heavy rainfall alert: ${Math.max(...heavyRain)}mm in 3 hours`);
+                }
+                
+                // Low pressure alert (<1000 hPa)
+                const lowPressure = mslpData.values.filter(p => p/100 < 1000);
+                if (lowPressure.length > 0) {
+                    alerts.push(`Low pressure system: ${Math.min(...lowPressure)/100} hPa`);
+                }
+                
+                // Show alerts if any
+                if (alerts.length > 0) {
+                    Utils.showAlert(alerts.join(' • '), alerts.some(a => a.includes('Heavy rainfall') || a.includes('Low pressure')) ? 'danger' : 'warning');
+                }
+            }
+            
+            // ===== EVENT LISTENERS =====
+            // Export chart button
+            document.getElementById('export-chart')?.addEventListener('click', () => {
+                if (window.weatherChart) {
+                    window.weatherChart.exportChart();
+                }
+            });
+            
+            // Refresh chart button
+            document.getElementById('refresh-chart')?.addEventListener('click', () => {
+                if (currentMarker) {
+                    const { lat, lng } = currentMarker.getLatLng();
+                    loadWeatherData(lat, lng);
+                }
+            });
+            
+            // Hide instructions after first interaction
+            const instructions = document.getElementById('map-instructions');
+            map.once('click', () => {
+                instructions.style.opacity = '0';
+                setTimeout(() => {
+                    instructions.style.display = 'none';
+                }, 300);
+            });
+            
+            // Handle window resize for layer control
+            let resizeTimer;
+            window.addEventListener('resize', () => {
+                clearTimeout(resizeTimer);
+                resizeTimer = setTimeout(() => {
+                    map.invalidateSize();
+                }, 250);
+            });
+            
+            // Prevent right-click context menu on map (optional)
+            document.getElementById('map').addEventListener('contextmenu', (e) => {
+                e.preventDefault();
+                // Show custom context menu if needed
+            });
+            
+            // ===== INITIAL INSTRUCTIONS =====
+            // Auto-hide instructions after 10 seconds
+            setTimeout(() => {
+                if (instructions) {
+                    instructions.style.transition = 'opacity 0.5s';
+                    instructions.style.opacity = '0';
+                    setTimeout(() => {
+                        instructions.style.display = 'none';
+                    }, 500);
+                }
+            }, 10000);
         });
     </script>
 </body>
