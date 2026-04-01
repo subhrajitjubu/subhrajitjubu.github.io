@@ -1,361 +1,165 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
-    <title>AtmosPulse | Advanced Weather Analytics Dashboard</title>
-    
-    <!-- Highcharts + Leaflet (latest stable) -->
+    <title>Weather Charts</title>
     <script src="https://code.highcharts.com/highcharts.js"></script>
     <script src="https://code.highcharts.com/modules/exporting.js"></script>
     <script src="https://code.highcharts.com/modules/export-data.js"></script>
     <script src="https://code.highcharts.com/modules/accessibility.js"></script>
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-    
-    <!-- Font Awesome 6 (free icons) -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    
-    <!-- Google Fonts: Inter + Fallback -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
-    
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
     <style>
-        * {
+        body {
+            background: linear-gradient(135deg, #d1e8ff, #4a6a8f);
+            color: #1e293b;
+            line-height: 1.3;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
             margin: 0;
             padding: 0;
+            font-family: 'Roboto', sans-serif;
+        }
+        #map {
+            flex-grow: 1;
+            width: 100%;
+            padding: 1rem;
             box-sizing: border-box;
         }
-
-        :root {
-            --primary: #0f62fe;
-            --primary-dark: #0043ce;
-            --secondary: #24a148;
-            --warning: #ff832b;
-            --danger: #da1e28;
-            --surface: #ffffff;
-            --surface-alt: #f4f4f4;
-            --background: #eef2f6;
-            --text-primary: #161616;
-            --text-secondary: #6f6f6f;
-            --border: #e0e0e0;
-            --shadow-sm: 0 1px 2px rgba(0,0,0,0.05);
-            --shadow-md: 0 4px 12px rgba(0,0,0,0.08);
-            --radius-md: 12px;
-            --radius-sm: 8px;
-            --temp-gradient: linear-gradient(135deg, #ff7e5e, #feb47b);
-            --pressure-gradient: linear-gradient(135deg, #1e3c72, #2a5298);
-            --rain-gradient: linear-gradient(135deg, #00b4db, #0083b0);
+        .container {
+            width: 80%;
+            margin: 2rem auto;
+            background-color: #fff;
+            padding: 2rem;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
         }
-
-        body {
-            font-family: 'Inter', sans-serif;
-            background: var(--background);
-            color: var(--text-primary);
-            line-height: 1.5;
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
+        header {
+            background-color: #2d3748;
+            color: #fff;
+            padding: 1rem 0;
+            text-align: center;
         }
-
-        /* refined header */
-        .app-header {
-            background: linear-gradient(112deg, #0a2540 0%, #1a4d6b 100%);
-            color: white;
-            padding: 0.8rem 2rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 1rem;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-            position: sticky;
-            top: 0;
-            z-index: 1100;
+        nav {
+            text-align: center;
+            padding: 1.5rem 0;
+            background-color: #2d3748;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+            z-index: 1000;
         }
-
-        .logo {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            font-weight: 700;
-            font-size: 1.4rem;
-            letter-spacing: -0.3px;
-        }
-
-        .logo-icon {
-            font-size: 1.8rem;
-            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));
-        }
-
-        /* navigation modern */
-        .nav-container {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 0.4rem;
-        }
-
-        .nav-link {
-            background: rgba(255,255,255,0.12);
-            backdrop-filter: blur(4px);
-            padding: 0.5rem 1rem;
-            border-radius: 40px;
-            font-size: 0.85rem;
-            font-weight: 500;
-            transition: all 0.2s ease;
+        nav a {
+            color: #63b3ed;
+            margin: 0 1rem;
             text-decoration: none;
-            color: white;
+            padding: 0.5rem 1rem;
+            transition: color 0.3s ease, background-color 0.3s ease;
         }
-
-        .nav-link:hover, .nav-link.active {
-            background: white;
-            color: #0a2540;
-            transform: translateY(-1px);
+        nav a:hover {
+            color: #fff;
+            background-color: rgba(99, 179, 237, 0.2);
+            border-radius: 5px;
         }
-
-        /* Main layout */
-        .main-dashboard {
-            display: flex;
-            flex: 1;
-            padding: 1.5rem;
-            gap: 1.8rem;
-            max-width: 1800px;
-            margin: 0 auto;
-            width: 100%;
-        }
-
-        /* Map Section */
-        .map-module {
-            flex: 1.4;
-            display: flex;
-            flex-direction: column;
-            gap: 0.8rem;
-        }
-
-        .card-header {
-            background: var(--surface);
-            padding: 0.8rem 1.2rem;
-            border-radius: var(--radius-md);
-            box-shadow: var(--shadow-sm);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-left: 4px solid var(--primary);
-        }
-
-        .card-header h2 {
-            font-size: 1.2rem;
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .map-wrapper {
-            position: relative;
-            border-radius: var(--radius-md);
-            overflow: hidden;
-            box-shadow: var(--shadow-md);
-            background: #e9eef3;
-            height: 520px;
-        }
-
-        #map {
-            width: 100%;
-            height: 100%;
-        }
-
-        .map-badge {
-            position: absolute;
-            bottom: 18px;
-            left: 18px;
-            background: rgba(0,0,0,0.75);
-            backdrop-filter: blur(8px);
-            padding: 6px 14px;
-            border-radius: 40px;
-            color: white;
-            font-size: 0.8rem;
-            font-weight: 500;
-            z-index: 500;
-            pointer-events: none;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            font-family: monospace;
-        }
-
-        /* Analytics Panel (right) */
-        .analytics-panel {
-            flex: 1;
-            min-width: 380px;
-            display: flex;
-            flex-direction: column;
-            gap: 1.4rem;
-        }
-
-        .data-card {
-            background: var(--surface);
-            border-radius: var(--radius-md);
-            box-shadow: var(--shadow-md);
-            overflow: hidden;
-            transition: transform 0.1s ease;
-            border: 1px solid var(--border);
-        }
-
-        .card-title-bar {
-            padding: 1rem 1.2rem;
-            background: var(--surface-alt);
-            border-bottom: 1px solid var(--border);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-        }
-
-        .card-title-bar h3 {
-            font-size: 1rem;
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .btn-icon {
-            background: transparent;
-            border: none;
-            width: 32px;
-            height: 32px;
-            border-radius: 50%;
-            cursor: pointer;
-            transition: all 0.2s;
-            color: var(--text-secondary);
-            font-size: 1rem;
-        }
-
-        .btn-icon:hover {
-            background: var(--surface-alt);
-            color: var(--primary);
-            transform: scale(1.05);
-        }
-
-        .chart-area {
-            padding: 1rem 0.8rem 0.8rem 0.8rem;
-            height: 340px;
-            position: relative;
-        }
-
-        .placeholder-state {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            height: 100%;
-            text-align: center;
-            color: var(--text-secondary);
-            gap: 12px;
-        }
-
-        .placeholder-state i {
-            font-size: 3rem;
-            opacity: 0.5;
-        }
-
-        .loader {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100%;
-            flex-direction: column;
-            gap: 12px;
-        }
-
-        .spinner {
-            width: 40px;
-            height: 40px;
-            border: 3px solid rgba(15,98,254,0.2);
-            border-top-color: var(--primary);
-            border-radius: 50%;
-            animation: spin 0.8s linear infinite;
-        }
-
-        @keyframes spin { to { transform: rotate(360deg); } }
-
-        .alert-modern {
-            background: #fff5e8;
-            border-left: 5px solid var(--warning);
-            padding: 0.9rem 1rem;
-            border-radius: 12px;
-            display: flex;
-            gap: 12px;
-            align-items: center;
-            font-size: 0.85rem;
-        }
-
-        .alert-modern.danger {
-            background: #ffe9e9;
-            border-left-color: var(--danger);
-        }
-
-        .info-card {
-            background: var(--surface-alt);
-            border-radius: var(--radius-sm);
-            padding: 1rem;
-            font-size: 0.85rem;
-            color: var(--text-secondary);
-            border: 1px solid var(--border);
-        }
-
-        .location-badge {
-            background: var(--primary);
-            color: white;
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-size: 0.75rem;
-            font-weight: 500;
-        }
-
         footer {
-            background: white;
-            border-top: 1px solid var(--border);
-            padding: 1rem 2rem;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
             text-align: center;
-            font-size: 0.75rem;
-            color: #6f6f6f;
-            margin-top: 0.5rem;
+            padding: 1rem;
+            background-color: #2d3748;
+            color: #e2e8f0;
+            z-index: 1000;
         }
-
-        @media (max-width: 1000px) {
-            .main-dashboard { flex-direction: column; }
-            .analytics-panel { min-width: auto; }
-            .map-wrapper { height: 420px; }
+        .dropdown {
+            display: inline-flex;
+            position: relative;
         }
-
-        @media (max-width: 600px) {
-            .app-header { flex-direction: column; align-items: stretch; padding: 1rem; }
-            .nav-container { justify-content: center; }
+        .dropbtn {
+            padding: 14px 16px;
+            color: #63b3ed;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s ease;
         }
-
-        .leaflet-popup-content-wrapper {
-            border-radius: 16px !important;
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            top: 100%;
+            background-color: #f7fafc;
+            min-width: 160px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+            border-radius: 8px;
+            z-index: 1;
+        }
+        .dropdown-content a {
+            color: #1461e6;
+            padding: 10px 16px;
+            text-decoration: none;
+            display: block;
+            transition: background-color 0.3s ease;
+        }
+        .dropdown-content a:hover {
+            background-color: #c2192765;
+        }
+        .dropdown:hover .dropdown-content {
+            display: block;
+        }
+        .dropdown:hover .dropbtn {
+            color: #fff;
+        }
+        @media (max-width: 768px) {
+            .container {
+                width: 90%;
+                padding: 1rem;
+            }
+            nav {
+                padding: 1rem;
+            }
+            nav a {
+                margin: 0 0.5rem;
+                font-size: 14px;
+            }
+            #map {
+                padding: 0.5rem;
+            }
+        }
+        .popup-tabs {
+            overflow: hidden;
+            border-bottom: 1px solid #e2e8f0;
+            margin-bottom: 10px;
+        }
+        .popup-tabs button {
+            background-color: #f1f1f1;
+            float: left;
+            border: none;
+            outline: none;
+            cursor: pointer;
+            padding: 10px 16px;
+            transition: 0.3s;
+            font-size: 14px;
+            color: #4a5568;
+            border-radius: 5px 5px 0 0;
+        }
+        .popup-tabs button:hover {
+            background-color: #ddd;
+        }
+        .popup-tabs button.active {
+            background-color: #fff;
+            color: #2b6cb0;
+            border-bottom: 2px solid #2b6cb0;
+        }
+        .tabcontent {
+            display: none;
+            padding: 10px 0;
+        }
+        .tabcontent.active {
+            display: block;
         }
     </style>
-    
 </head>
 <body>
-    <!-- Skip to content link for accessibility -->
-    <a href="#main-content" class="sr-only">Skip to main content</a>
-    
-    <!-- Alert Banner -->
-    <div id="alert-banner" class="alert-banner" role="alert" aria-live="polite">
-        ⚠️ Weather Alert: <span id="alert-message"></span>
-    </div>
-    
-    <!-- Header & Navigation -->
-    <header class="app-header">
-        <div class="logo">
-            <span class="logo-icon">🌤️</span>
-            <span>Weather Analytics Dashboard</span>
-        </div>
-        <nav>
+    <nav>
         <a href="../index.html">Home</a>
         <a href="../education.html">Education</a>
         <a href="../experience.html">Skills</a>
@@ -405,606 +209,315 @@
         <a href="../movies.html">Movies</a>
         <a href="../series.html">Series</a>
     </nav>
-    </header>
-    
-    <!-- Main Content -->
-    <main id="main-content" class="main-container">
-        <!-- Map Section -->
-        <section class="map-section" aria-labelledby="map-heading">
-            <div class="section-header">
-                <h1 id="map-heading" class="section-title">Interactive Weather Map</h1>
-                <div class="map-controls">
-                    <button id="reset-view" class="chart-btn" title="Reset map view" aria-label="Reset map view">🔄</button>
-                </div>
-            </div>
-            <div class="map-container">
-                <div id="map" role="application" aria-label="Interactive weather map. Click any location to view weather data."></div>
-                <div class="map-instructions" id="map-instructions">
-                    <span>👆</span> Click anywhere on the map to view temperature, rainfall & pressure data
-                </div>
-            </div>
-        </section>
-        
-        <!-- Charts Panel -->
-        <aside class="charts-panel" aria-labelledby="charts-heading">
-            <button class="panel-toggle" id="panel-toggle" aria-expanded="true" aria-controls="charts-container">
-                <span id="toggle-icon">▼</span>
-            </button>
-            
-            <div id="charts-container">
-                <div class="chart-card">
-                    <div class="chart-header">
-                        <h2 id="charts-heading" class="chart-title">📊 Weather Forecast</h2>
-                        <div class="chart-actions">
-                            <button class="chart-btn" id="export-chart" title="Export chart" aria-label="Export chart">📤</button>
-                            <button class="chart-btn" id="refresh-chart" title="Refresh data" aria-label="Refresh data">🔄</button>
-                        </div>
-                    </div>
-                    <div class="chart-container">
-                        <div id="chart-placeholder" class="chart-placeholder">
-                            <div class="chart-placeholder-icon">📈</div>
-                            <p>Click on the map to load weather data for a location</p>
-                            <p style="font-size: 0.85rem; color: var(--text-secondary); margin-top: 0.25rem;">
-                                Data updates every 3 hours • IST timezone
-                            </p>
-                        </div>
-                        <div id="weather-chart" class="chart-container" style="display: none;"></div>
-                        <div id="chart-loading" class="chart-placeholder" style="display: none;">
-                            <div class="loading-spinner"></div>
-                            <p>Loading weather data...</p>
-                        </div>
-                        <div id="chart-error" class="error-message" style="display: none;"></div>
-                    </div>
-                </div>
-                
-                <div class="chart-card">
-                    <div class="chart-header">
-                        <h2 class="chart-title">ℹ️ Data Information</h2>
-                    </div>
-                    <div style="font-size: 0.9rem; color: var(--text-secondary); line-height: 1.6;">
-                        <p><strong>Temperature:</strong> 2m above ground (°C)</p>
-                        <p><strong>Rainfall:</strong> Accumulated precipitation (mm/3hr)</p>
-                        <p><strong>MSLP:</strong> Mean Sea Level Pressure (Pa)</p>
-                        <p style="margin-top: 0.75rem; padding-top: 0.75rem; border-top: 1px solid var(--border);">
-                            <strong>Disclaimer:</strong> This is not an official forecast. Data is for research and informational purposes only. Always consult official meteorological services for critical decisions.
-                        </p>
-                    </div>
-                </div>
-            </div>
-        </aside>
-    </main>
-    
-    <!-- Footer -->
-    <footer class="app-footer">
-        <p>Weather Analytics Dashboard • Developed by Subhrajit • Pune, India</p>
-        <div class="footer-links">
-            <a href="https://github.com" target="_blank" rel="noopener">GitHub</a>
-            <a href="https://scholar.google.com" target="_blank" rel="noopener">Google Scholar</a>
-            <a href="https://researchgate.net" target="_blank" rel="noopener">ResearchGate</a>
-            <a href="mailto:your.email@example.com">Contact</a>
-        </div>
-        <p style="margin-top: 0.75rem; font-size: 0.8rem; opacity: 0.8;">
-            Map data © <a href="https://openstreetmap.org" target="_blank" rel="noopener">OpenStreetMap</a> contributors • 
-            Weather data sources: NASA GIBS, IMD, ECMWF
-        </p>
+    <div id="map"></div>
+    <footer>
+        <p>© 2024 Subhrajit Rath - Personal Blog</p>
     </footer>
 
     <script>
-        // ===== UTILITY FUNCTIONS =====
-        const Utils = {
-            // Format date to IST with readable format
-            formatISTDate: (gmtTime) => {
-                const date = new Date(gmtTime);
-                date.setHours(date.getHours() + 5);
-                date.setMinutes(date.getMinutes() + 30);
-                
-                const days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
-                const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", 
-                               "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-                
-                const dayName = days[date.getDay()];
-                const day = date.getDate();
-                const month = months[date.getMonth()];
-                const year = date.getFullYear();
-                let hours = date.getHours();
-                const ampm = hours >= 12 ? 'PM' : 'AM';
-                hours = hours % 12;
-                hours = hours ? hours : 12;
-                
-                return `${dayName}, ${day} ${month} ${year} ${hours}:00 ${ampm}`;
-            },
-            
-            // Find nearest index with reasonable tolerance
-            findNearestIndex: (value, array, tolerance = 0.5) => {
-                let nearestIndex = 0;
-                let minDiff = Math.abs(value - array[0]);
-                
-                for (let i = 1; i < array.length; i++) {
-                    const diff = Math.abs(value - array[i]);
-                    if (diff < minDiff) {
-                        minDiff = diff;
-                        nearestIndex = i;
-                    }
-                }
-                
-                return minDiff <= tolerance ? nearestIndex : null;
-            },
-            
-            // Show/hide elements with animation
-            toggleElement: (element, show, duration = 200) => {
-                if (show) {
-                    element.style.display = 'flex';
-                    // Force reflow
-                    void element.offsetWidth;
-                    element.style.opacity = '1';
-                } else {
-                    element.style.opacity = '0';
-                    setTimeout(() => {
-                        element.style.display = 'none';
-                    }, duration);
-                }
-            },
-            
-            // Show alert banner
-            showAlert: (message, type = 'warning', duration = 8000) => {
-                const banner = document.getElementById('alert-banner');
-                const alertMsg = document.getElementById('alert-message');
-                
-                alertMsg.textContent = message;
-                banner.className = `alert-banner ${type} show`;
-                
-                setTimeout(() => {
-                    banner.classList.remove('show');
-                }, duration);
-            }
+        document.addEventListener('contextmenu', function(e) { e.preventDefault(); });
+        document.onkeydown = function(e) {
+            if (e.key === 'F12' || (e.ctrlKey && e.shiftKey && e.key === 'I')) { e.preventDefault(); }
         };
+
+        let targetLat = 16.5;
+        let targetLon = 78.4;
+        const map = L.map('map').setView([targetLat, targetLon], 5);
+
+        const googleHybrid = L.tileLayer('http://{s}.google.com/vt/lyrs=s,h&x={x}&y={y}&z={z}', {
+            maxZoom: 20,
+            subdomains: ['mt0', 'mt1', 'mt2', 'mt3'],
+            attribution: '© googleMap'
+        }).addTo(map);
+
+        const southWest = L.latLng(-90, 60);
+        const northEast = L.latLng(90, 100);
+        const bounds = L.latLngBounds(southWest, northEast);
+        map.setMaxBounds(bounds);
+
+        const baseMaps = { 'Google Hybrid': googleHybrid };
+        L.control.layers(baseMaps).addTo(map);
+        let markers = [];
+
+        function findNearestIndex(value, array) {
+            const exactIndex = array.indexOf(value);
+            if (exactIndex !== -1) return exactIndex;
+            let nearestIndex = 0;
+            let minDiff = Math.abs(value - array[0]);
+            for (let i = 1; i < array.length; i++) {
+                const diff = Math.abs(value - array[i]);
+                if (diff < minDiff) {
+                    minDiff = diff;
+                    nearestIndex = i;
+                }
+            }
+            return minDiff > 5 ? null : nearestIndex;
+        }
+
+        // ECMWF Data Fetch Functions
+        function getTemperatureDataECMWF(targetLat, targetLon) {
+            return fetch('2m_temp.json').then(response => {
+                if (!response.ok) throw new Error("Network response was not ok");
+                return response.json();
+            }).then(data => {
+                const temperatureData = data.data;
+                const latArray = data.coords.latitude.data;
+                const lonArray = data.coords.longitude.data;
+                const nearestLatIndex = findNearestIndex(targetLat, latArray);
+                const nearestLonIndex = findNearestIndex(targetLon, lonArray);
+                const labels = data.coords.valid_time.data;
+                const chartData = temperatureData.map(row => parseFloat((row[nearestLatIndex][nearestLonIndex] - 273.15).toFixed(2)));
+                return { labels: labels, temperatures: chartData };
+            }).catch(error => {
+                console.error("Error fetching ECMWF temperature data:", error);
+                return [];
+            });
+        }
+
+        function getrfDataECMWF(targetLat, targetLon) {
+            return fetch('rf.json').then(response => {
+                if (!response.ok) throw new Error("Network response was not ok");
+                return response.json();
+            }).then(data => {
+                const rainfallData = data.data;
+                const latArray = data.coords.latitude.data;
+                const lonArray = data.coords.longitude.data;
+                const nearestLatIndex = findNearestIndex(targetLat, latArray);
+                const nearestLonIndex = findNearestIndex(targetLon, lonArray);
+                const chartData = rainfallData.map(row => parseFloat(row[nearestLatIndex][nearestLonIndex].toFixed(0)));
+                return { rf: chartData };
+            }).catch(error => {
+                console.error("Error fetching ECMWF rainfall data:", error);
+                return [];
+            });
+        }
+
+        function getmslDataECMWF(targetLat, targetLon) {
+            return fetch('msl.json').then(response => {
+                if (!response.ok) throw new Error("Network response was not ok");
+                return response.json();
+            }).then(data => {
+                const mslData = data.data;
+                const latArray = data.coords.latitude.data;
+                const lonArray = data.coords.longitude.data;
+                const nearestLatIndex = findNearestIndex(targetLat, latArray);
+                const nearestLonIndex = findNearestIndex(targetLon, lonArray);
+                const chartData = mslData.map(row => parseFloat(row[nearestLatIndex][nearestLonIndex].toFixed(2)));
+                return { msl: chartData };
+            }).catch(error => {
+                console.error("Error fetching ECMWF MSLP data:", error);
+                return [];
+            });
+        }
+
+        // NOAA-GFS Data Fetch Functions (using NASA data)
+        function getTemperatureDataGFS(targetLat, targetLon) {
+            return fetch('temp_tot_nasa.json').then(response => {
+                if (!response.ok) throw new Error("Network response was not ok");
+                return response.json();
+            }).then(data => {
+                const temperatureData = data.data;
+                const latArray = data.coords.lat.data;
+                const lonArray = data.coords.lon.data;
+                const nearestLatIndex = findNearestIndex(targetLat, latArray);
+                const nearestLonIndex = findNearestIndex(targetLon, lonArray);
+                const labels = data.coords.time.data;
+                const chartData = temperatureData.map(row => parseFloat((row[nearestLatIndex][nearestLonIndex] - 273.15).toFixed(2)));
+                return { labels: labels, temperatures: chartData };
+            }).catch(error => {
+                console.error("Error fetching GFS temperature data:", error);
+                return [];
+            });
+        }
         
-        // ===== MAP INITIALIZATION =====
-        document.addEventListener('DOMContentLoaded', () => {
-            // Initialize map centered on India
-            const map = L.map('map', {
-                center: [20.5937, 78.9629],
-                zoom: 5,
-                minZoom: 4,
-                maxZoom: 12,
-                worldCopyJump: true
-            });
-            
-            // Base layers
-            const baseLayers = {
-                'OpenStreetMap': L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                    attribution: '© OpenStreetMap contributors',
-                    maxZoom: 19
-                }),
-                'Satellite': L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
-                    attribution: 'Tiles © Esri',
-                    maxZoom: 20
-                }),
-                'Topographic': L.tileLayer('https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png', {
-                    attribution: '© OpenTopoMap',
-                    maxZoom: 17
-                })
-            };
-            
-            // Overlay layers (NASA GIBS)
-            const overlayLayers = {
-                'True Color': L.tileLayer('https://map1.vis.earthdata.nasa.gov/wmts-webmerc/MODIS_Terra_CorrectedReflectance_TrueColor/default/{time}/GoogleMapsCompatible_Level9/{z}/{y}/{x}.jpg', {
-                    attribution: 'NASA GIBS',
-                    maxZoom: 9,
-                    time: ''
-                }),
-                'Precipitation (IMERG)': L.tileLayer('https://map1.vis.earthdata.nasa.gov/wmts-webmerc/IMERG_Precipitation_Rate/default/{time}/GoogleMapsCompatible_Level6/{z}/{y}/{x}.png', {
-                    attribution: 'NASA GIBS',
-                    maxZoom: 6,
-                    time: '',
-                    opacity: 0.8
-                }),
-                'Land Surface Temp': L.tileLayer('https://map1.vis.earthdata.nasa.gov/wmts-webmerc/MODIS_Terra_Land_Surface_Temp_Day/default/{time}/GoogleMapsCompatible_Level7/{z}/{y}/{x}.png', {
-                    attribution: 'NASA GIBS',
-                    maxZoom: 7,
-                    time: '',
-                    opacity: 0.7
-                })
-            };
-            
-            // Add layer control
-            L.control.layers(baseLayers, overlayLayers, {
-                position: 'topright',
-                collapsed: window.innerWidth < 768
-            }).addTo(map);
-            
-            // Add default base layer
-            baseLayers['OpenStreetMap'].addTo(map);
-            
-            // Restrict map bounds to Indian region
-            const southWest = L.latLng(5.0, 65.0);
-            const northEast = L.latLng(40.0, 100.0);
-            const bounds = L.latLngBounds(southWest, northEast);
-            map.setMaxBounds(bounds.pad(0.1));
-            
-            // Reset view button
-            document.getElementById('reset-view').addEventListener('click', () => {
-                map.setView([20.5937, 78.9629], 5, { animate: true });
-            });
-            
-            // ===== CHARTS PANEL TOGGLE =====
-            const panelToggle = document.getElementById('panel-toggle');
-            const chartsPanel = document.querySelector('.charts-panel');
-            const toggleIcon = document.getElementById('toggle-icon');
-            
-            panelToggle.addEventListener('click', () => {
-                const isExpanded = chartsPanel.classList.toggle('collapsed');
-                toggleIcon.textContent = isExpanded ? '►' : '▼';
-                panelToggle.setAttribute('aria-expanded', !isExpanded);
-                
-                // Save preference
-                localStorage.setItem('chartsPanelCollapsed', isExpanded);
-            });
-            
-            // Load saved panel state
-            if (localStorage.getItem('chartsPanelCollapsed') === 'true') {
-                chartsPanel.classList.add('collapsed');
-                toggleIcon.textContent = '►';
-                panelToggle.setAttribute('aria-expanded', 'false');
-            }
-            
-            // ===== MAP CLICK HANDLER =====
-            let currentMarker = null;
-            const chartContainer = document.getElementById('weather-chart');
-            const placeholder = document.getElementById('chart-placeholder');
-            const loading = document.getElementById('chart-loading');
-            const errorEl = document.getElementById('chart-error');
-            
-            map.on('click', async (e) => {
-                const { lat, lng } = e.latlng;
-                const targetLat = parseFloat(lat.toFixed(2));
-                const targetLon = parseFloat(lng.toFixed(2));
-                
-                // Remove previous marker
-                if (currentMarker) {
-                    map.removeLayer(currentMarker);
-                }
-                
-                // Add new marker
-                currentMarker = L.marker([targetLat, targetLon], {
-                    draggable: true
-                }).addTo(map);
-                
-                // Update marker position on drag
-                currentMarker.on('dragend', (event) => {
-                    const newPos = event.target.getLatLng();
-                    loadWeatherData(newPos.lat, newPos.lng);
-                });
-                
-                // Show popup with coordinates
-                const popup = L.popup({
-                    maxWidth: 400,
-                    minWidth: 300,
-                    className: 'weather-popup'
-                })
-                .setLatLng(e.latlng)
-                .setContent(`
-                    <div class="popup-header">
-                        <span>Selected Location</span>
-                        <span class="popup-coords">${targetLat}°, ${targetLon}°</span>
-                    </div>
-                    <div class="popup-body">
-                        <div class="popup-chart-container" id="popup-chart"></div>
-                    </div>
-                `)
-                .openOn(map);
-                
-                // Load and display weather data
-                await loadWeatherData(targetLat, targetLon);
-            });
-            
-            // ===== WEATHER DATA LOADING =====
-            async function loadWeatherData(lat, lon) {
-                // Show loading state
-                placeholder.style.display = 'none';
-                chartContainer.style.display = 'none';
-                errorEl.style.display = 'none';
-                loading.style.display = 'flex';
-                
-                try {
-                    // Fetch all data in parallel
-                    const [tempData, rainData, mslpData] = await Promise.all([
-                        fetchWeatherData('2m_temp.json', lat, lon, true),
-                        fetchWeatherData('rf.json', lat, lon, false),
-                        fetchWeatherData('msl.json', lat, lon, false)
-                    ]);
-                    
-                    // Hide loading, show chart
-                    loading.style.display = 'none';
-                    chartContainer.style.display = 'block';
-                    
-                    // Create the chart
-                    createWeatherChart(tempData, rainData, mslpData, lat, lon);
-                    
-                    // Check for alerts
-                    checkWeatherAlerts(tempData, rainData, mslpData);
-                    
-                } catch (error) {
-                    console.error('Error loading weather data:', error);
-                    loading.style.display = 'none';
-                    errorEl.style.display = 'block';
-                    errorEl.innerHTML = `
-                        <strong>Failed to load data</strong><br>
-                        ${error.message || 'Please try again later'}<br>
-                        <small style="display: block; margin-top: 0.5rem; opacity: 0.8;">
-                            Ensure JSON files are available in the correct directory
-                        </small>
-                    `;
-                }
-            }
-            
-            // Fetch and process weather data from JSON
-            async function fetchWeatherData(filename, lat, lon, isTemperature) {
-                const response = await fetch(filename);
-                if (!response.ok) {
-                    throw new Error(`Failed to load ${filename}: ${response.status}`);
-                }
-                
-                const data = await response.json();
-                if (!data.data || !data.coords) {
-                    throw new Error('Invalid data format');
-                }
-                
-                const { latitude, longitude, valid_time } = data.coords;
-                const latIndex = Utils.findNearestIndex(lat, latitude.data);
-                const lonIndex = Utils.findNearestIndex(lon, longitude.data);
-                
-                if (latIndex === null || lonIndex === null) {
-                    throw new Error('Location outside data coverage area');
-                }
-                
-                // Extract time series data (first 100 points)
-                const timeData = (valid_time.data || []).slice(0, 100);
-                const values = data.data.map(row => {
-                    let value = row[latIndex][lonIndex];
-                    if (isTemperature) {
-                        value = parseFloat((value - 273.15).toFixed(2)); // Kelvin to Celsius
-                    } else {
-                        value = parseFloat(value.toFixed(isTemperature ? 2 : 0));
+        function sanitizeJSON(jsonString) {
+                      return jsonString.replace(/\bNaN\b/g, "0"); // Replace NaN with 0
                     }
-                    return value;
-                }).slice(0, 100);
-                
-                return {
-                    time: timeData.map(t => Utils.formatISTDate(t)),
-                    values: values,
-                    label: isTemperature ? 'Temperature (°C)' : 
-                           filename.includes('rf') ? 'Rainfall (mm/3hr)' : 'MSLP (Pa)'
-                };
+
+        function getrfDataGFS(targetLat, targetLon) {
+          return fetch('rf_tot_nasa.json')
+              .then(response => {
+                  if (!response.ok) throw new Error("Network response was not ok");
+                  return response.text(); // Read response as text
+              })
+              .then(text => JSON.parse(sanitizeJSON(text))) // Sanitize before parsing
+              .then(data => {
+                  const rainfallData = data.data;
+                  const latArray = data.coords.lat.data;
+                  const lonArray = data.coords.lon.data;
+                  const nearestLatIndex = findNearestIndex(targetLat, latArray);
+                  const nearestLonIndex = findNearestIndex(targetLon, lonArray);
+
+                  const chartData = rainfallData.map(row => {
+                      let value = row[nearestLatIndex][nearestLonIndex];
+                      return isNaN(value) ? 0 : parseFloat(value.toFixed(0));
+                  });
+
+                  return { rf: chartData };
+              })
+              .catch(error => {
+                  console.error("Error fetching GFS rainfall data:", error);
+                  return { rf: [] };
+              });
+}
+
+
+
+        function getmslDataGFS(targetLat, targetLon) {
+            return fetch('mslp_tot_nasa.json').then(response => {
+                if (!response.ok) throw new Error("Network response was not ok");
+                return response.json();
+            }).then(data => {
+                const mslData = data.data;
+                const latArray = data.coords.lat.data;
+                const lonArray = data.coords.lon.data;
+                const nearestLatIndex = findNearestIndex(targetLat, latArray);
+                const nearestLonIndex = findNearestIndex(targetLon, lonArray);
+                const chartData = mslData.map(row => parseFloat(row[nearestLatIndex][nearestLonIndex].toFixed(2)));
+                return { msl: chartData };
+            }).catch(error => {
+                console.error("Error fetching GFS MSLP data:", error);
+                return [];
+            });
+        }
+
+        function createWeatherChart(targetLat, targetLon, container, model) {
+            let tempPromise, rfPromise, mslPromise;
+            if (model === 'NOAA-GFS') {
+                tempPromise = getTemperatureDataGFS(targetLat, targetLon);
+                rfPromise = getrfDataGFS(targetLat, targetLon);
+                mslPromise = getmslDataGFS(targetLat, targetLon);
+                timedata=getTemperatureDataGFS(targetLat, targetLon)
+            } else { // ECMWF
+                tempPromise = getTemperatureDataECMWF(targetLat, targetLon);
+                rfPromise = getrfDataECMWF(targetLat, targetLon);
+                mslPromise = getmslDataECMWF(targetLat, targetLon);
             }
-            
-            // Create Highcharts weather chart
-            function createWeatherChart(tempData, rainData, mslpData, lat, lon) {
-                // Destroy existing chart if any
-                if (window.weatherChart) {
-                    window.weatherChart.destroy();
-                }
-                
-                window.weatherChart = Highcharts.chart('weather-chart', {
-                    chart: {
-                        type: 'line',
-                        height: 300,
-                        style: { fontFamily: 'Inter, sans-serif' }
-                    },
-                    title: {
-                        text: `Weather Forecast • ${lat}°, ${lon}°`,
-                        style: { fontSize: '14px', fontWeight: '600' },
-                        margin: 15
-                    },
-                    subtitle: {
-                        text: 'Data: IMD • ECMWF • NASA',
-                        style: { fontSize: '11px', color: '#5f6368' }
-                    },
+
+            Promise.all([tempPromise, rfPromise, mslPromise]).then(([tempData, rainData, mslData]) => {
+                const time = tempData.labels;
+                const temperatures = tempData.temperatures;
+                const rainfall = rainData.rf;
+                const mslp = mslData.msl;
+
+                const istTime = time.map(t => {
+                    let date = new Date(t);
+                    date.setHours(date.getHours() + 5, date.getMinutes() + 30);
+                    let hours = date.getHours();
+                    let minutes = date.getMinutes();
+                    let ampm = hours >= 12 ? 'PM' : 'AM';
+                    hours = hours % 12 || 12;
+                    minutes = minutes < 10 ? '0' + minutes : minutes;
+                    return `${date.getDate()}-${date.getMonth() + 1}-${date.getFullYear().toString().slice(-2)} ${hours}:${minutes} ${ampm}`;
+                });
+
+                Highcharts.chart(container, {
+                    chart: { type: 'line', backgroundColor: '#f7fafc', borderRadius: 8 },
+                    title: { text: `${model} Forecast`, style: { fontSize: '12px', color: '#2d3748' } },
+                    // subtitle: { text: 'Disclaimer: This is not an official forecast. Data is for informational purposes only.' },
                     xAxis: {
-                        categories: tempData.time,
-                        labels: {
-                            rotation: -45,
-                            style: { fontSize: '10px' },
-                            step: 2
-                        },
-                        title: { text: 'Time (IST)' },
-                        crosshair: true
+                        categories: istTime,
+                        labels: { rotation: -45, style: { fontSize: '12px', color: '#4a5568' } },
+                        title: { text: 'Time (IST)', style: { color: '#4a5568' } }
                     },
-                    yAxis: [{
-                        // Temperature axis
-                        title: {
-                            text: 'Temperature (°C)',
-                            style: { color: 'var(--temp-color)' }
-                        },
-                        labels: {
-                            style: { color: 'var(--temp-color)' },
-                            format: '{value}°'
-                        },
-                        opposite: false
-                    }, {
-                        // Pressure axis
-                        title: {
-                            text: 'Pressure (hPa)',
-                            style: { color: 'var(--pressure-color)' }
-                        },
-                        labels: {
-                            style: { color: 'var(--pressure-color)' },
-                            format: '{value}'
-                        },
-                        opposite: true,
-                        min: 980,
-                        max: 1040
-                    }, {
-                        // Rainfall axis
-                        title: {
-                            text: 'Rainfall (mm)',
-                            style: { color: 'var(--rainfall-color)' }
-                        },
-                        labels: {
-                            style: { color: 'var(--rainfall-color)' }
-                        },
-                        opposite: false
-                    }],
+                yAxis: [
+                    { title: { text: 'Temperature (°C)', style: { color: '#ff531a' } }, labels: { style: { color: '#ff531a' } } },
+                    { title: { text: 'Pressure (hPa)', style: { color: '#1a75ff' } }, opposite: true, labels: { style: { color: '#1a75ff' } } },
+                    { 
+                        title: { 
+                            text: model === 'NOAA-GFS' ? 'Rainfall (mm/hr)' : 'Rainfall (mm/3hr)', 
+                            style: { color: '#00cc00' } 
+                        }, 
+                        labels: { style: { color: '#00cc00' } } 
+                    }
+                ],
+                    series: [
+                        { name: 'Temperature', data: temperatures, color: '#ff531a', marker: { radius: 3 } },
+                        { name: 'Pressure', data: mslp, color: '#1a75ff', yAxis: 1, dashStyle: 'ShortDash', marker: { radius: 3 } },
+                        { name: 'Rainfall', data: rainfall, color: '#00cc00', yAxis: 2, type: 'column', opacity: 0.8 }
+                    ],
                     tooltip: {
                         shared: true,
-                        formatter: function() {
-                            let s = `<b>${this.x}</b><br/>`;
+                        backgroundColor: '#fff',
+                        borderColor: '#e2e8f0',
+                        formatter: function () {
+                            let timeValue = this.series.xAxis.categories[this.x];
+                            let tooltip = `<b>Time (IST):</b> ${timeValue}<br>`;
                             this.points.forEach(point => {
-                                const color = point.color;
-                                const name = point.series.name;
-                                const y = point.y;
-                                const unit = name.includes('Temperature') ? '°C' : 
-                                           name.includes('Pressure') ? ' hPa' : ' mm';
-                                s += `<span style="color:${color}">●</span> ${name}: <b>${y}${unit}</b><br/>`;
+                                tooltip += `<span style="color:${point.color}">\u25CF</span> <b>${point.series.name}:</b> ${point.y}<br>`;
                             });
-                            return s;
+                            return tooltip;
                         }
                     },
-                    legend: {
-                        layout: 'horizontal',
-                        align: 'center',
-                        verticalAlign: 'bottom',
-                        itemStyle: { fontSize: '11px' }
-                    },
-                    plotOptions: {
-                        series: {
-                            marker: { enabled: false },
-                            animation: { duration: 500 }
-                        },
-                        column: {
-                            pointPadding: 0.1,
-                            groupPadding: 0.1
-                        }
-                    },
-                    series: [
-                        {
-                            name: 'Temperature',
-                            data: tempData.values,
-                            color: 'var(--temp-color)',
-                            yAxis: 0,
-                            tooltip: { valueSuffix: '°C' }
-                        },
-                        {
-                            name: 'MSLP',
-                            data: mslpData.values.map(v => v/100), // Pa to hPa
-                            color: 'var(--pressure-color)',
-                            yAxis: 1,
-                            type: 'line',
-                            dashStyle: 'ShortDash',
-                            tooltip: { valueSuffix: ' hPa' }
-                        },
-                        {
-                            name: 'Rainfall',
-                            data: rainData.values,
-                            color: 'var(--rainfall-color)',
-                            yAxis: 2,
-                            type: 'column',
-                            tooltip: { valueSuffix: ' mm' }
-                        }
-                    ],
-                    exporting: {
-                        enabled: true,
-                        buttons: {
-                            contextButton: {
-                                menuItems: ['downloadPNG', 'downloadPDF', 'viewData']
-                            }
-                        }
-                    },
-                    credits: {
-                        enabled: false
-                    },
-                    responsive: {
-                        rules: [{
-                            condition: { maxWidth: 400 },
-                            chartOptions: {
-                                legend: { enabled: false },
-                                xAxis: { labels: { rotation: -30, step: 3 } }
-                            }
-                        }]
-                    }
+                    plotOptions: { column: { borderRadius: 2 } },
+                    responsive: { rules: [{ condition: { maxWidth: 500 }, chartOptions: { legend: { enabled: false } } }] }
                 });
-            }
-            
-            // Check for weather alerts
-            function checkWeatherAlerts(tempData, rainData, mslpData) {
-                const alerts = [];
-                
-                // Temperature alert (>35°C)
-                const highTemp = tempData.values.filter(t => t > 35);
-                if (highTemp.length > 0) {
-                    alerts.push(`High temperature alert: ${Math.max(...highTemp).toFixed(1)}°C recorded`);
-                }
-                
-                // Heavy rainfall alert (>15mm/3hr)
-                const heavyRain = rainData.values.filter(r => r > 15);
-                if (heavyRain.length > 0) {
-                    alerts.push(`Heavy rainfall alert: ${Math.max(...heavyRain)}mm in 3 hours`);
-                }
-                
-                // Low pressure alert (<1000 hPa)
-                const lowPressure = mslpData.values.filter(p => p/100 < 1000);
-                if (lowPressure.length > 0) {
-                    alerts.push(`Low pressure system: ${Math.min(...lowPressure)/100} hPa`);
-                }
-                
-                // Show alerts if any
-                if (alerts.length > 0) {
-                    Utils.showAlert(alerts.join(' • '), alerts.some(a => a.includes('Heavy rainfall') || a.includes('Low pressure')) ? 'danger' : 'warning');
-                }
-            }
-            
-            // ===== EVENT LISTENERS =====
-            // Export chart button
-            document.getElementById('export-chart')?.addEventListener('click', () => {
-                if (window.weatherChart) {
-                    window.weatherChart.exportChart();
-                }
-            });
-            
-            // Refresh chart button
-            document.getElementById('refresh-chart')?.addEventListener('click', () => {
-                if (currentMarker) {
-                    const { lat, lng } = currentMarker.getLatLng();
-                    loadWeatherData(lat, lng);
-                }
-            });
-            
-            // Hide instructions after first interaction
-            const instructions = document.getElementById('map-instructions');
-            map.once('click', () => {
-                instructions.style.opacity = '0';
-                setTimeout(() => {
-                    instructions.style.display = 'none';
-                }, 300);
-            });
-            
-            // Handle window resize for layer control
-            let resizeTimer;
-            window.addEventListener('resize', () => {
-                clearTimeout(resizeTimer);
-                resizeTimer = setTimeout(() => {
-                    map.invalidateSize();
-                }, 250);
-            });
-            
-            // Prevent right-click context menu on map (optional)
-            document.getElementById('map').addEventListener('contextmenu', (e) => {
-                e.preventDefault();
-                // Show custom context menu if needed
-            });
-            
-            // ===== INITIAL INSTRUCTIONS =====
-            // Auto-hide instructions after 10 seconds
+
+                const highTempThreshold = 35;
+                const exceededTemps = temperatures.filter(temp => temp > highTempThreshold);
+                const highrfThreshold = 10;
+                const exceededrf = rainfall.filter(rf => rf > highrfThreshold);
+                const lowmslThreshold = 1000;
+                const exceededlow = mslp.filter(msl => msl < lowmslThreshold);
+                let alertMessage = '';
+                if (exceededTemps.length > 0) alertMessage += `Temperature has crossed ${highTempThreshold}°C! `;
+                if (exceededrf.length > 0) alertMessage += `Rainfall has crossed ${highrfThreshold} mm! `;
+                if (exceededlow.length > 0) alertMessage += `MSLP has crossed below ${lowmslThreshold} hPa! `;
+                if (alertMessage) alert(`Alert (${model}): ${alertMessage}`);
+            }).catch(error => console.error("Error:", error));
+        }
+
+        map.on('click', function (e) {
+            const targetLat = parseFloat(e.latlng.lat.toFixed(2));
+            const targetLon = parseFloat(e.latlng.lng.toFixed(2));
+            const uniqueContainerIdECMWF = 'container-ecmwf-' + Date.now();
+            const uniqueContainerIdGFS = 'container-gfs-' + Date.now();
+
+            const popupContent = `
+                <div style="font-family: 'Roboto', sans-serif; padding: 1rem; background: #fff; border-radius: 8px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);  max-height: 400px; /* Set maximum height */
+    min-height: 450px; /* Set minimum height */
+    overflow-y: auto; ">
+                    <h3 style="margin: 0 0 10px; color: #2b6cb0;">Disclaimer: This is not an official forecast. Data is for informational purposes only.</h3>
+                    <p><strong>Coordinates:</strong> ${targetLat}, ${targetLon}</p>
+                    <div class="popup-tabs">
+                        <button class="tablink active" onclick="openTab(event, '${uniqueContainerIdECMWF}', this)">ECMWF</button>
+                        <button class="tablink" onclick="openTab(event, '${uniqueContainerIdGFS}', this)">NOAA-GFS</button>
+                    </div>
+                    <div id="${uniqueContainerIdECMWF}" class="tabcontent active" style="width: 100%; height: 350px;"></div>
+                    <div id="${uniqueContainerIdGFS}" class="tabcontent" style="width: 100%; height: 350px;"></div>
+                </div>`;
+
+            markers.forEach(marker => map.removeLayer(marker));
+            markers = [];
+            const marker = L.marker([targetLat, targetLon]).addTo(map);
+            marker.bindPopup(popupContent, { maxWidth: window.innerWidth > 768 ? 900 : 600, minWidth: 700 });
+            marker.openPopup();
+
             setTimeout(() => {
-                if (instructions) {
-                    instructions.style.transition = 'opacity 0.5s';
-                    instructions.style.opacity = '0';
-                    setTimeout(() => {
-                        instructions.style.display = 'none';
-                    }, 500);
+                const ecmwfContainer = document.getElementById(uniqueContainerIdECMWF);
+                const gfsContainer = document.getElementById(uniqueContainerIdGFS);
+                if (ecmwfContainer && gfsContainer) {
+                    createWeatherChart(targetLat, targetLon, uniqueContainerIdECMWF, 'ECMWF');
+                    createWeatherChart(targetLat, targetLon, uniqueContainerIdGFS, 'NOAA-GFS');
+                } else {
+                    console.error("Popup content not rendered.");
                 }
-            }, 10000);
+            }, 300);
+            markers.push(marker);
         });
+
+        function openTab(evt, tabId, button) {
+            const tabcontent = document.getElementsByClassName('tabcontent');
+            for (let i = 0; i < tabcontent.length; i++) {
+                tabcontent[i].classList.remove('active');
+            }
+            const tablinks = document.getElementsByClassName('tablink');
+            for (let i = 0; i < tablinks.length; i++) {
+                tablinks[i].classList.remove('active');
+            }
+            document.getElementById(tabId).classList.add('active');
+            button.classList.add('active');
+        }
     </script>
 </body>
 </html>
