@@ -526,8 +526,8 @@
                     if (highTemp) msg += '🔥 Temp>35°C ';
                     if (highRain) msg += `💧 Rainfall>10mm/${model === 'ECMWF' ? '3hr' : 'hr'} `;
                     if (lowPress) msg += '📉 Pressure<1000hPa ';
-                    if (highPM25) msg += '😷 PM2.5>60μg/m³ ';
-                    if (highPM10) msg += '🌫️ PM10>100μg/m³ ';
+                    // if (highPM25) msg += '😷 PM2.5>60μg/m³ ';
+                   // if (highPM10) msg += '🌫️ PM10>100μg/m³ ';
                     setTimeout(() => alert(msg), 100);
                 }
 
@@ -540,14 +540,14 @@
 
                 // Add new variables if data exists
                 if (dewPoint.length > 0) {
-                    series.push({ name: '💧 Dew Point (°C)', data: dewPoint, color: '#8b5cf6', yAxis: 0, dashStyle: 'Dot', marker: { radius: 2 }, lineWidth: 2 });
+                    series.push({ name: '💧 Dew Point (°C)', data: dewPoint, color: '#8b5cf6', yAxis: 0, marker: { fillColor: '#f97316' }, tooltip: { valueSuffix: ' °C' }, lineWidth: 2.5 } );
                 }
-                if (pm25.length > 0) {
-                    series.push({ name: '😷 PM2.5 (μg/m³)', data: pm25, color: '#ef4444', yAxis: 3, type: 'spline', marker: { radius: 2 }, lineWidth: 2 });
-                }
-                if (pm10.length > 0) {
-                    series.push({ name: '🌫️ PM10 (μg/m³)', data: pm10, color: '#f59e0b', yAxis: 3, type: 'spline', marker: { radius: 2 }, lineWidth: 2, dashStyle: 'ShortDash' });
-                }
+                // if (pm25.length > 0) {
+                //     series.push({ name: '😷 PM2.5 (μg/m³)', data: pm25, color: '#ef4444', yAxis: 3, type: 'spline', marker: { radius: 2 }, lineWidth: 2 });
+                // }
+                // if (pm10.length > 0) {
+                //     series.push({ name: '🌫️ PM10 (μg/m³)', data: pm10, color: '#f59e0b', yAxis: 3, type: 'spline', marker: { radius: 2 }, lineWidth: 2, dashStyle: 'ShortDash' });
+                // }
 
                 // Configure yAxes with 4 possible axes
                 let yAxes = [
@@ -556,9 +556,9 @@
                     { title: { text: '☔ Rainfall (mm)', style: { color: '#10b981' } }, opposite: false, labels: { style: { color: '#10b981' } }, gridLineWidth: 0 }
                 ];
 
-                if (pm25.length > 0 || pm10.length > 0) {
-                    yAxes.push({ title: { text: '🌫️ PM / AQI (μg/m³)', style: { color: '#ef4444' } }, opposite: true, labels: { style: { color: '#ef4444' } }, gridLineWidth: 0 });
-                }
+                // if (pm25.length > 0 || pm10.length > 0) {
+                //     yAxes.push({ title: { text: '🌫️ PM / AQI (μg/m³)', style: { color: '#ef4444' } }, opposite: true, labels: { style: { color: '#ef4444' } }, gridLineWidth: 0 });
+                // }
 
                 Highcharts.chart(containerId, {
                     chart: {
@@ -570,7 +570,7 @@
                         height: 480
                     },
                     title: { text: `${model} • ${lat.toFixed(2)}°, ${lon.toFixed(2)}°`, align: 'left', style: { fontWeight: '600', fontSize: '14px', color: '#1e293b' } },
-                    subtitle: { text: 'Multi-variable: Weather + Air Quality + Dew Point', align: 'left', style: { fontSize: '11px', color: '#475569' } },
+                    subtitle: { text: 'Multi-variable: Weather chart', align: 'left', style: { fontSize: '11px', color: '#475569' } },
                     xAxis: {
                         categories: istLabels,
                         labels: { rotation: -35, style: { fontSize: '9px', fontWeight: '500' }, autoRotation: false },
