@@ -1,4 +1,4 @@
-name: Download and preprocess 06UTC
+name: Download and preprocess 18UTC
 on:
   schedule:
     - cron: '0 1 * * *'  # Fixed: removed extra asterisk
