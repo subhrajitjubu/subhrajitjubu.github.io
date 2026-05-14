@@ -1,7 +1,7 @@
 name: Download and preprocess 12UTC
 on:
   schedule:
-    - cron: '0 21 * * *'  # Fixed: removed extra asterisk
+    - cron: '0 18 * * *'  # Fixed: removed extra asterisk
   workflow_dispatch:  # Allows manual triggering
 
 jobs:
