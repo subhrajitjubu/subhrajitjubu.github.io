@@ -1,7 +1,7 @@
-name: Download and preprocess 18UTC
+name: Download and preprocess 06UTC
 on:
   schedule:
-    - cron: '0 3 * * *'  # Fixed: removed extra asterisk
+    - cron: '0 1 * * *'  # Fixed: removed extra asterisk
   workflow_dispatch:  # Allows manual triggering
 
 jobs:
@@ -24,13 +24,7 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-pip-
             
-      - name: Cache virtual environment
-        uses: actions/cache@v3
-        with:
-          path: venv
-          key: ${{ runner.os }}-venv-${{ hashFiles('**/requirements.txt') }}
-          restore-keys: |
-            ${{ runner.os }}-venv-
+
             
       - name: Create and setup virtual environment
         run: |
@@ -52,7 +46,7 @@ jobs:
         run: |
           source venv/bin/activate
           find src/* -type f -name "*.json" ! -name "IND.json" -exec rm {} \;          
-          ipython -c "%run src/singlelevel_06.ipynb"
+          ipython -c "%run src/singlelevel_18.ipynb"
           rm atms.grib2* || true  # Added || true to prevent failure if files don't exist
           mv *.json src/ || true  # Added || true to prevent failure if no json files
           
