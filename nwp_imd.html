@@ -365,9 +365,9 @@
                 const nhr = String(hours).padStart(2, '0');
                 imageDisplay.src = `https://nwp.imd.gov.in/wrf/WRF3km-03-RAIN_india_${nhr}.png`;
             } else if (currentDataType === 'rf_6hrly') {
-                imageDisplay.src = `https://www.ncmrwf.gov.in/HomePage/Data/mihir/${currentDate}/00/6-hrs%20Accumulated%20Precipitation/pf${hours}_rain06.png`;
+                imageDisplay.src = `https://nwp.ncmrwf.gov.in/HomePage/Data/mihir/${currentDate}/00/6-hrs%20Accumulated%20Precipitation/pf${hours}_rain06.png`;
             } else if (currentDataType === 'temp') {
-                imageDisplay.src = `https://www.ncmrwf.gov.in/HomePage/Data/mihir/${currentDate}/00/Temperature%20at%202m/pf${hours}_2mtemp.png`;
+                imageDisplay.src = `https://nwp.ncmrwf.gov.in/HomePage/Data/mihir/${currentDate}/00/Temperature%20at%202m/pf${hours}_2mtemp.png`;
             } else if (currentDataType === 'Wind850') {
                 const nhr = String(hours).padStart(2, '0');
                 imageDisplay.src = `https://nwp.imd.gov.in/wrf/WRF3km-ZWd850_india_${nhr}.png`;
@@ -376,10 +376,10 @@
                 imageDisplay.src = `https://nwp.imd.gov.in/wrf/WRF3km-ZWd500_india_${nhr}.png`;
             } else if (currentDataType === 'Wind850c') {
                 const nhr = String(hours).padStart(2, '0');
-                imageDisplay.src = `https://www.ncmrwf.gov.in/HomePage/Data/mihir/${currentDate}/00/Lower%20Level%20Convergenc/850/pf${hours}_850conv.png`;
+                imageDisplay.src = `https://nwp.ncmrwf.gov.in/HomePage/Data/mihir/${currentDate}/00/Lower%20Level%20Convergenc/850/pf${hours}_850conv.png`;
             } else if (currentDataType === 'Wind500d') {
                 const nhr = String(hours).padStart(2, '0');
-                imageDisplay.src = `https://www.ncmrwf.gov.in/HomePage/Data/mihir/${currentDate}/00/Upper%20Level%20Divergence%20/500/pf${hours}_500div.png`;
+                imageDisplay.src = `https://nwp.ncmrwf.gov.in/HomePage/Data/mihir/${currentDate}/00/Upper%20Level%20Divergence%20/500/pf${hours}_500div.png`;
             } else if (currentDataType === 'Wind850rain') {
                 const nhr = String(hours).padStart(2, '0');
                 imageDisplay.src = `https://nwp.imd.gov.in/gfs/00/${hours}hGFS1534w850rf.gif`;
