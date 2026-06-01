@@ -2,11 +2,8 @@ name: Download and preprocess 00UTC
 
 on:
   schedule:
-    - cron: '0 7 * * *'
-  workflow_dispatch:
-
-permissions:
-  contents: write
+    - cron: '30 7 * * *'  # This runs every day at 10:00 UTC
+  workflow_dispatch:  # Allows manual triggering
 
 jobs:
   run-notebook:
@@ -14,123 +11,50 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v2
 
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v2
         with:
-          python-version: '3.10'
+          python-version: '3.10'  # Specify the Python version you need
 
-      - name: Configure git
-        run: |
-          git config --global user.name "subhrajitjubu"
-          git config --global user.email "66462700+subhrajitjubu@users.noreply.github.com"
-
-      - name: Cache pip packages
-        uses: actions/cache@v4
+      - name: Cache Python packages
+        uses: actions/checkout@v4
         with:
+          cache: 'pip'
           path: ~/.cache/pip
           key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
           restore-keys: |
             ${{ runner.os }}-pip-
-
-      - name: Install dependencies
+      - name: Create virtual environment
         run: |
+          python -m venv venv
+          source venv/bin/activate
           pip install --upgrade pip
           pip install jupyter nbconvert
-          pip install -r requirements.txt
+          pip install -r requirements.txt  # Install your dependencies
+      - name: pull repo
+        run: |
+          git config --global user.name "subhrajitjubu"
+          git config --global user.email "66462700+subhrajitjubu@users.noreply.github.com"
 
-      - name: Pull latest changes
-        run: git pull --rebase origin main
-
+          
       - name: Run Jupyter Notebook
         run: |
-          find src/ -type f -name "*.json" ! -name "IND.json" -exec rm {} \;
-
-          jupyter nbconvert \
-            --to notebook \
-            --execute src/singlelevel_00.ipynb \
-            --output /tmp/singlelevel_00_executed.ipynb \
-            --ExecutePreprocessor.timeout=600
-
-          rm -f atms.grib2*
-
-          find . -maxdepth 1 -name "*.json" ! -name "IND.json" -exec mv {} src/ \;
-
-      - name: Debug working tree
+          source venv/bin/activate   
+          find src/* -type f -name "*.json" ! -name "IND.json" -exec rm {} \;
+          ipython -c "%run src/singlelevel_00.ipynb"
+          rm atms.grib2*
+      - name: Commit and push changes
         run: |
-          echo "========================================="
-          echo "1. ALL modified/staged/untracked files"
-          echo "========================================="
-          git status
-
-          echo ""
-          echo "========================================="
-          echo "2. Short status (what git sees as dirty)"
-          echo "========================================="
-          git status --porcelain
-
-          echo ""
-          echo "========================================="
-          echo "3. Unstaged changes (modified tracked files)"
-          echo "========================================="
-          git diff --stat
-
-          echo ""
-          echo "========================================="
-          echo "4. Staged changes (already added)"
-          echo "========================================="
-          git diff --cached --stat
-
-          echo ""
-          echo "========================================="
-          echo "5. Untracked files"
-          echo "========================================="
-          git ls-files --others --exclude-standard
-
-          echo ""
-          echo "========================================="
-          echo "6. All files changed since last commit"
-          echo "========================================="
-          git diff HEAD --stat
-
-          echo ""
-          echo "========================================="
-          echo "7. Contents of srcc/ directory"
-          echo "========================================="
-          ls -la srcc/
-
-          echo ""
-          echo "========================================="
-          echo "8. Any .json files in root"
-          echo "========================================="
-          find . -maxdepth 1 -name "*.json" -ls
-
-          echo ""
-          echo "========================================="
-          echo "9. Any .ipynb changes"
-          echo "========================================="
-          git diff --stat -- "*.ipynb"
-
-          echo ""
-          echo "========================================="
-          echo "10. Any .grib2 or temp files"
-          echo "========================================="
-          find . -maxdepth 2 \( -name "*.grib2" -o -name "*.nc" -o -name "*.zip" -o -name "*.tmp" \) -ls
-          
-      - name: Commit and push JSON files
-        run: |
+          git config --global user.name "subhrajitjubu"
+          git config --global user.email "66462700+subhrajitjubu@users.noreply.github.com"
+          git pull origin main
+          mv *.json src/
           git add src/*.json
-
           if [ -n "$(git status --porcelain)" ]; then
-            git commit -m "Update JSON files - $(date -u '+%Y-%m-%d %H:%M UTC')"
-
-            for i in 1 2 3; do
-              git pull --rebase origin main
-              git push origin main && break
-              echo "Push attempt $i failed, retrying..."
-              sleep 5
-            done
+            git commit -m "Update files created by Jupyter Notebook"
+            git push origin main
           else
             echo "No changes to commit."
           fi
