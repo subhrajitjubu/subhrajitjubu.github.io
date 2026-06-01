@@ -1,42 +1,39 @@
 name: Download and preprocess 18UTC
+
 on:
   schedule:
-    - cron: '0 1 * * *'  # Fixed: removed extra asterisk
+    - cron: '10 1 * * *'  # This runs every day at 10:00 UTC
   workflow_dispatch:  # Allows manual triggering
 
 jobs:
   run-notebook:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4  # Updated to latest version
-        
+        uses: actions/checkout@v2
+
       - name: Set up Python
-        uses: actions/setup-python@v4  # Updated to latest version
+        uses: actions/setup-python@v2
         with:
-          python-version: '3.10'
-          
-      - name: Cache pip packages
-        uses: actions/cache@v3
+          python-version: '3.10'  # Specify the Python version you need
+
+      - name: Cache Python packages
+        uses: actions/checkout@v4
         with:
+          cache: 'pip'
           path: ~/.cache/pip
           key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
           restore-keys: |
             ${{ runner.os }}-pip-
-            
-
-            
-      - name: Create and setup virtual environment
+      - name: Create virtual environment
         run: |
-          if [ ! -d "venv" ]; then
-            python -m venv venv
-          fi
+          python -m venv venv
           source venv/bin/activate
           pip install --upgrade pip
           pip install jupyter nbconvert
-          pip install -r requirements.txt
-          
-      - name: Pull latest changes
+          pip install -r requirements.txt  # Install your dependencies
+      - name: pull repo
         run: |
           git config --global user.name "subhrajitjubu"
           git config --global user.email "66462700+subhrajitjubu@users.noreply.github.com"
@@ -44,35 +41,20 @@ jobs:
           
       - name: Run Jupyter Notebook
         run: |
-          source venv/bin/activate
-          find src/* -type f -name "*.json" ! -name "IND.json" -exec rm {} \;          
+          source venv/bin/activate   
+          find src/* -type f -name "*.json" ! -name "IND.json" -exec rm {} \;
           ipython -c "%run src/singlelevel_18.ipynb"
-          rm atms.grib2* || true  # Added || true to prevent failure if files don't exist
-          mv *.json src/ || true  # Added || true to prevent failure if no json files
-          
-      - name: Compress JSON files
+          rm atms.grib2*
+      - name: Commit and push changes
         run: |
-          if ls src/*.json 1> /dev/null 2>&1; then
-            tar -czvf json_files.tar.gz src/*.json
-            rm src/*.json  # Clean up original JSON files
-          else
-            echo "No JSON files to compress"
-          fi
-          
-      - name: Commit and push compressed files
-        run: |
-          git config --global user.name "subhrajitjubu"  # Fixed: consistent username
-          git config --global user.email "66462700+subhrajitjubu@users.noreply.github.com"  # Fixed: consistent email
+          git config --global user.name "subhrajitjubu"
+          git config --global user.email "66462700+subhrajitjubu@users.noreply.github.com"
           git pull origin main
-          
-          if [ -f "json_files.tar.gz" ]; then
-            git add json_files.tar.gz
-            if [ -n "$(git status --porcelain)" ]; then
-              git commit -m "Update compressed JSON files - $(date)"
-              git push origin main
-            else
-              echo "No changes to commit."
-            fi
+          mv *.json src/
+          git add src/*.json
+          if [ -n "$(git status --porcelain)" ]; then
+            git commit -m "Update files created by Jupyter Notebook"
+            git push origin main
           else
-            echo "No compressed file to commit."
+            echo "No changes to commit."
           fi
