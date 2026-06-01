@@ -45,72 +45,33 @@ jobs:
 
       - name: Run Jupyter Notebook
         run: |
-          # Clean up old JSON files except IND.json
           find src/ -type f -name "*.json" ! -name "IND.json" -exec rm {} \;
 
-          # Execute notebook without baking outputs into source file
           jupyter nbconvert \
             --to notebook \
             --execute src/singlelevel_00.ipynb \
             --output /tmp/singlelevel_00_executed.ipynb \
             --ExecutePreprocessor.timeout=600
 
-          # Clean up grib files
           rm -f atms.grib2*
 
-          # Move any JSON files dumped to root into src/
           find . -maxdepth 1 -name "*.json" ! -name "IND.json" -exec mv {} src/ \;
 
-      - name: Compress JSON files
+      - name: Commit and push JSON files
         run: |
-          if ls src/*.json 1>/dev/null 2>&1; then
-            # Remove old archive first to avoid stale data
-            rm -f json_files.tar.gz
+          git add src/*.json
 
-            tar -czvf json_files.tar.gz src/*.json
-
-            # Verify archive integrity
-            if ! tar -tzf json_files.tar.gz > /dev/null 2>&1; then
-              echo "ERROR: Archive is corrupted"
-              exit 1
-            fi
-
-            # Verify archive is not suspiciously small
-            ARCHIVE_SIZE=$(stat -c%s json_files.tar.gz)
-            if [ "$ARCHIVE_SIZE" -lt 100 ]; then
-              echo "ERROR: Archive suspiciously small ($ARCHIVE_SIZE bytes)"
-              exit 1
-            fi
-
-            echo "Archive created successfully: $ARCHIVE_SIZE bytes"
-
-            # Clean up original JSON files after successful compression
-            rm src/*.json
-          else
-            echo "No JSON files found — skipping compression"
-          fi
-
-      - name: Commit and push compressed files
-        run: |
-          # Rebase to avoid merge commits from concurrent runs
           git pull --rebase origin main
 
-          if [ -f "json_files.tar.gz" ]; then
-            git add json_files.tar.gz
+          if [ -n "$(git status --porcelain)" ]; then
+            git commit -m "Update JSON files - $(date -u '+%Y-%m-%d %H:%M UTC')"
 
-            if [ -n "$(git status --porcelain)" ]; then
-              git commit -m "Update compressed JSON files - $(date -u '+%Y-%m-%d %H:%M UTC')"
-
-              # Retry push up to 3 times in case of race condition
-              for i in 1 2 3; do
-                git push origin main && break
-                echo "Push attempt $i failed, retrying..."
-                git pull --rebase origin main
-                sleep 5
-              done
-            else
-              echo "No changes to commit."
-            fi
+            for i in 1 2 3; do
+              git push origin main && break
+              echo "Push attempt $i failed, retrying..."
+              git pull --rebase origin main
+              sleep 5
+            done
           else
-            echo "No compressed file to commit."
+            echo "No changes to commit."
           fi
