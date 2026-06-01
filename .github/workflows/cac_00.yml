@@ -57,6 +57,67 @@ jobs:
 
           find . -maxdepth 1 -name "*.json" ! -name "IND.json" -exec mv {} src/ \;
 
+      - name: Debug working tree
+        run: |
+          echo "========================================="
+          echo "1. ALL modified/staged/untracked files"
+          echo "========================================="
+          git status
+
+          echo ""
+          echo "========================================="
+          echo "2. Short status (what git sees as dirty)"
+          echo "========================================="
+          git status --porcelain
+
+          echo ""
+          echo "========================================="
+          echo "3. Unstaged changes (modified tracked files)"
+          echo "========================================="
+          git diff --stat
+
+          echo ""
+          echo "========================================="
+          echo "4. Staged changes (already added)"
+          echo "========================================="
+          git diff --cached --stat
+
+          echo ""
+          echo "========================================="
+          echo "5. Untracked files"
+          echo "========================================="
+          git ls-files --others --exclude-standard
+
+          echo ""
+          echo "========================================="
+          echo "6. All files changed since last commit"
+          echo "========================================="
+          git diff HEAD --stat
+
+          echo ""
+          echo "========================================="
+          echo "7. Contents of srcc/ directory"
+          echo "========================================="
+          ls -la srcc/
+
+          echo ""
+          echo "========================================="
+          echo "8. Any .json files in root"
+          echo "========================================="
+          find . -maxdepth 1 -name "*.json" -ls
+
+          echo ""
+          echo "========================================="
+          echo "9. Any .ipynb changes"
+          echo "========================================="
+          git diff --stat -- "*.ipynb"
+
+          echo ""
+          echo "========================================="
+          echo "10. Any .grib2 or temp files"
+          echo "========================================="
+          find . -maxdepth 2 \( -name "*.grib2" -o -name "*.nc" -o -name "*.zip" -o -name "*.tmp" \) -ls
+          
       - name: Commit and push JSON files
         run: |
           git add src/*.json
