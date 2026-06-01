@@ -61,15 +61,13 @@ jobs:
         run: |
           git add src/*.json
 
-          git pull --rebase origin main
-
           if [ -n "$(git status --porcelain)" ]; then
             git commit -m "Update JSON files - $(date -u '+%Y-%m-%d %H:%M UTC')"
 
             for i in 1 2 3; do
+              git pull --rebase origin main
               git push origin main && break
               echo "Push attempt $i failed, retrying..."
-              git pull --rebase origin main
               sleep 5
             done
           else
