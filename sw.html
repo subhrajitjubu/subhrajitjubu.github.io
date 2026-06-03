@@ -685,7 +685,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>NEBULA FORECAST | Direct Weather Intelligence</title>
+    <title>Weater Card| Direct Weather from API</title>
     <link rel="preconnect" href="https://cdnjs.cloudflare.com">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -1188,7 +1188,7 @@
 
             for (let entry of cardsData) {
                 const tempC = kelvinToC(entry.temperature);
-                const dewC = kelvinToC(entry.DEWpoint);
+                const dewC = entry.DEWpoint;
                 const mslp = entry.MSLP ? entry.MSLP.toFixed(1) : '—';
                 const cloud = entry['total cloud cover'] !== undefined ? entry['total cloud cover'].toFixed(1) : '—';
                 const rainfall = (entry.rainfall || 0).toFixed(2);
