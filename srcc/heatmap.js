@@ -456,7 +456,7 @@ function renderHeatmap(timeIndex, sstData, latData, lonData, topology, timeData)
     for (let i = 0; i < latData.length; i++) {
         for (let j = 0; j < lonData.length; j++) {
             const v = sstForTime[i][j];
-            if (v === null || v === undefined || v === -273.15 || v === 0) continue;
+            if (v === null || v === undefined  || v === 0) continue;
             const lon = lonData[j] > 180 ? lonData[j] - 360 : lonData[j];
             formattedData.push({ lat: latData[i], lon, value: v });
         }
