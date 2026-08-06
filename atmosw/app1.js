@@ -19,18 +19,19 @@ async function fetchApiKey() {
 
     try {
         // Must use your full Vercel deployment URL here because the backend lives on Vercel, not GitHub
-        const response = await fetch("https://mkopyt.vercel.app/api/get-key");
+        const response = await fetch("https://opkey.vercel.app/api/get-key");
         
         if (!response.ok) {
             throw new Error(`HTTP error! Status: ${response.status}`);
         }
 
         const data = await response.json();
-        const key = data.OPP;
+        // const key = data.OPP;
+        const OPENROUTER_API_KEY = data.OPP;
 
         // Display or use the key
-        outputElement.textContent = `Successfully fetched key: ${key}`;
-        console.log("Key:", key);
+        // outputElement.textContent = `Successfully fetched key: ${key}`;
+        // console.log("Key:", key);
 
     } catch (error) {
         outputElement.textContent = "Failed to fetch key.";
