@@ -40,7 +40,27 @@ async function fetchApiKey() {
 }
 
 
+async function initializeApp() {
+    try {
+        // Fetch the key securely from your backend serverless function
+        const response = await fetch("https://opkey.vercel.app/api/get-key");
+        
+        if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+        }
 
+        const data = await response.json();
+        const OPENROUTER_API_KEY = data.OPP;
+
+        console.log("Successfully loaded API key!");
+
+        // Use your key here (e.g., call OpenRouter API)
+        callOpenRouter(OPENROUTER_API_KEY);
+
+    } catch (error) {
+        console.error("Failed to load API key:", error);
+    }
+}
 
 
 const GEO_URL       = "https://nominatim.openstreetmap.org/search";
