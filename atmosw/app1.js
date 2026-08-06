@@ -61,7 +61,26 @@ async function initializeApp() {
         console.error("Failed to load API key:", error);
     }
 }
+async function callOpenRouter(apiKey) {
+    // Example function using your fetched key
+    const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+        method: "POST",
+        headers: {
+            "Authorization": `Bearer ${apiKey}`,
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+            model: "openai/gpt-3.5-turbo",
+            messages: [{ role: "user", content: "Hello!" }]
+        })
+    });
+    
+    const result = await response.json();
+    console.log("OpenRouter Response:", result);
+}
 
+// Run when your app loads
+initializeApp();
 
 const GEO_URL       = "https://nominatim.openstreetmap.org/search";
 
@@ -1196,4 +1215,3 @@ async function handleSend() {
 keyBtn.style.borderColor = "var(--accent-dim)";
 keyBtn.style.color = "var(--accent)";
 // Run your application
-initializeApp();
