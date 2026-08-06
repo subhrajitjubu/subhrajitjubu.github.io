@@ -17,67 +17,42 @@ const groq_URL = "https://api.groq.com/openai/v1/chat/completions";
 
 
 
-
-
-async function fetchApiKey() {
-    const outputElement = document.getElementById("output");
-
+// Replace your existing initializeAppo() and initializeAppg() with:
+async function initializeApp() {
     try {
-        // Must use your full Vercel deployment URL here because the backend lives on Vercel, not GitHub
-        const response = await fetch("https://opkey.vercel.app/api/get-key");
-        
-        if (!response.ok) {
-            throw new Error(`HTTP error! Status: ${response.status}`);
+        // Try to load OpenRouter key first
+        const openRouterResponse = await fetch("https://opkey.vercel.app/api/get-key");
+        if (openRouterResponse.ok) {
+            const openRouterData = await openRouterResponse.json();
+            if (openRouterData.OPP) {
+                window.OPENROUTER_API_KEY = openRouterData.OPP;
+                console.log("OpenRouter key loaded");
+            }
         }
-
-        const data = await response.json();
-        // const key = data.OPP;
-        const OPENROUTER_API_KEY = data.OPP;
-
-        // Display or use the key
-        // outputElement.textContent = `Successfully fetched key: ${key}`;
-        // console.log("Key:", key);
-
-    } catch (error) {
-        outputElement.textContent = "Failed to fetch key.";
-        console.error("Error fetching the API:", error);
+    } catch (e) {
+        console.warn("Failed to load OpenRouter key:", e);
+    }
+    
+    try {
+        // Try to load Groq key as fallback
+        const groqResponse = await fetch("https://opkey.vercel.app/api/groq");
+        if (groqResponse.ok) {
+            const groqData = await groqResponse.json();
+            if (groqData.OPP) {
+                window.GROQ_API_KEY = groqData.OPP;
+                console.log("Groq key loaded");
+            }
+        }
+    } catch (e) {
+        console.warn("Failed to load Groq key:", e);
     }
 }
 
-
-async function initializeAppo() {
-    const response = await fetch("https://opkey.vercel.app/api/get-key");
-
-    if (!response.ok)
-        throw new Error("Unable to load API key");
-
-    const data = await response.json();
-
-    OPENROUTER_API_KEY = data.OPP;
-
-    console.log("Key loaded");
-}
-
-async function initializeAppg() {
-    const response = await fetch("https://opkey.vercel.app/api/groq");
-
-    if (!response.ok)
-        throw new Error("Unable to load API key");
-
-    const data = await response.json();
-
-    OPENROUTER_API_KEY = data.OPP;
-
-    console.log("Key loaded");
-}
-
-
-
-
-
 // Run when your app loads
-// initializeAppo();
-initializeAppg();
+initializeApp();
+
+
+
 
 const GEO_URL       = "https://nominatim.openstreetmap.org/search";
 
@@ -624,33 +599,109 @@ function extractLocationFallback(query) {
   return null;
 }
 
-async function chat(messages) {
-   if (!OPENROUTER_API_KEY)
-        throw new Error("OpenRouter key not loaded.");
-//OPENROUTER_URL
-    const resp = await fetch(groq_URL, { 
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-            "Authorization": `Bearer ${OPENROUTER_API_KEY}`,
-            "HTTP-Referer": window.location.origin,
-            "X-Title": "AtmosAware"
-        },
-        body: JSON.stringify({
-            model: "openai/gpt-oss-20b",//"openrouter/free", 
-            messages: messages,
-            reasoning: {
-                enabled: true
-            }
-        })
-    });
+// ── CHAT WITH FALLBACK ────────────────────────────────────────
+async function chatWithFallback(messages) {
+    // Try OpenRouter first
+    if (window.OPENROUTER_API_KEY) {
+        try {
+            console.log("Attempting with OpenRouter...");
+            const response = await fetch(OPENROUTER_URL, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${window.OPENROUTER_API_KEY}`,
+                    "HTTP-Referer": window.location.origin,
+                    "X-Title": "AtmosAware"
+                },
+                body: JSON.stringify({
+                    model: "openrouter/free", 
+                    messages: messages,
+                    reasoning: {
+                        enabled: true
+                    }
+                })
+            });
 
-    if (!resp.ok) {
-        throw new Error(await resp.text());
+            if (response.ok) {
+                const data = await response.json();
+                if (data.choices?.[0]?.message?.content) {
+                    console.log("OpenRouter succeeded");
+                    return data;
+                }
+            }
+            console.warn("OpenRouter failed with status:", response.status);
+        } catch (e) {
+            console.warn("OpenRouter error:", e);
+        }
     }
 
-    return await resp.json();
+    // Fallback to Groq
+    if (window.GROQ_API_KEY) {
+        try {
+            console.log("Falling back to Groq...");
+            const response = await fetch(groq_URL, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${window.GROQ_API_KEY}`
+                },
+                body: JSON.stringify({
+                    model: "openai/gpt-oss-20b",
+                    messages: messages,
+                    reasoning: {
+                        enabled: true
+                    }
+                })
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+                if (data.choices?.[0]?.message?.content) {
+                    console.log("Groq succeeded");
+                    return data;
+                }
+            }
+            console.warn("Groq failed with status:", response.status);
+        } catch (e) {
+            console.warn("Groq error:", e);
+        }
+    }
+
+    throw new Error("All API providers failed. Please check your configuration.");
 }
+
+// Replace your existing chat() function with this wrapper
+async function chat(messages) {
+    return await chatWithFallback(messages);
+}
+
+// async function chat(messages) {
+//    if (!OPENROUTER_API_KEY)
+//         throw new Error("OpenRouter key not loaded.");
+// //OPENROUTER_URL
+//     const resp = await fetch(groq_URL, { 
+//         method: "POST",
+//         headers: {
+//             "Content-Type": "application/json",
+//             "Authorization": `Bearer ${OPENROUTER_API_KEY}`,
+//             "HTTP-Referer": window.location.origin,
+//             "X-Title": "AtmosAware"
+//         },
+//         body: JSON.stringify({
+//             model: "openai/gpt-oss-20b",//"openrouter/free", 
+//             messages: messages,
+//             reasoning: {
+//                 enabled: true
+//             }
+//         })
+//     });
+
+//     if (!resp.ok) {
+//         throw new Error(await resp.text());
+//     }
+
+//     return await resp.json();
+// }
 
 // async function ollamaChat(messages) {
 
