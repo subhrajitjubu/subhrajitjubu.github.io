@@ -620,7 +620,7 @@ async function chat(messages) {
             model: "openrouter/free",
             messages: messages,
             reasoning: {
-                enabled: false
+                enabled: true
             }
         })
     });
