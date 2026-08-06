@@ -14,7 +14,7 @@ const OLLAMA_API_KEY="aee5e1b6d22c4b769a51ccf8685ecfb1.SKZ8I5jsuQn_RPo36I9pXIJJ"
 const OLLAMA_MODEL = "nemotron-3-ultra:cloud";
 const OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions";
 
-const OPENROUTER_API_KEY= process.env.OPENROUTER_API_KEY
+const OPENROUTER_API_KEY="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"
 
 
 
