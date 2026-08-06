@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>AtmosAware — Weather & Air Intelligence</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css"/>
+</head>
+<body>
+  <div class="grain"></div>
+
+  <header class="header">
+    <div class="logo">
+      <span class="logo-icon">◈</span>
+      <span class="logo-text">AtmosAware</span>
+    </div>
+    <div class="header-sub">Weather & Air Intelligence · India</div>
+    <button class="key-btn" id="keyBtn" title="View AI proxy status">⚙ AI PROXY</button>
+  </header>
+
+  <!-- AI Proxy Modal -->
+  <div class="modal-overlay" id="keyModal">
+    <div class="modal">
+      <div class="modal-title">NVIDIA Proxy Enabled</div>
+      <p class="modal-desc">AtmosAware now sends AI requests through the same-origin server proxy, which forwards `/api/chat/completions` to NVIDIA. This avoids browser CORS blocks and keeps the NVIDIA key off the frontend.</p>
+      <div class="modal-actions">
+        <button class="btn-save" id="cancelKey">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <main class="main">
+    <!-- Chat area -->
+    <div class="chat-wrap" id="chatWrap">
+      <div class="welcome-screen" id="welcomeScreen">
+        <div class="welcome-icon">⛅</div>
+        <h1 class="welcome-title">Ask about India's weather<br/>or air quality</h1>
+        <p class="welcome-sub">Powered by live data · Scoped to India · Strict unit conversion</p>
+        <div class="sample-queries">
+          <button class="sample-btn" data-q="What is the current temperature in Mumbai?">🌡 Temperature in Mumbai</button>
+          <button class="sample-btn" data-q="What is the air quality in Delhi right now? Give all AOD types.">🌫 Air quality in Delhi</button>
+          <button class="sample-btn" data-q="Is it going to rain in Chennai tomorrow?">🌧 Rainfall forecast for Chennai</button>
+          <button class="sample-btn" data-q="What is the MSLP and dew point in Bengaluru?">📊 Pressure & dew point in Bengaluru</button>
+          <button class="sample-btn" data-q="Show me PM2.5 and dust levels in Kolkata.">💨 PM2.5 & dust in Kolkata</button>
+        </div>
+      </div>
+      <div class="messages" id="messages"></div>
+    </div>
+
+    <!-- Input bar -->
+    <div class="input-bar">
+      <div class="input-wrap">
+        <textarea
+          id="userInput"
+          class="user-input"
+          placeholder="Ask about weather or air quality anywhere in India…"
+          rows="1"
+        ></textarea>
+        <button class="send-btn" id="sendBtn">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+            <path d="M5 12H19M19 12L12 5M19 12L12 19" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </button>
+      </div>
+      <div class="input-meta">India only · Live data · GMT→IST · K→°C</div>
+    </div>
+  </main>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+  <script src="app1.js"></script>
+</body>
+</html>
