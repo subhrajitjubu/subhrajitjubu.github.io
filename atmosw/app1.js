@@ -11,7 +11,35 @@ const AOD_BASE      = "https://sweatherapi.vercel.app/aod";
 const AOD_TYPES     = "dust,total,sea,sulfate,pm10,pm25,nitrate";
 const OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions";
 
-const OPENROUTER_API_KEY= window.APP_CONFIG.OPP;
+
+
+
+async function fetchApiKey() {
+    const outputElement = document.getElementById("output");
+
+    try {
+        // Must use your full Vercel deployment URL here because the backend lives on Vercel, not GitHub
+        const response = await fetch("https://mkopyt.vercel.app/api/get-key");
+        
+        if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+
+        const data = await response.json();
+        const key = data.OPP;
+
+        // Display or use the key
+        outputElement.textContent = `Successfully fetched key: ${key}`;
+        console.log("Key:", key);
+
+    } catch (error) {
+        outputElement.textContent = "Failed to fetch key.";
+        console.error("Error fetching the API:", error);
+    }
+}
+
+
+
 
 
 const GEO_URL       = "https://nominatim.openstreetmap.org/search";
@@ -1146,3 +1174,5 @@ async function handleSend() {
 // ── INIT ──────────────────────────────────────────────────────
 keyBtn.style.borderColor = "var(--accent-dim)";
 keyBtn.style.color = "var(--accent)";
+// Run your application
+initializeApp();
