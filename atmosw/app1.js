@@ -12,6 +12,10 @@ const AOD_TYPES     = "dust,total,sea,sulfate,pm10,pm25,nitrate";
 const OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions";
 let OPENROUTER_API_KEY = null;
 
+const groq_URL = "https://api.groq.com/openai/v1/chat/completions";
+
+
+
 
 
 
@@ -41,8 +45,21 @@ async function fetchApiKey() {
 }
 
 
-async function initializeApp() {
+async function initializeAppo() {
     const response = await fetch("https://opkey.vercel.app/api/get-key");
+
+    if (!response.ok)
+        throw new Error("Unable to load API key");
+
+    const data = await response.json();
+
+    OPENROUTER_API_KEY = data.OPP;
+
+    console.log("Key loaded");
+}
+
+async function initializeAppg() {
+    const response = await fetch("https://opkey.vercel.app/api/groq");
 
     if (!response.ok)
         throw new Error("Unable to load API key");
@@ -56,8 +73,11 @@ async function initializeApp() {
 
 
 
+
+
 // Run when your app loads
-initializeApp();
+// initializeAppo();
+initializeAppg();
 
 const GEO_URL       = "https://nominatim.openstreetmap.org/search";
 
@@ -607,8 +627,8 @@ function extractLocationFallback(query) {
 async function chat(messages) {
    if (!OPENROUTER_API_KEY)
         throw new Error("OpenRouter key not loaded.");
-
-    const resp = await fetch(OPENROUTER_URL, {
+//OPENROUTER_URL
+    const resp = await fetch(groq_URL, { 
         method: "POST",
         headers: {
             "Content-Type": "application/json",
@@ -617,7 +637,7 @@ async function chat(messages) {
             "X-Title": "AtmosAware"
         },
         body: JSON.stringify({
-            model: "openrouter/free",
+            model: "openai/gpt-oss-20b",//"openrouter/free", 
             messages: messages,
             reasoning: {
                 enabled: true
