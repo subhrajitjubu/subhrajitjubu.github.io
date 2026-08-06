@@ -11,7 +11,7 @@ const AOD_BASE      = "https://sweatherapi.vercel.app/aod";
 const AOD_TYPES     = "dust,total,sea,sulfate,pm10,pm25,nitrate";
 const OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions";
 
-const OPENROUTER_API_KEY=process.env.OPENROUTER_API_KEY
+const OPENROUTER_API_KEY=.env.OPENROUTER_API_KEY
 
 
 const GEO_URL       = "https://nominatim.openstreetmap.org/search";
