@@ -10,6 +10,7 @@ const WEATHER_BASE  = "https://sweatherapi.vercel.app/timeseries";
 const AOD_BASE      = "https://sweatherapi.vercel.app/aod";
 const AOD_TYPES     = "dust,total,sea,sulfate,pm10,pm25,nitrate";
 const OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions";
+let OPENROUTER_API_KEY = null;
 
 
 
@@ -41,43 +42,19 @@ async function fetchApiKey() {
 
 
 async function initializeApp() {
-    try {
-        // Fetch the key securely from your backend serverless function
-        const response = await fetch("https://opkey.vercel.app/api/get-key");
-        
-        if (!response.ok) {
-            throw new Error(`HTTP error! Status: ${response.status}`);
-        }
+    const response = await fetch("https://opkey.vercel.app/api/get-key");
 
-        const data = await response.json();
-        const OPENROUTER_API_KEY = data.OPP;
+    if (!response.ok)
+        throw new Error("Unable to load API key");
 
-        console.log("Successfully loaded API key!");
+    const data = await response.json();
 
-        // Use your key here (e.g., call OpenRouter API)
-        callOpenRouter(OPENROUTER_API_KEY);
+    OPENROUTER_API_KEY = data.OPP;
 
-    } catch (error) {
-        console.error("Failed to load API key:", error);
-    }
+    console.log("Key loaded");
 }
-async function callOpenRouter(apiKey) {
-    // Example function using your fetched key
-    const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
-        method: "POST",
-        headers: {
-            "Authorization": `Bearer ${apiKey}`,
-            "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-            model: "openai/gpt-3.5-turbo",
-            messages: [{ role: "user", content: "Hello!" }]
-        })
-    });
-    
-    const result = await response.json();
-    console.log("OpenRouter Response:", result);
-}
+
+
 
 // Run when your app loads
 initializeApp();
@@ -628,6 +605,8 @@ function extractLocationFallback(query) {
 }
 
 async function chat(messages) {
+   if (!OPENROUTER_API_KEY)
+        throw new Error("OpenRouter key not loaded.");
 
     const resp = await fetch(OPENROUTER_URL, {
         method: "POST",
