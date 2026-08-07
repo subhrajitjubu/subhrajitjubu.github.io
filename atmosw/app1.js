@@ -7,7 +7,7 @@ const OPENROUTER_URL = "https://nvproxy-three.vercel.app/api/chato/";
 let OPENROUTER_API_KEY = null;
 // ── STATE ─────────────────────────────────────────────────────
 
-const groq_URL = "https://nvproxy-three.vercel.app/api/chatg/";
+const GROQ_URL = "https://nvproxy-three.vercel.app/api/chatg/";
 const NVIDIA_URL = "https://nvproxy-three.vercel.app/api/chat/";
 let NVIDIA_API_KEY = null;
 
