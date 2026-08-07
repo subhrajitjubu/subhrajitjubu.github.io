@@ -13,7 +13,6 @@ const AOD_TYPES     = "dust,total,sea,sulfate,pm10,pm25,nitrate";
 const OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions";
 let OPENROUTER_API_KEY = null;
 // ── STATE ─────────────────────────────────────────────────────
-let conversationHistory = [];  
 
 const groq_URL = "https://api.groq.com/openai/v1/chat/completions";
 const NVIDIA_URL = "https://integrate.api.nvidia.com/v1/chat/completions";
