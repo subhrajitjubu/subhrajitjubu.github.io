@@ -1254,6 +1254,7 @@ Valid intents:
 - offtopic: Anything unrelated.
 
 Extract the city, district, state, or region in India if one is mentioned.
+IMPORTANT: Even if the location is a small village, town, or obscure place (like Gajadipur), extract it. Do not return null just because you are unsure if it is a major city.
 Context: The previous user intent was: ${previousIntent || 'None'}.
 IMPORTANT: If the query is a follow-up like "how about Mumbai" or "what about Delhi", 
 assume the SAME intent as the previous intent, and extract the new location.
