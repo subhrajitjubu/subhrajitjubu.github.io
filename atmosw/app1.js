@@ -560,6 +560,14 @@ let lastQueryType = null;
 
 function detectIntentFallback(query) {
     const q = query.toLowerCase();
+
+     // ✅ ADD: Travel and planning patterns that imply weather intent
+    const travelPatterns = /\b(plan(ni?ng)?\s+to\s+(go|visit|travel)|trip|viable|suitable|good\s+time\s+to\s+visit|should\s+i\s+(go|visit)|is\s+it\s+(okay|good|safe|viable)|what('?s| is)\s+the\s+best\s+time)\b/i;    
+    if (travelPatterns.test(q)) {
+        console.log("Travel/planning intent detected → weather");
+        return "both";
+    }
+    
     
     // ✅ Check for follow-up patterns that imply same topic as before
     if (/^(how|what)\s+about\b/i.test(q) || /^(and|also)\b/i.test(q)) {
@@ -664,6 +672,12 @@ function extractLocationFallback(query) {
         /\bneed\b/g, /\bwant\b/g, /\blike\b/g, /\bgoing\b/g,
         /\bexpect\b/g, /\bexpected\b/g, /\blikely\b/g,
         /\bchance\b/g, /\bchances\b/g, /\bpredict\b/g, /\bprediction\b/g,
+        
+         // 🚨 Travel / Implicit weather words
+        /\bplan\b/g, /\bplanning\b/g, /\bgo\b/g, /\bgoing\b/g,
+        /\bvisit\b/g, /\bvisiting\b/g, /\btrip\b/g, /\btravel\b/g,
+        /\btrek\b/g, /\boutdoor\b/g, /\boutdoors\b/g, /\bpicnic\b/g,
+        /\bviable\b/g, /\bsafe\b/g, /\bsuitable\b/g, /\bworth\b/g,
         
         // Common English words
         /\bthe\b/g, /\ba\b/g, /\ban\b/g, /\bof\b/g,
@@ -1250,21 +1264,37 @@ Classify the user's query.
 Valid intents:
 - weather: Questions about temperature, rain, forecasts, humidity, wind.
 - aod: Questions about Aerosol Optical Depth, air pollution, AQI, smog, dust.
-- both: Asking about both weather and aod.
+- both: Travel/planning queries OR questions asking about both weather AND air quality.
 - offtopic: Anything unrelated.
 
+IMPORTANT RULES:
+1. Travel/planning questions (e.g., "planning to visit X", "is it viable to go to X") → classify as "weather"
+2. Questions about outdoor activities, events, trips → classify as "weather"
+3. "How about X", "What about X" → carry forward previous intent
+4. If a location is mentioned but no specific weather/AQ keywords, default to "weather"
+5. Extract the FULL place name including "fort", "beach", "temple" etc.
+
+
+
 Extract the city, district, state, or region in India if one is mentioned.
-IMPORTANT: Even if the location is a small village, town, or obscure place (like Gajadipur), extract it. Do not return null just because you are unsure if it is a major city.
+IMPORTANT: Even if the location is a small village, town,fort, beach or obscure place (like Gajadipur), extract it. Do not return null just because you are unsure if it is a major city.
 Context: The previous user intent was: ${previousIntent || 'None'}.
 IMPORTANT: If the query is a follow-up like "how about Mumbai" or "what about Delhi", 
 assume the SAME intent as the previous intent, and extract the new location.
 
 If no location is mentioned, return null.
+
+Examples:
+- "planning to go to palashi fort next saturday" → {"intent":"weather","location":"palashi fort"}
+- "planning to go to palashi next saturday" → {"intent":"weather","location":"palashi "}
+- "is it viable to visit Goa" → {"intent":"weather","location":"Goa"}
+- "should i go to Mumbai tomorrow" → {"intent":"weather","location":"Mumbai"}
+- "how about mumbai" → {"intent":"aod","location":"Mumbai"}
+- "what's the temperature in Delhi" → {"intent":"weather","location":"Delhi"}
+- "show me AOD in Kolkata" → {"intent":"aod","location":"Kolkata"}
+
 Return ONLY valid JSON. No markdown.
 
-Example: {"intent":"weather","location":"Pune"}
-Example: {"intent":"aod","location":"Delhi"}
-Example: {"intent":"offtopic","location":null}
 
 Query: ${query}
 `;
