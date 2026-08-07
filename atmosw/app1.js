@@ -887,8 +887,9 @@ async function chatWithFallback(messages) {
                 return data;
             }
         }
+        const text = await response.text();
 
-        console.warn("❌ Groq failed:", response.status);
+        console.warn("❌ Groq failed:", response.status,text);
 
     } catch (e) {
         console.warn("❌ Groq error:", e);
