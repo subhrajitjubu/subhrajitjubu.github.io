@@ -9,6 +9,8 @@ const OPENROUTER_URL = "https://nvproxy-three.vercel.app/api/chato/";
 
 const GROQ_URL   = "https://nvproxy-three.vercel.app/api/chatg/";
 const NVIDIA_URL = "https://nvproxy-three.vercel.app/api/chat/";
+const HF_URL         = "https://your-project.vercel.app/api/chathf";
+const VERCEL_URL     = "https://your-project.vercel.app/api/chatv";
 
 
 const GEO_URL       = "https://nominatim.openstreetmap.org/search";
@@ -685,151 +687,14 @@ function extractLocationFallback(query) {
 
 
 
-
-
-///from one
-// function extractLocationFallback(query) {
-//     const normalized = query.replace(/\s+/g, " ").trim();
-//     console.log("🔍 Extracting location from:", normalized);
-    
-//     // Common Indian location suffixes to help identify city names
-//     const locationSuffixes = /(?:pur|bad|abad|nagar|garh|ganj|palli|halli|ur|oor|ore|ere|aram|gram|gaon|pada|wadi|patnam|patna|patti|kot|kottai|pura|puram|giri|gadh|dwara|dwar|bari|sarai|hat|hatti|mandi|pet|peta|tola|palem|valasa|padu|prolu|konda|guda|gudem|uru|kere|guppe|halli|kuppam|kuppan|cheri|cheruvu|kur|ooru)\b/i;
-    
-//     // Known Indian city names (add more as needed)
-//     const knownCities = /\b(?:mumbai|delhi|kolkata|chennai|bengaluru|bangalore|hyderabad|ahmedabad|pune|jaipur|lucknow|kanpur|nagpur|indore|thane|bhopal|visakhapatnam|patna|vadodara|ghaziabad|ludhiana|agra|nashik|faridabad|meerut|rajkot|varanasi|srinagar|aurangabad|dhanbad|amritsar|allahabad|ranchi|jabalpur|gwalior|coimbatore|vijayawada|jodhpur|madurai|raipur|chandigarh|guwahati|solapur|hubli|mysore|tiruchirappalli|bareilly|aligarh|moradabad|gorakhpur|bhilai|jamshedpur|bhagalpur|bokaro|ranchi|siliguri|darjeeling|shimla|dehradun|haridwar|rishikesh|udaipur|ajmer|bikaner|jaisalmer|pushkar|pondicherry|kochi|thiruvananthapuram|kollam|kottayam|kannur|kasaragod|mangalore|udupi|belgaum|gulbarga|warangal|nellore|kurnool|rajahmundry|kakinada|eluru|ongole|tenali|guntur|anantapur|chittoor|tirupati|kadapa|khammam|nizamabad|karimnagar|ramagundam|adilabad|mancherial|nirmal|bhainsa|basar|nizamabad|medak|sangareddy|siddipet|wanaparthy|gadwal|nagarkurnool|mahbubnagar|nalgonda|suryapet|miryalaguda|bhongir|jangaon|hanamkonda|parakala|thorur|mulugu|bhadrachalam|manuguru|yellandu|kothagudem|palvancha|mandamarri|bellampalli|manchiryal|luxettipet|asifabad|jagtial|metpalli|koratla|siricilla|karimnagar|huzurabad|husnabad|warangal|hanamkonda|parakala|mahabubabad|dornakal|kesamudram|narsampet|parkal|bhupalpalle|manthani|peddapalli|godavarikhani|ramagundam|mancherial|bellampalli|mandamarri|adilabad|nirmal|bhainsa|basar|nizamabad|armoor|bodhan|kamareddy|medak|sangareddy|siddipet|zahirabad|bidar|gulbarga|yadgir|raichur|ballari|hospet|kadapa|anantapur|dharwad|hubli|belgaum|udupi)\b/i;
-    
-//     // Step 1: Try follow-up patterns
-//     const followUpPatterns = [
-//         /\b(?:how|what)\s+(?:about|for)\s+([a-z][a-z\s.'-]*?)(?=\s*\?*$)/i,
-//         /\b(?:and|also)\s+([a-z][a-z\s.'-]*?)(?=\s*\?*$)/i,
-//     ];
-    
-//     for (const pattern of followUpPatterns) {
-//         const match = normalized.match(pattern);
-//         const candidate = sanitizeLocationCandidate(match?.[1]);
-//         if (candidate) {
-//             console.log("✅ Found via follow-up pattern:", candidate);
-//             return candidate;
-//         }
-//     }
-    
-//     // Step 2: Try "Location keyword" pattern (e.g., "Gajadipur forecast")
-//     const locationBeforeKeyword = /\b([A-Z][a-z]+(?:\s+[A-Z][a-z]+)*)\s+(?:weather|forecast|air quality|aod|pollution|temp|temperature|rain|humidity|climate|pm2\.5|pm10|dust)\b/i;
-//     const match1 = normalized.match(locationBeforeKeyword);
-//     if (match1) {
-//         const candidate = sanitizeLocationCandidate(match1[1]);
-//         if (candidate) {
-//             console.log("✅ Found via 'Location keyword' pattern:", candidate);
-//             return candidate;
-//         }
-//     }
-    
-//     // Step 3: Try "keyword in Location" pattern (e.g., "weather in Mumbai")
-//     const keywordBeforeLocation = /\b(?:weather|forecast|air quality|aod|pollution|temp|temperature|rain|humidity|climate|pm2\.5|pm10|dust)\s+(?:in|at|for|of|near|over)\s+([A-Z][a-z]+(?:\s+[A-Z][a-z]+)*)/i;
-//     const match2 = normalized.match(keywordBeforeLocation);
-//     if (match2) {
-//         const candidate = sanitizeLocationCandidate(match2[1]);
-//         if (candidate) {
-//             console.log("✅ Found via 'keyword in Location' pattern:", candidate);
-//             return candidate;
-//         }
-//     }
-    
-//     // Step 4: Try preposition patterns (e.g., "in Mumbai", "at Delhi")
-//     const prepositionPattern = /\b(?:in|at|for|near|around|over)\s+([A-Z][a-z]+(?:\s+[A-Z][a-z]+)*)/i;
-//     const match3 = normalized.match(prepositionPattern);
-//     if (match3) {
-//         const candidate = sanitizeLocationCandidate(match3[1]);
-//         if (candidate) {
-//             console.log("✅ Found via preposition pattern:", candidate);
-//             return candidate;
-//         }
-//     }
-    
-//     // Step 5: Check against known cities
-//     const knownCityMatch = normalized.match(knownCities);
-//     if (knownCityMatch) {
-//         const candidate = knownCityMatch[0];
-//         console.log("✅ Found via known cities list:", candidate);
-//         return candidate;
-//     }
-    
-//     // Step 6: Look for words that look like Indian place names
-//     const words = normalized.split(/\s+/);
-//     for (const word of words) {
-//         // Check if word has location-like suffix or starts with capital letter
-//         if (word.length > 3 && 
-//             (locationSuffixes.test(word) || /^[A-Z][a-z]+$/.test(word)) &&
-//             !/^(?:what|how|when|where|why|who|which|weather|forecast|temperature|rain|humidity|show|tell|give|please|can|could|would|will|is|are|the|for|in|at|to|of|next|hours|hour|days|day|right|now|today|tomorrow)$/i.test(word)) {
-//             console.log("✅ Found via location suffix/capital pattern:", word);
-//             return word;
-//         }
-//     }
-    
-//     // Step 7: Just take the first word if it starts with capital and looks like a name
-//     const firstWordMatch = normalized.match(/^([A-Z][a-z]+(?:\s+[A-Z][a-z]+)*)/);
-//     if (firstWordMatch && !/^(?:what|how|when|where|why|who|which|weather|forecast|show|tell|please)$/i.test(firstWordMatch[1])) {
-//         const candidate = sanitizeLocationCandidate(firstWordMatch[1]);
-//         if (candidate && candidate.length > 2) {
-//             console.log("✅ Found via first capitalized word:", candidate);
-//             return candidate;
-//         }
-//     }
-    
-//     console.log("❌ No location found");
-//     return null;
-// }
-
-//???????????
-
-// function extractLocationFallback(query) {
-//     const normalized = query.replace(/\s+/g, " ").trim();
-    
-//     // ✅ ADD: Pattern for follow-up questions like "how about X", "what about X"
-//     const followUpPatterns = [
-//         /\b(?:how|what)\s+(?:about|for)\s+([a-z][a-z\s.'-]*?)(?=\s*\?*$)/i,
-//         /\b(?:and|also)\s+([a-z][a-z\s.'-]*?)(?=\s*\?*$)/i,
-//     ];
-    
-//     for (const pattern of followUpPatterns) {
-//         const match = normalized.match(pattern);
-//         const candidate = sanitizeLocationCandidate(match?.[1]);
-//         if (candidate) {
-//             console.log("Found location from follow-up pattern:", candidate);
-//             return candidate;
-//         }
-//     }
-    
-//     // Existing patterns
-//     const patterns = [
-//         /\b(?:in|at|for|near|around)\s+([a-z][a-z\s.'-]*?)(?=(?:\s+\b(?:right now|now|today|tomorrow|currently|this|next|please|give|show|plot|chart|graph|draw)\b|[?.!,]|$))/i,
-//         /\b(?:weather|forecast|air quality|aod|pollution)\s+(?:in|for)\s+([a-z][a-z\s.'-]*?)(?=(?:\s+\b(?:right now|now|today|tomorrow|currently|this|next)\b|[?.!,]|$))/i,
-//     ];
-
-//     for (const pattern of patterns) {
-//         const match = normalized.match(pattern);
-//         const candidate = sanitizeLocationCandidate(match?.[1]);
-//         if (candidate) return candidate;
-//     }
-
-//     // ✅ ADD: If query is just a location name (like "Mumbai?" or "Delhi?")
-//     const simpleLocationPattern = /^([a-z][a-z\s.'-]*?)\s*\?*$/i;
-//     const simpleMatch = normalized.match(simpleLocationPattern);
-//     const simpleCandidate = sanitizeLocationCandidate(simpleMatch?.[1]);
-//     if (simpleCandidate && simpleCandidate.length > 2) {
-//         console.log("Found location from simple pattern:", simpleCandidate);
-//         return simpleCandidate;
-//     }
-
-//     return null;
-// }
-
 // ── CHAT WITH TRIPLE FALLBACK ──────────────────────────────────
 
 
 async function chatWithFallback(messages) {
 
-    // Try 1: OpenRouter
+    // ===========================
+    // 1. OpenRouter
+    // ===========================
     try {
         console.log("Attempting OpenRouter...");
 
@@ -840,29 +705,29 @@ async function chatWithFallback(messages) {
             },
             body: JSON.stringify({
                 model: "openrouter/free",
-                messages: messages,
+                messages,
                 reasoning: {
                     enabled: true
                 }
             })
         });
 
-        if (response.ok) {
-            const data = await response.json();
+        const data = await response.json();
 
-            if (data.choices?.[0]?.message?.content) {
-                console.log("✅ OpenRouter succeeded");
-                return data;
-            }
+        if (response.ok && data.choices?.[0]?.message?.content) {
+            console.log("✅ OpenRouter succeeded");
+            return data;
         }
 
-        console.warn("❌ OpenRouter failed:", response.status);
+        console.warn("❌ OpenRouter failed:", response.status, data);
 
     } catch (e) {
         console.warn("❌ OpenRouter error:", e);
     }
 
-    // Try 2: Groq
+    // ===========================
+    // 2. Groq
+    // ===========================
     try {
         console.log("Falling back to Groq...");
 
@@ -872,30 +737,29 @@ async function chatWithFallback(messages) {
                 "Content-Type": "application/json"
             },
             body: JSON.stringify({
-                model: "groq/compound-mini",
-                messages: messages,
+                model: "compound-mini",
+                messages,
                 temperature: 1,
                 stream: false
             })
         });
 
-        if (response.ok) {
-            const data = await response.json();
+        const data = await response.json();
 
-            if (data.choices?.[0]?.message?.content) {
-                console.log("✅ Groq succeeded");
-                return data;
-            }
+        if (response.ok && data.choices?.[0]?.message?.content) {
+            console.log("✅ Groq succeeded");
+            return data;
         }
-        const text = await response.text();
 
-        console.warn("❌ Groq failed:", response.status,text);
+        console.warn("❌ Groq failed:", response.status, data);
 
     } catch (e) {
         console.warn("❌ Groq error:", e);
     }
 
-    // Try 3: NVIDIA
+    // ===========================
+    // 3. NVIDIA
+    // ===========================
     try {
         console.log("Falling back to NVIDIA...");
 
@@ -906,30 +770,91 @@ async function chatWithFallback(messages) {
             },
             body: JSON.stringify({
                 model: "openai/gpt-oss-20b",
-                messages: messages,
+                messages,
                 temperature: 1,
                 top_p: 1,
                 frequency_penalty: 0,
                 presence_penalty: 0,
                 max_tokens: 4096,
-                stream: false,
-                reasoning_effort: "medium"
+                reasoning_effort: "medium",
+                stream: false
             })
         });
 
-        if (response.ok) {
-            const data = await response.json();
+        const data = await response.json();
 
-            if (data.choices?.[0]?.message?.content) {
-                console.log("✅ NVIDIA succeeded");
-                return data;
-            }
+        if (response.ok && data.choices?.[0]?.message?.content) {
+            console.log("✅ NVIDIA succeeded");
+            return data;
         }
 
-        console.warn("❌ NVIDIA failed:", response.status);
+        console.warn("❌ NVIDIA failed:", response.status, data);
 
     } catch (e) {
         console.warn("❌ NVIDIA error:", e);
+    }
+
+    // ===========================
+    // 4. Hugging Face
+    // ===========================
+    try {
+        console.log("Falling back to Hugging Face...");
+
+        const response = await fetch(HF_URL, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                model: "meta-llama/Llama-3.2-3B-Instruct:fastest",
+                messages,
+                temperature: 1,
+                stream: false
+            })
+        });
+
+        const data = await response.json();
+
+        if (response.ok && data.choices?.[0]?.message?.content) {
+            console.log("✅ Hugging Face succeeded");
+            return data;
+        }
+
+        console.warn("❌ Hugging Face failed:", response.status, data);
+
+    } catch (e) {
+        console.warn("❌ Hugging Face error:", e);
+    }
+
+    // ===========================
+    // 5. Vercel AI Gateway
+    // ===========================
+    try {
+        console.log("Falling back to Vercel AI Gateway...");
+
+        const response = await fetch(VERCEL_URL, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                model: "openai/gpt-5.6-sol",
+                messages,
+                stream: false
+            })
+        });
+
+        const data = await response.json();
+
+        if (response.ok && data.choices?.[0]?.message?.content) {
+            console.log("✅ Vercel AI Gateway succeeded");
+            return data;
+        }
+
+        console.warn("❌ Vercel AI Gateway failed:", response.status, data);
+
+    } catch (e) {
+        console.warn("❌ Vercel AI Gateway error:", e);
     }
 
     throw new Error("All providers failed.");
