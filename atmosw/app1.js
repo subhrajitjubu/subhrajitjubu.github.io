@@ -8,7 +8,7 @@ let OPENROUTER_API_KEY = null;
 // ── STATE ─────────────────────────────────────────────────────
 
 const groq_URL = "https://api.groq.com/openai/v1/chat/completions";
-const NVIDIA_URL = "https://integrate.api.nvidia.com/v1/chat/completions";
+const NVIDIA_URL = "https://nvproxy-three.vercel.app/api/chat/";
 let NVIDIA_API_KEY = null;
 
 
@@ -41,19 +41,10 @@ async function initializeApp() {
         console.warn("Failed to load Groq key:", e);
     }
 
-    // ✅ ADD: Try to load NVIDIA key
-    try {
-        const nvidiaResponse = await fetch("https://opkey.vercel.app/api/nvidia"); // Adjust endpoint as needed
-        if (nvidiaResponse.ok) {
-            const nvidiaData = await nvidiaResponse.json();
-            if (nvidiaData.OPP) {
-                window.NVIDIA_API_KEY = nvidiaData.OPP;
-                console.log("NVIDIA key loaded");
-            }
-        }
-    } catch (e) {
-        console.warn("Failed to load NVIDIA key:", e);
-    }
+
+
+
+
 }
 
 
@@ -951,7 +942,6 @@ async function chatWithFallback(messages) {
                 headers: {
                     "Content-Type": "application/json",
                     "Accept": "application/json",
-                    "Authorization": `Bearer ${window.NVIDIA_API_KEY}`
                 },
                 body: JSON.stringify({
                     model: "openai/gpt-oss-20b",
@@ -961,7 +951,7 @@ async function chatWithFallback(messages) {
                     frequency_penalty: 0,
                     presence_penalty: 0,
                     max_tokens: 4096,
-                    stream: false,
+                    stream: true,
                     reasoning_effort: "medium"
                 })
             });
