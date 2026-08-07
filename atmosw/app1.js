@@ -11,6 +11,8 @@ const AOD_BASE      = "https://sweatherapi.vercel.app/aod";
 const AOD_TYPES     = "dust,total,sea,sulfate,pm10,pm25,nitrate";
 const OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions";
 let OPENROUTER_API_KEY = null;
+// ── STATE ─────────────────────────────────────────────────────
+let conversationHistory = [];  
 
 const groq_URL = "https://api.groq.com/openai/v1/chat/completions";
 
@@ -111,26 +113,26 @@ function extractAODValue(jsonData, lat, lon) {
   return jsonData.data[0][latIdx][lonIdx];
 }
 
-// ── FALLBACK FETCH: build a synthetic weather/AOD object ──────
-async function fetchFallbackWeather(lat, lon) {
-  const keys = ["temperature", "rainfall", "MSLP", "DEWpoint", "tcwv"];
-  // Note: DEWpoint fallback comes from D2M (already °C in fallback JSON)
-  const results = {};
-  await Promise.all(keys.map(async key => {
-    try {
-      const resp = await fetchWithTimeout(FALLBACK[key] || FALLBACK["DEWpoint"], 20000);
-      const json = await resp.json();
-      const url  = FALLBACK[key];
-      // D2M is in srcc (AOD grid), others in src (weather grid)
-      if (key === "DEWpoint") {
-        results[key] = extractAODValue(json, lat, lon);
-      } else {
-        results[key] = extractWeatherValue(json, lat, lon);
-      }
-    } catch(e) { results[key] = null; }
-  }));
-  return results;
-}
+// // ── FALLBACK FETCH: build a synthetic weather/AOD object ──────
+// async function fetchFallbackWeather(lat, lon) {
+//   const keys = ["temperature", "rainfall", "MSLP", "DEWpoint", "tcwv"];
+//   // Note: DEWpoint fallback comes from D2M (already °C in fallback JSON)
+//   const results = {};
+//   await Promise.all(keys.map(async key => {
+//     try {
+//       const resp = await fetchWithTimeout(FALLBACK[key] || FALLBACK["DEWpoint"], 20000);
+//       const json = await resp.json();
+//       const url  = FALLBACK[key];
+//       // D2M is in srcc (AOD grid), others in src (weather grid)
+//       if (key === "DEWpoint") {
+//         results[key] = extractAODValue(json, lat, lon);
+//       } else {
+//         results[key] = extractWeatherValue(json, lat, lon);
+//       }
+//     } catch(e) { results[key] = null; }
+//   }));
+//   return results;
+// }
 
 async function fetchFallbackAOD(lat, lon) {
   const keys = ["dust","total","sea","sulfate","nitrate"];
@@ -428,8 +430,10 @@ async function fetchWeather(lat, lon) {
     return data;
   } catch (e) {
     console.warn("Live weather API failed (" + e.message + ") — switching to static fallback.");
-    const data = await fetchFallbackWeather(lat, lon);
-    return data;
+    return await fetchFallbackWeather(lat, lon);
+
+    // const data = await fetchFallbackWeather(lat, lon);
+    // return data;
   }
 }
 
@@ -887,8 +891,6 @@ Valid intents:
 
 Extract the city, district, state, or region in India if one is mentioned.
 
-If no location is mentioned, return null.
-
 Return ONLY valid JSON.
 
 Example:
@@ -949,18 +951,27 @@ ${query}
 async function generateResponse(query, context, isPlot) {
 
     const SYSTEM = `
-You are Atmosaware.
+You are Atmosaware, a helpful weather and air quality assistant for India.
+CRITICAL - Use these EXACT rainfall categories (IMD standards):
+- Very Light Rain: up to 2.4 mm
+- Light Rain: 2.5 to 15.5 mm
+- Moderate Rain: 15.6 to 64.4 mm
+- Heavy Rain: 64.5 to 115.5 mm
+- Very Heavy Rain: 115.6 to 204.4 mm
+- Extremely Heavy Rain: 204.5 mm or more
+- Exceptionally Heavy Rain: Near highest recorded for that station/season, above 240 mm
 
 Rules:
-
-1. Only answer weather and air quality questions.
-2. Use only supplied context.
-3. Temperature in Celsius.
-4. Time in IST.
-5. Rainfall in mm.
-6. MSLP in hPa.
-7. Do not invent data.
-8. India only.
+1. Only answer weather and air quality questions about India.
+2. Use ONLY the data provided in the context.
+3. Keep responses SHORT and SIMPLE - use plain language, not technical terms.
+4. Round numbers to whole values when possible (e.g., "about 25°C" instead of "25.3°C").
+5. Use descriptive terms instead of raw numbers (e.g., "light rain", "heavy rain", "clear sky", "hazy").
+6. If heavy rain is expected, say so clearly. Heavy rain means more than 5mm in 3 hours or 10mm per day.
+7. For AQI/AOD: say "good", "moderate", "poor", or "very poor" air quality instead of exact values.
+8. Mention time in simple terms (e.g., "this evening", "tomorrow morning", "next 2 days").
+9. Do NOT show raw data tables or long lists of numbers.
+10. If asked about future beyond available data, say honestly what you can and cannot predict.
 
 ${isPlot ? "A chart is already displayed. Explain the trends." : ""}
 `;
@@ -1003,93 +1014,9 @@ ${context}`
         conversationHistory = conversationHistory.slice(-20);
     }
 
+
     return assistantMsg;
 }
-
-
-// async function generateResponse(
-//   query,
-//   context,
-//   isPlot
-// ) {
-
-//   const SYSTEM = `
-// You are Atmosaware.
-
-// Rules:
-
-// 1. Only answer weather and air quality questions.
-// 2. Use only supplied context.
-// 3. Temperature in Celsius.
-// 4. Time in IST.
-// 5. Rainfall in mm.
-// 6. MSLP in hPa.
-// 7. Do not invent data.
-// 8. India only.
-
-// ${isPlot
-//   ? "A chart is already displayed. Explain the trends."
-//   : ""}
-// `;
-
-//   const messages = [
-//     {
-//       role: "system",
-//       content: SYSTEM
-//     },
-
-//     ...conversationHistory,
-
-//     {
-//       role: "user",
-//       content:
-//         `${query}
-
-// LIVE DATA:
-
-// ${context}`
-//     }
-//   ];
-
-//   const data = await chat(messages);
-
-//   const assistantMsg =
-//     data.message?.content ||
-//     "No response received.";
-
-//   conversationHistory.push({
-//     role: "user",
-//     content: query
-//   });
-
-//   conversationHistory.push({
-//     role: "assistant",
-//     content: assistantMsg
-//   });
-
-//   if (conversationHistory.length > 20) {
-//     conversationHistory =
-//       conversationHistory.slice(-20);
-//   }
-
-//   return assistantMsg;
-// }
-
-
-// async function testOllama() {
-
-//   const data = await chat([
-//     {
-//       role: "user",
-//       content: "hello"
-//     }
-//   ]);
-
-//   console.log(data);
-// }
-
-
-
 
 
 
