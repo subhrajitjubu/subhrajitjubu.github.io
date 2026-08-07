@@ -562,8 +562,7 @@ function detectIntentFallback(query) {
     const q = query.toLowerCase();
 
      // ✅ ADD: Travel and planning patterns that imply weather intent
-    const travelPatterns = /\b(plan(ni?ng)?\s+to\s+(go|visit|travel)|trip|viable|suitable|good\s+time\s+to\s+visit|should\s+i\s+(go|visit)|is\s+it\s+(okay|good|safe|viable)|what('?s| is)\s+the\s+best\s+time)\b/i;    
-    if (travelPatterns.test(q)) {
+        const travelPatterns = /\b(plan(ni?ng|ned)?\s+to\s+(go|visit|travel)\s+(to|for)|trip|viable|suitable|good\s+time\s+to\s+visit|should\s+i\s+(go|visit)|is\s+it\s+(okay|good|safe|viable)|what('?s| is)\s+the\s+best\s+time|go\s+(to|for)\s+[a-z])\b/i;    if (travelPatterns.test(q)) {
         console.log("Travel/planning intent detected → weather");
         return "both";
     }
@@ -693,6 +692,19 @@ function extractLocationFallback(query) {
         /\bkindly\b/g, /\bregion\b/g, /\barea\b/g, /\bplace\b/g,
         /\bcity\b/g, /\bdistrict\b/g, /\bstate\b/g, /\bcountry\b/g,
         /\bindia\b/g, /\bindian\b/g,
+
+         // "planning to go to X", "planning to visit X", "planned to go for X"
+    /\b(?:plan(?:ni?ng|ned)?\s+to\s+(?:go|visit|travel)\s+(?:to|for)\s+)([a-z][a-z\s.'-]*?)(?=(?:\s+(?:next|this|tomorrow|on|for|is|will|would|can|should)\b|[?.!,]|$))/i,
+    
+    // "go to X", "visit X", "go for X"
+    /\b(?:go|visit|travel)\s+(?:to|for)\s+([a-z][a-z\s.'-]*?)(?=(?:\s+(?:next|this|tomorrow|on|for|is|will|would|can|should)\b|[?.!,]|$))/i,
+    
+    // "viable to go to X", "viable to go for X"
+    /\b(?:viable|okay|good|safe|suitable)\s+to\s+(?:go|visit|travel)\s+(?:to|for)\s+([a-z][a-z\s.'-]*?)(?=(?:\s+(?:next|this|tomorrow|on|for|is|will|would|can|should)\b|[?.!,]|$))/i,
+    
+    // ✅ NEW: Catch "planned to go for X" directly
+    /\b(?:planned|planning|plan)\s+to\s+go\s+(?:to|for)\s+([a-z][a-z\s.'-]*?)(?=(?:\s+(?:next|this|tomorrow|on|is|will|would|can|should)\b|[?.!,]|$))/i,
+        
         
         // Numbers (like "12" in "next 12 hour")
         /\b\d+\b/g,
