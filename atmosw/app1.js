@@ -925,9 +925,7 @@ async function chatWithFallback(messages) {
                 body: JSON.stringify({
                     model: "groq/compound-mini",
                     content: messages,
-                    reasoning: {
-                        enabled: true
-                    }
+                    
                 })
             });
 
