@@ -923,8 +923,8 @@ async function chatWithFallback(messages) {
                     "Authorization": `Bearer ${window.GROQ_API_KEY}`
                 },
                 body: JSON.stringify({
-                    model: "openai/gpt-oss-20b",
-                    messages: messages,
+                    model: "groq/compound-mini",
+                    content: messages,
                     reasoning: {
                         enabled: true
                     }
