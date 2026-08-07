@@ -555,14 +555,33 @@ function normalizeIntent(value) {
   return ["weather", "aod", "both", "offtopic"].includes(intent) ? intent : null;
 }
 
+let lastQueryType = null;
+
+
 function detectIntentFallback(query) {
-  const q = query.toLowerCase();
-  const hasWeather = /\b(temp(erature)?|rain(fall)?|mslp|pressure|mean sea level|cloud|dew(\s*point)?|forecast)\b/.test(q);
-  const hasAOD = /\b(aod|air quality|poll(ution)?|dust|pm\s*10|pm\s*2\.?5|particulate|sulfate|sulphate|nitrate|sea salt)\b/.test(q);
-  if (hasWeather && hasAOD) return "both";
-  if (hasAOD) return "aod";
-  if (hasWeather) return "weather";
-  return "offtopic";
+    const q = query.toLowerCase();
+    
+    // ✅ Check for follow-up patterns that imply same topic as before
+    if (/^(how|what)\s+about\b/i.test(q) || /^(and|also)\b/i.test(q)) {
+        console.log("Follow-up detected, using last query type:", lastQueryType);
+        if (lastQueryType) return lastQueryType;
+    }
+    
+    const hasWeather = /\b(temp(erature)?|rain(fall)?|mslp|pressure|mean sea level|cloud|dew(\s*point)?|forecast|sunny|hot|cold|humid)\b/.test(q);
+    const hasAOD = /\b(aod|air quality|poll(ution)?|dust|pm\s*10|pm\s*2\.?5|particulate|sulfate|sulphate|nitrate|sea salt|pm2\.5)\b/.test(q);
+    
+    let intent;
+    if (hasWeather && hasAOD) intent = "both";
+    else if (hasAOD) intent = "aod";
+    else if (hasWeather) intent = "weather";
+    else intent = "offtopic";
+    
+    // ✅ Store for next follow-up
+    if (intent !== "offtopic") {
+        lastQueryType = intent;
+    }
+    
+    return intent;
 }
 
 function sanitizeLocationCandidate(value) {
@@ -576,21 +595,46 @@ function sanitizeLocationCandidate(value) {
 }
 
 function extractLocationFallback(query) {
-  const normalized = query.replace(/\s+/g, " ").trim();
-  const patterns = [
-    /\b(?:in|at|for|near|around)\s+([a-z][a-z\s.'-]*?)(?=(?:\s+\b(?:right now|now|today|tomorrow|currently|this|next|please|give|show|plot|chart|graph|draw)\b|[?.!,]|$))/i,
-    /\b(?:weather|forecast|air quality|aod|pollution)\s+(?:in|for)\s+([a-z][a-z\s.'-]*?)(?=(?:\s+\b(?:right now|now|today|tomorrow|currently|this|next)\b|[?.!,]|$))/i,
-  ];
+    const normalized = query.replace(/\s+/g, " ").trim();
+    
+    // ✅ ADD: Pattern for follow-up questions like "how about X", "what about X"
+    const followUpPatterns = [
+        /\b(?:how|what)\s+(?:about|for)\s+([a-z][a-z\s.'-]*?)(?=\s*\?*$)/i,
+        /\b(?:and|also)\s+([a-z][a-z\s.'-]*?)(?=\s*\?*$)/i,
+    ];
+    
+    for (const pattern of followUpPatterns) {
+        const match = normalized.match(pattern);
+        const candidate = sanitizeLocationCandidate(match?.[1]);
+        if (candidate) {
+            console.log("Found location from follow-up pattern:", candidate);
+            return candidate;
+        }
+    }
+    
+    // Existing patterns
+    const patterns = [
+        /\b(?:in|at|for|near|around)\s+([a-z][a-z\s.'-]*?)(?=(?:\s+\b(?:right now|now|today|tomorrow|currently|this|next|please|give|show|plot|chart|graph|draw)\b|[?.!,]|$))/i,
+        /\b(?:weather|forecast|air quality|aod|pollution)\s+(?:in|for)\s+([a-z][a-z\s.'-]*?)(?=(?:\s+\b(?:right now|now|today|tomorrow|currently|this|next)\b|[?.!,]|$))/i,
+    ];
 
-  for (const pattern of patterns) {
-    const match = normalized.match(pattern);
-    const candidate = sanitizeLocationCandidate(match?.[1]);
-    if (candidate) return candidate;
-  }
+    for (const pattern of patterns) {
+        const match = normalized.match(pattern);
+        const candidate = sanitizeLocationCandidate(match?.[1]);
+        if (candidate) return candidate;
+    }
 
-  return null;
+    // ✅ ADD: If query is just a location name (like "Mumbai?" or "Delhi?")
+    const simpleLocationPattern = /^([a-z][a-z\s.'-]*?)\s*\?*$/i;
+    const simpleMatch = normalized.match(simpleLocationPattern);
+    const simpleCandidate = sanitizeLocationCandidate(simpleMatch?.[1]);
+    if (simpleCandidate && simpleCandidate.length > 2) {
+        console.log("Found location from simple pattern:", simpleCandidate);
+        return simpleCandidate;
+    }
+
+    return null;
 }
-
 
 // ── CHAT WITH TRIPLE FALLBACK ──────────────────────────────────
 async function chatWithFallback(messages) {
@@ -982,71 +1026,133 @@ function renderCharts(msgDiv, location, weatherData, aodData, vars) {
 }
 
 // ── CLASSIFY INTENT ───────────────────────────────────────────
-async function classifyIntent(query) {
 
+
+
+async function classifyIntent(query, previousIntent = null) {
   const prompt = `
 Classify the user's query.
 
 Valid intents:
-- weather
-- aod
-- both
-- offtopic
+- weather: Questions about temperature, rain, forecasts, humidity, wind.
+- aod: Questions about Aerosol Optical Depth, air pollution, AQI, smog, dust.
+- both: Asking about both weather and aod.
+- offtopic: Anything unrelated.
 
 Extract the city, district, state, or region in India if one is mentioned.
+Context: The previous user intent was: ${previousIntent || 'None'}.
+IMPORTANT: If the query is a follow-up like "how about Mumbai" or "what about Delhi", 
+assume the SAME intent as the previous intent, and extract the new location.
 
-Return ONLY valid JSON.
+If no location is mentioned, return null.
+Return ONLY valid JSON. No markdown.
 
-Example:
+Example: {"intent":"weather","location":"Pune"}
+Example: {"intent":"aod","location":"Delhi"}
+Example: {"intent":"offtopic","location":null}
 
-{"intent":"weather","location":"Pune"}
-
-Example:
-
-{"intent":"aod","location":"Delhi"}
-
-Example:
-
-{"intent":"offtopic","location":null}
-
-Query:
-${query}
+Query: ${query}
 `;
 
   const data = await chat([
-    {
-      role: "system",
-      content:
-        "Return only valid JSON. No markdown."
-    },
-    {
-      role: "user",
-      content: prompt
-    }
+    { role: "system", content: "Return only valid JSON. No markdown." },
+    { role: "user", content: prompt }
   ]);
 
-  // const raw = data.message.content.trim();
   const raw = data.choices?.[0]?.message?.content?.trim();
-  if (!raw) {
-      throw new Error("Classifier returned an empty response.");
+  if (!raw) throw new Error("Classifier returned an empty response.");
+
+  // Safely strip markdown wrappers
+  let cleanText = raw;
+  if (cleanText.startsWith("```json")) cleanText = cleanText.slice(7);
+  else if (cleanText.startsWith("```")) cleanText = cleanText.slice(3);
+  if (cleanText.endsWith("```")) cleanText = cleanText.slice(0, -3);
+  cleanText = cleanText.trim();
+
+  // Safely extract JSON object (prevents regex greedy matching bugs)
+  const firstBrace = cleanText.indexOf('{');
+  const lastBrace = cleanText.lastIndexOf('}');
+  if (firstBrace !== -1 && lastBrace !== -1) {
+      cleanText = cleanText.substring(firstBrace, lastBrace + 1);
   }
 
   try {
-    return JSON.parse(raw);
-  }
-  catch {
-
-    const m = raw.match(/\{[\s\S]*\}/);
-
-    if (m) {
-      return JSON.parse(m[0]);
-    }
-
-    throw new Error(
-      "Failed to parse classifier JSON"
-    );
+    return JSON.parse(cleanText);
+  } catch (e) {
+    throw new Error("Failed to parse classifier JSON");
   }
 }
+
+
+// async function classifyIntent(query) {
+
+//   const prompt = `
+// Classify the user's query.
+
+// Valid intents:
+// - weather
+// - aod
+// - both
+// - offtopic
+
+// Extract the city, district, state, or region in India if one is mentioned.
+// IMPORTANT: If the query is a follow-up like "how about Mumbai" or "what about Delhi", 
+// assume the same intent as the previous query would suggest, and extract the new location.
+
+// If no location is mentioned, return null.
+
+// Return ONLY valid JSON.
+
+// Example:
+
+// {"intent":"weather","location":"Pune"}
+
+// Example:
+
+// {"intent":"aod","location":"Delhi"}
+
+// Example:
+
+// {"intent":"offtopic","location":null}
+
+// Query:
+// ${query}
+// `;
+
+//   const data = await chat([
+//     {
+//       role: "system",
+//       content:
+//         "Return only valid JSON. No markdown."
+//     },
+//     {
+//       role: "user",
+//       content: prompt
+//     }
+//   ]);
+
+//   // const raw = data.message.content.trim();
+//   const raw = data.choices?.[0]?.message?.content?.trim();
+//   if (!raw) {
+//       throw new Error("Classifier returned an empty response.");
+//   }
+
+//   try {
+//     return JSON.parse(raw);
+//   }
+//   catch {
+
+//     const m = raw.match(/\{[\s\S]*\}/);
+
+//     if (m) {
+//       return JSON.parse(m[0]);
+//     }
+
+//     throw new Error(
+//       "Failed to parse classifier JSON"
+//     );
+//   }
+// }
 
 
 
@@ -1160,6 +1266,8 @@ function escapeAndFormat(text) {
 }
 
 // ── MAIN HANDLER ──────────────────────────────────────────────
+
+// ── MAIN HANDLER ──────────────────────────────────────────────
 async function handleSend() {
   const query = userInput.value.trim();
   if (!query) return;
@@ -1176,22 +1284,35 @@ async function handleSend() {
 
   const loadingDiv = appendMessage("assistant", "", true, isPlot);
 
-  
-
   try {
-    // Step 1: Classify
+    // Step 1: Classify (Pass lastQueryType for follow-up context!)
     let intent, location;
+    let clsIntent = null, clsLocation = null;
+    
     try {
-      const cls = await classifyIntent(query);
-      intent   = normalizeIntent(cls.intent) || detectIntentFallback(query);
-      location = sanitizeLocationCandidate(cls.location) || extractLocationFallback(query);
-
-      //log the classifier, intent, and location for debugging
-
+      // We pass lastQueryType so the LLM knows what "how about X" refers to
+      const cls = await classifyIntent(query, lastQueryType);
+      clsIntent = normalizeIntent(cls.intent);
+      clsLocation = sanitizeLocationCandidate(cls.location);
       
+      console.log("🔍 Classifier result:", {
+        query: query,
+        classifierIntent: clsIntent,
+        classifierLocation: clsLocation
+      });
     } catch(e) {
-      intent = detectIntentFallback(query);
-      location = extractLocationFallback(query);
+      console.warn("Classifier failed, using regex fallback:", e);
+    }
+
+    // Fallback to regex if classifier failed or returned invalid
+    intent = clsIntent || detectIntentFallback(query);
+    location = clsLocation || extractLocationFallback(query);
+    
+    console.log("🔍 Final resolved:", { intent, location });
+
+    // Update memory for next turn's follow-ups
+    if (intent && intent !== "offtopic") {
+        lastQueryType = intent;
     }
 
     if (intent === "offtopic") {
@@ -1205,72 +1326,66 @@ async function handleSend() {
 
     // Step 2: Geocode
     let geoResult;
-    try { geoResult = await geocode(location); }
-    catch(e) { updateMessage(loadingDiv, `❌ ${e.message}`, true); return; }
+    try { 
+        geoResult = await geocode(location); 
+    } catch(e) { 
+        updateMessage(loadingDiv, `❌ ${e.message}`, true); 
+        return; 
+    }
     const { lat, lon, display_name } = geoResult;
 
     // Step 3: Decide what to fetch
-    // For plot — fetch based on plotVars requested
     let needWeather = intent === "weather" || intent === "both";
     let needAOD     = intent === "aod"     || intent === "both";
+    
+    // If plotting, force fetch based on plotVars regardless of LLM intent
     if (isPlot) {
-      if (plotVars.weather.length > 0) needWeather = true;
-      if (plotVars.aod.length > 0)     needAOD     = true;
+      if (plotVars.weather && plotVars.weather.length > 0) needWeather = true;
+      if (plotVars.aod && plotVars.aod.length > 0) needAOD = true;
     }
 
     let context = `Location resolved: ${display_name} (lat=${lat.toFixed(4)}, lon=${lon.toFixed(4)})\n\n`;
     let weatherData = null, aodData = null;
     let usingFallback = { weather: false, aod: false };
 
+    // Fetch Weather 
+    // Note: fetchWeather already handles internal fallback if live API fails!
     if (needWeather) {
       try {
         weatherData = await fetchWeather(lat, lon);
         lastWeatherData = weatherData;
         const slot = getCurrentSlot(weatherData.timeseries);
         context += buildWeatherContext(weatherData, slot) + "\n\n";
+        
+        // Just check the flag instead of trying to fetch again
+        if (weatherData._fallback) usingFallback.weather = true;
       } catch(e) {
-        // Live API failed — try static JSON fallback
-        try {
-          const fallbackVals = await fetchFallbackWeather(lat, lon);
-          context += buildFallbackWeatherContext(fallbackVals, lat.toFixed(4), lon.toFixed(4)) + "\n\n";
-          usingFallback.weather = true;
-        } catch(fe) {
-          context += `[Weather data unavailable: ${e.message}. Fallback also failed: ${fe.message}]\n\n`;
-        }
+        // This only triggers if BOTH live and fallback failed inside fetchWeather
+        context += `[Weather data completely unavailable: ${e.message}]\n\n`;
       }
     }
+
+    // Fetch AOD
+    // Note: fetchAOD already handles internal fallback if live API fails!
     if (needAOD) {
       try {
         aodData = await fetchAOD(lat, lon);
         lastAODData = aodData;
         const currentAOD = getCurrentAODSlot(aodData.timeseries);
         context += buildAODContext(aodData, currentAOD);
+        
+        if (aodData._fallback) usingFallback.aod = true;
       } catch(e) {
-        // Live API failed — try static JSON fallback
-        try {
-          const fallbackVals = await fetchFallbackAOD(lat, lon);
-          context += buildFallbackAODContext(fallbackVals, lat.toFixed(4), lon.toFixed(4));
-          usingFallback.aod = true;
-        } catch(fe) {
-          context += `[AOD data unavailable: ${e.message}. Fallback also failed: ${fe.message}]\n`;
-        }
+        context += `[AOD data completely unavailable: ${e.message}]\n`;
       }
-    }
-
-    // Warn user if fallback was used
-    if (usingFallback.weather || usingFallback.aod) {
-      const fbNote = document.createElement("div");
-      fbNote.style.cssText = "font-size:11px;color:var(--warn);margin-bottom:8px;padding:6px 10px;background:rgba(240,178,74,0.08);border-left:2px solid var(--warn);border-radius:4px;";
-      fbNote.textContent = "⚠ Live API unavailable — showing static grid snapshot as fallback. Data may not be latest.";
-      loadingDiv.querySelector(".msg-body").insertBefore(fbNote, loadingDiv.querySelector(".msg-text"));
     }
 
     // Step 4: Generate text response
     const response = await generateResponse(query, context, isPlot);
     updateMessage(loadingDiv, response);
 
-    // Show fallback warning badge if either source was static
-    if ((weatherData && weatherData._fallback) || (aodData && aodData._fallback)) {
+    // Show a single, clean fallback warning badge if either source was static
+    if (usingFallback.weather || usingFallback.aod) {
       const badge = document.createElement("div");
       badge.style.cssText = "margin-top:10px;padding:6px 12px;background:#2a1f0a;border:1px solid #f0b24a44;border-radius:6px;font-size:11px;color:#f0b24a;letter-spacing:0.04em;";
       badge.innerHTML = "⚠ Live API was unavailable — showing static fallback data from GitHub. Timestamps replaced with step indices.";
@@ -1279,6 +1394,11 @@ async function handleSend() {
 
     // Step 5: Render charts if requested
     if (isPlot && (weatherData || aodData)) {
+      
+      // Destroy old charts before rendering new ones to prevent memory leaks!
+      chartInstances.forEach(chart => chart.destroy());
+      chartInstances = [];
+
       const shortLocation = display_name.split(",")[0];
       renderCharts(loadingDiv, shortLocation, weatherData, aodData, plotVars);
       chatWrap.scrollTop = chatWrap.scrollHeight;
@@ -1291,6 +1411,156 @@ async function handleSend() {
     sendBtn.disabled = false;
   }
 }
+
+
+
+// async function handleSend() {
+//   const query = userInput.value.trim();
+//   if (!query) return;
+
+//   userInput.value = "";
+//   userInput.style.height = "auto";
+//   sendBtn.disabled = true;
+
+//   appendMessage("user", query);
+
+//   // Detect if this is a plot request
+//   const isPlot = PLOT_KEYWORDS.test(query);
+//   const plotVars = isPlot ? detectPlotVariables(query) : null;
+
+//   const loadingDiv = appendMessage("assistant", "", true, isPlot);
+//   try {
+//     // Step 1: Classify
+//     let intent, location;
+//     try {
+//       const cls = await classifyIntent(query);
+//       intent   = normalizeIntent(cls.intent) || detectIntentFallback(query);
+//       location = sanitizeLocationCandidate(cls.location) || extractLocationFallback(query);
+//     console.log("🔍 Classification result:", {
+//                 query: query,
+//                 classifierIntent: cls.intent,
+//                 finalIntent: intent,
+//                 classifierLocation: cls.location,
+//                 finalLocation: location
+//             });
+
+//       //log the classifier, intent, and location for debugging
+
+      
+//     } catch(e) {
+//     console.warn("Classifier failed, using fallback:", e);
+//     intent = detectIntentFallback(query);
+//     location = extractLocationFallback(query);
+//     console.log("🔍 Fallback result:", { intent, location });
+        
+//       intent = detectIntentFallback(query);
+//       location = extractLocationFallback(query);
+//     }
+
+//     if (intent === "offtopic") {
+//       updateMessage(loadingDiv, "I'm Atmosaware, a weather and air intelligence assistant for India. Please ask me about weather conditions or air quality in any Indian city or region.");
+//       return;
+//     }
+//     if (!location) {
+//       updateMessage(loadingDiv, "Could you specify a location in India? For example: \"Plot temperature in Bhubaneswar\".");
+//       return;
+//     }
+
+//     // Step 2: Geocode
+//     let geoResult;
+//     try { geoResult = await geocode(location); }
+//     catch(e) { updateMessage(loadingDiv, `❌ ${e.message}`, true); return; }
+//     const { lat, lon, display_name } = geoResult;
+
+//     // Step 3: Decide what to fetch
+//     // For plot — fetch based on plotVars requested
+//     let needWeather = intent === "weather" || intent === "both";
+//     let needAOD     = intent === "aod"     || intent === "both";
+//     if (isPlot) {
+//       if (plotVars.weather.length > 0) needWeather = true;
+//       if (plotVars.aod.length > 0)     needAOD     = true;
+//     }
+
+//     let context = `Location resolved: ${display_name} (lat=${lat.toFixed(4)}, lon=${lon.toFixed(4)})\n\n`;
+//     let weatherData = null, aodData = null;
+//     let usingFallback = { weather: false, aod: false };
+
+//     if (needWeather) {
+//       try {
+//         weatherData = await fetchWeather(lat, lon);
+//         lastWeatherData = weatherData;
+//         const slot = getCurrentSlot(weatherData.timeseries);
+//         context += buildWeatherContext(weatherData, slot) + "\n\n";
+
+//         if (weatherData._fallback) usingFallback.weather = true;
+
+//       } catch(e)  {
+//         // This only triggers if BOTH live and fallback failed inside fetchWeather
+//         context += `[Weather data completely unavailable: ${e.message}]\n\n`;
+//       }
+//         {
+//         // Live API failed — try static JSON fallback
+//         try {
+//           const fallbackVals = await fetchFallbackWeather(lat, lon);
+//           context += buildFallbackWeatherContext(fallbackVals, lat.toFixed(4), lon.toFixed(4)) + "\n\n";
+//           usingFallback.weather = true;
+//         } catch(fe) {
+//           context += `[Weather data unavailable: ${e.message}. Fallback also failed: ${fe.message}]\n\n`;
+//         }
+//       }
+//     }
+//     if (needAOD) {
+//       try {
+//         aodData = await fetchAOD(lat, lon);
+//         lastAODData = aodData;
+//         const currentAOD = getCurrentAODSlot(aodData.timeseries);
+//         context += buildAODContext(aodData, currentAOD);
+//       } catch(e) {
+//         // Live API failed — try static JSON fallback
+//         try {
+//           const fallbackVals = await fetchFallbackAOD(lat, lon);
+//           context += buildFallbackAODContext(fallbackVals, lat.toFixed(4), lon.toFixed(4));
+//           usingFallback.aod = true;
+//         } catch(fe) {
+//           context += `[AOD data unavailable: ${e.message}. Fallback also failed: ${fe.message}]\n`;
+//         }
+//       }
+//     }
+
+//     // Warn user if fallback was used
+//     if (usingFallback.weather || usingFallback.aod) {
+//       const fbNote = document.createElement("div");
+//       fbNote.style.cssText = "font-size:11px;color:var(--warn);margin-bottom:8px;padding:6px 10px;background:rgba(240,178,74,0.08);border-left:2px solid var(--warn);border-radius:4px;";
+//       fbNote.textContent = "⚠ Live API unavailable — showing static grid snapshot as fallback. Data may not be latest.";
+//       loadingDiv.querySelector(".msg-body").insertBefore(fbNote, loadingDiv.querySelector(".msg-text"));
+//     }
+
+//     // Step 4: Generate text response
+//     const response = await generateResponse(query, context, isPlot);
+//     updateMessage(loadingDiv, response);
+
+//     // Show fallback warning badge if either source was static
+//     if ((weatherData && weatherData._fallback) || (aodData && aodData._fallback)) {
+//       const badge = document.createElement("div");
+//       badge.style.cssText = "margin-top:10px;padding:6px 12px;background:#2a1f0a;border:1px solid #f0b24a44;border-radius:6px;font-size:11px;color:#f0b24a;letter-spacing:0.04em;";
+//       badge.innerHTML = "⚠ Live API was unavailable — showing static fallback data from GitHub. Timestamps replaced with step indices.";
+//       loadingDiv.querySelector(".msg-body").appendChild(badge);
+//     }
+
+//     // Step 5: Render charts if requested
+//     if (isPlot && (weatherData || aodData)) {
+//       const shortLocation = display_name.split(",")[0];
+//       renderCharts(loadingDiv, shortLocation, weatherData, aodData, plotVars);
+//       chatWrap.scrollTop = chatWrap.scrollHeight;
+//     }
+
+//   } catch(err) {
+//     console.error("Atmosaware error:", err);
+//     updateMessage(loadingDiv, `❌ ${err.message || "Unknown error. Check console for details."}`, true);
+//   } finally {
+//     sendBtn.disabled = false;
+//   }
+// }
 
 // ── INIT ──────────────────────────────────────────────────────
 keyBtn.style.borderColor = "var(--accent-dim)";
