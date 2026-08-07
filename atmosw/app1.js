@@ -1,10 +1,3 @@
-/* ╔══════════════════════════════════════════════════════════╗
-   ║  Atmosaware — Weather & Air Intelligence                       ║
-   ║  APIs: sweatherapi.vercel.app  ·           ║
-   ║  Geocoding: Nominatim (OSM, free, no key)                ║
-   ║  Charts: Chart.js (CDN)                                  ║
-   ╚══════════════════════════════════════════════════════════╝ */
-
 // ── CONFIG ────────────────────────────────────────────────────
 const WEATHER_BASE  = "https://sweatherapi.vercel.app/timeseries";
 const AOD_BASE      = "https://sweatherapi.vercel.app/aod";
