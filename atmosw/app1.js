@@ -3,53 +3,14 @@ const WEATHER_BASE  = "https://sweatherapi.vercel.app/timeseries";
 const AOD_BASE      = "https://sweatherapi.vercel.app/aod";
 const AOD_TYPES     = "dust,total,sea,sulfate,pm10,pm25,nitrate";
 
-const OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions";
+const OPENROUTER_URL = "https://nvproxy-three.vercel.app/api/chato/";
 let OPENROUTER_API_KEY = null;
 // ── STATE ─────────────────────────────────────────────────────
 
-const groq_URL = "https://api.groq.com/openai/v1/chat/completions";
+const groq_URL = "https://nvproxy-three.vercel.app/api/chatg/";
 const NVIDIA_URL = "https://nvproxy-three.vercel.app/api/chat/";
 let NVIDIA_API_KEY = null;
 
-
-async function initializeApp() {
-    // Try to load OpenRouter key first
-    try {
-        const openRouterResponse = await fetch("https://opkey.vercel.app/api/get-key");
-        if (openRouterResponse.ok) {
-            const openRouterData = await openRouterResponse.json();
-            if (openRouterData.OPP) {
-                window.OPENROUTER_API_KEY = openRouterData.OPP;
-                console.log("OpenRouter key loaded");
-            }
-        }
-    } catch (e) {
-        console.warn("Failed to load OpenRouter key:", e);
-    }
-    
-    // Try to load Groq key
-    try {
-        const groqResponse = await fetch("https://opkey.vercel.app/api/groq");
-        if (groqResponse.ok) {
-            const groqData = await groqResponse.json();
-            if (groqData.OPP) {
-                window.GROQ_API_KEY = groqData.OPP;
-                console.log("Groq key loaded");
-            }
-        }
-    } catch (e) {
-        console.warn("Failed to load Groq key:", e);
-    }
-
-
-
-
-
-}
-
-
-// Run when your app loads
-initializeApp();
 
 
 
@@ -868,110 +829,115 @@ function extractLocationFallback(query) {
 // }
 
 // ── CHAT WITH TRIPLE FALLBACK ──────────────────────────────────
-async function chatWithFallback(messages) {
-    // Try 1: OpenRouter
-    if (window.OPENROUTER_API_KEY) {
-        try {
-            console.log("Attempting with OpenRouter...");
-            const response = await fetch(OPENROUTER_URL, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    "Authorization": `Bearer ${window.OPENROUTER_API_KEY}`,
-                    "HTTP-Referer": window.location.origin,
-                    "X-Title": "AtmosAware"
-                },
-                body: JSON.stringify({
-                    model: "openrouter/free", 
-                    messages: messages,
-                    reasoning: {
-                        enabled: true
-                    }
-                })
-            });
 
-            if (response.ok) {
-                const data = await response.json();
-                if (data.choices?.[0]?.message?.content) {
-                    console.log("✅ OpenRouter succeeded");
-                    return data;
+
+async function chatWithFallback(messages) {
+
+    // Try 1: OpenRouter
+    try {
+        console.log("Attempting OpenRouter...");
+
+        const response = await fetch(OPENROUTER_URL, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                model: "openrouter/free",
+                messages: messages,
+                reasoning: {
+                    enabled: true
                 }
+            })
+        });
+
+        if (response.ok) {
+            const data = await response.json();
+
+            if (data.choices?.[0]?.message?.content) {
+                console.log("✅ OpenRouter succeeded");
+                return data;
             }
-            console.warn("OpenRouter failed with status:", response.status);
-        } catch (e) {
-            console.warn("OpenRouter error:", e.message);
         }
+
+        console.warn("❌ OpenRouter failed:", response.status);
+
+    } catch (e) {
+        console.warn("❌ OpenRouter error:", e);
     }
 
     // Try 2: Groq
-    if (window.GROQ_API_KEY) {
-        try {
-            console.log("Falling back to Groq...");
-            const response = await fetch(groq_URL, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    "Authorization": `Bearer ${window.GROQ_API_KEY}`
-                },
-                body: JSON.stringify({
-                    model: "compound-mini",
-                    content: messages,
-                    
-                })
-            });
+    try {
+        console.log("Falling back to Groq...");
 
-            if (response.ok) {
-                const data = await response.json();
-                if (data.choices?.[0]?.message?.content) {
-                    console.log("✅ Groq succeeded");
-                    return data;
-                }
+        const response = await fetch(GROQ_URL, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                model: "compound-mini",
+                messages: messages,
+                temperature: 1,
+                stream: false
+            })
+        });
+
+        if (response.ok) {
+            const data = await response.json();
+
+            if (data.choices?.[0]?.message?.content) {
+                console.log("✅ Groq succeeded");
+                return data;
             }
-            console.warn("Groq failed with status:", response.status);
-        } catch (e) {
-            console.warn("Groq error:", e.message);
         }
+
+        console.warn("❌ Groq failed:", response.status);
+
+    } catch (e) {
+        console.warn("❌ Groq error:", e);
     }
 
-    // ✅ ADD: Try 3: NVIDIA NIM API
-    if (window.NVIDIA_API_KEY) {
-        try {
-            console.log("Falling back to NVIDIA NIM...");
-            const response = await fetch(NVIDIA_URL, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    "Accept": "application/json",
-                },
-                body: JSON.stringify({
-                    model: "openai/gpt-oss-20b",
-                    messages: messages,
-                    temperature: 1,
-                    top_p: 1,
-                    frequency_penalty: 0,
-                    presence_penalty: 0,
-                    max_tokens: 4096,
-                    stream: true,
-                    reasoning_effort: "medium"
-                })
-            });
+    // Try 3: NVIDIA
+    try {
+        console.log("Falling back to NVIDIA...");
 
-            if (response.ok) {
-                const data = await response.json();
-                if (data.choices?.[0]?.message?.content) {
-                    console.log("✅ NVIDIA NIM succeeded");
-                    return data;
-                }
+        const response = await fetch(NVIDIA_URL, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                model: "openai/gpt-oss-20b",
+                messages: messages,
+                temperature: 1,
+                top_p: 1,
+                frequency_penalty: 0,
+                presence_penalty: 0,
+                max_tokens: 4096,
+                stream: false,
+                reasoning_effort: "medium"
+            })
+        });
+
+        if (response.ok) {
+            const data = await response.json();
+
+            if (data.choices?.[0]?.message?.content) {
+                console.log("✅ NVIDIA succeeded");
+                return data;
             }
-            console.warn("NVIDIA NIM failed with status:", response.status);
-        } catch (e) {
-            console.warn("NVIDIA NIM error:", e.message);
         }
+
+        console.warn("❌ NVIDIA failed:", response.status);
+
+    } catch (e) {
+        console.warn("❌ NVIDIA error:", e);
     }
 
-    // All providers failed
-    throw new Error("All API providers failed (OpenRouter, Groq, NVIDIA). Please check your configuration.");
+    throw new Error("All providers failed.");
 }
+
 
 // Keep the wrapper function
 async function chat(messages) {
