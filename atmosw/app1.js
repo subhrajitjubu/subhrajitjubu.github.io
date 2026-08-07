@@ -585,56 +585,270 @@ function detectIntentFallback(query) {
 }
 
 function sanitizeLocationCandidate(value) {
-  if (typeof value !== "string") return null;
-  const location = value
-    .replace(/^[\s"'`]+|[\s"'`]+$/g, "")
-    .replace(/[?!.,;:]+$/g, "")
-    .replace(/\s+/g, " ")
-    .trim();
-  return location.length >= 2 ? location : null;
+    if (typeof value !== "string") return null;
+    
+    // Remove common filler words that might be captured with location
+    const fillerWords = /\b(?:the|next|coming|for|in|at|to|of|is|are|will|would|could|can|please|show|tell|give|me|right|now|today|tomorrow|hours|hour|days|day)\b/gi;
+    
+    let location = value
+        .replace(/^[\s"'`]+|[\s"'`]+$/g, "")  // Trim quotes and spaces
+        .replace(/[?!.,;:]+$/g, "")            // Remove trailing punctuation
+        .replace(fillerWords, "")              // Remove filler words
+        .replace(/\s+/g, " ")                  // Normalize spaces
+        .trim();
+    
+    console.log("Sanitized location:", location);
+    return location.length >= 2 ? location : null;
 }
 
 function extractLocationFallback(query) {
-    const normalized = query.replace(/\s+/g, " ").trim();
+    if (!query || typeof query !== 'string') return null;
     
-    // ✅ ADD: Pattern for follow-up questions like "how about X", "what about X"
-    const followUpPatterns = [
-        /\b(?:how|what)\s+(?:about|for)\s+([a-z][a-z\s.'-]*?)(?=\s*\?*$)/i,
-        /\b(?:and|also)\s+([a-z][a-z\s.'-]*?)(?=\s*\?*$)/i,
+    // Work with a lowercase copy for matching
+    let text = query.toLowerCase().trim();
+    
+    // Remove punctuation and special characters
+    text = text.replace(/[?!.,;:'"()\[\]{}]/g, ' ');
+    
+    // ── COMPREHENSIVE STOP PATTERNS ──
+    // Order matters: multi-word phrases FIRST, then single words
+    const stopPatterns = [
+        // Multi-word phrases (must come before single words)
+        /\bhow\s+about\b/g, /\bwhat\s+about\b/g,
+        /\bhow\s+is\b/g, /\bwhat\s+is\b/g, /\bhow\s+was\b/g,
+        /\bwhat\s+was\b/g, /\bright\s+now\b/g,
+        /\bair\s+quality\b/g, /\bcloud\s+cover\b/g,
+        /\bsea\s+salt\b/g, /\bdew\s*point\b/g,
+        /\btime\s+series\b/g, /\btotal\s+cloud\b/g,
+        /\bnext\s+\d+\s+\w+\b/g,  // "next 12 hour", "next 3 days"
+        /\bfor\s+the\s+next\b/g,
+        /\bin\s+the\s+next\b/g,
+        
+        // Weather / AOD keywords
+        /\bweather\b/g, /\bforecast\b/g, /\btemperature\b/g, /\btemp\b/g,
+        /\baod\b/g, /\bair\b/g, /\bpollution\b/g, /\bquality\b/g,
+        /\bdust\b/g, /\brain\b/g, /\brainfall\b/g, /\bhumidity\b/g,
+        /\bwind\b/g, /\bpressure\b/g, /\bmslp\b/g, /\bcloud\b/g,
+        /\bpm\s*10\b/g, /\bpm\s*2\.?5\b/g, /\bsulfate\b/g, /\bsulphate\b/g,
+        /\bnitrate\b/g, /\bsea\b/g, /\bdew\b/g, /\btotal\b/g,
+        /\bheat\b/g, /\bcold\b/g, /\bhot\b/g, /\bhumid\b/g,
+        /\bsunny\b/g, /\bcloudy\b/g, /\bstorm\b/g, /\bcyclone\b/g,
+        /\bmonsoon\b/g, /\bseason\b/g, /\bclimate\b/g,
+        
+        // Action / plot keywords
+        /\bplot\b/g, /\bchart\b/g, /\bgraph\b/g, /\bshow\b/g,
+        /\bdraw\b/g, /\bvisuali[sz]e\b/g, /\bdisplay\b/g,
+        /\bcompare\b/g, /\bvs\b/g, /\bversus\b/g,
+        
+        // Time expressions
+        /\btoday\b/g, /\btomorrow\b/g, /\byesterday\b/g,
+        /\bnow\b/g, /\bcurrently\b/g, /\bcurrent\b/g,
+        /\bnext\b/g, /\bthis\b/g, /\bthat\b/g,
+        /\bmorning\b/g, /\bevening\b/g, /\bnight\b/g,
+        /\bweek\b/g, /\bday\b/g, /\bdays\b/g,
+        /\bhour\b/g, /\bhours\b/g, /\bhr\b/g, /\bhrs\b/g,
+        /\bminute\b/g, /\bminutes\b/g, /\bmin\b/g,
+        /\bsecond\b/g, /\bseconds\b/g, /\bsec\b/g,
+        /\bforecast\s+for\b/g,
+        
+        // Question / filler words
+        /\bwhat\b/g, /\bhow\b/g, /\bwhen\b/g, /\bwhere\b/g,
+        /\bwhy\b/g, /\bwhich\b/g, /\bwho\b/g,
+        /\bis\b/g, /\bare\b/g, /\bwas\b/g, /\bwere\b/g,
+        /\bwill\b/g, /\bshall\b/g, /\bcan\b/g, /\bcould\b/g,
+        /\bwould\b/g, /\bshould\b/g, /\bmay\b/g, /\bmight\b/g,
+        /\bdo\b/g, /\bdoes\b/g, /\bdid\b/g,
+        /\btell\b/g, /\bme\b/g, /\babout\b/g, /\bplease\b/g,
+        /\bgive\b/g, /\bget\b/g, /\bfind\b/g, /\bcheck\b/g,
+        /\bshow\s+me\b/g, /\blet\s+me\b/g, /\bknow\b/g,
+        /\bneed\b/g, /\bwant\b/g, /\blike\b/g, /\bgoing\b/g,
+        /\bexpect\b/g, /\bexpected\b/g, /\blikely\b/g,
+        /\bchance\b/g, /\bchances\b/g, /\bpredict\b/g, /\bprediction\b/g,
+        
+        // Common English words
+        /\bthe\b/g, /\ba\b/g, /\ban\b/g, /\bof\b/g,
+        /\bfor\b/g, /\bin\b/g, /\bat\b/g, /\bnear\b/g,
+        /\baround\b/g, /\band\b/g, /\balso\b/g, /\bwith\b/g,
+        /\bto\b/g, /\bfrom\b/g, /\bthere\b/g, /\bhere\b/g,
+        /\bit\b/g, /\bits\b/g, /\bif\b/g, /\bany\b/g,
+        /\bsome\b/g, /\bmore\b/g, /\bless\b/g, /\bvery\b/g,
+        /\bmuch\b/g, /\bmany\b/g, /\bthan\b/g, /\bthen\b/g,
+        /\bheavily\b/g, /\bheavy\b/g, /\blight\b/g, /\bmoderate\b/g,
+        /\bextreme\b/g, /\bsevere\b/g, /\bcondition\b/g, /\bconditions\b/g,
+        /\breport\b/g, /\bupdate\b/g, /\bstatus\b/g,
+        /\bkindly\b/g, /\bregion\b/g, /\barea\b/g, /\bplace\b/g,
+        /\bcity\b/g, /\bdistrict\b/g, /\bstate\b/g, /\bcountry\b/g,
+        /\bindia\b/g, /\bindian\b/g,
+        
+        // Numbers (like "12" in "next 12 hour")
+        /\b\d+\b/g,
     ];
     
-    for (const pattern of followUpPatterns) {
-        const match = normalized.match(pattern);
-        const candidate = sanitizeLocationCandidate(match?.[1]);
-        if (candidate) {
-            console.log("Found location from follow-up pattern:", candidate);
-            return candidate;
-        }
+    // Apply all stop patterns
+    for (const pattern of stopPatterns) {
+        text = text.replace(pattern, ' ');
     }
     
-    // Existing patterns
-    const patterns = [
-        /\b(?:in|at|for|near|around)\s+([a-z][a-z\s.'-]*?)(?=(?:\s+\b(?:right now|now|today|tomorrow|currently|this|next|please|give|show|plot|chart|graph|draw)\b|[?.!,]|$))/i,
-        /\b(?:weather|forecast|air quality|aod|pollution)\s+(?:in|for)\s+([a-z][a-z\s.'-]*?)(?=(?:\s+\b(?:right now|now|today|tomorrow|currently|this|next)\b|[?.!,]|$))/i,
-    ];
-
-    for (const pattern of patterns) {
-        const match = normalized.match(pattern);
-        const candidate = sanitizeLocationCandidate(match?.[1]);
-        if (candidate) return candidate;
-    }
-
-    // ✅ ADD: If query is just a location name (like "Mumbai?" or "Delhi?")
-    const simpleLocationPattern = /^([a-z][a-z\s.'-]*?)\s*\?*$/i;
-    const simpleMatch = normalized.match(simpleLocationPattern);
-    const simpleCandidate = sanitizeLocationCandidate(simpleMatch?.[1]);
-    if (simpleCandidate && simpleCandidate.length > 2) {
-        console.log("Found location from simple pattern:", simpleCandidate);
-        return simpleCandidate;
-    }
-
-    return null;
+    // Clean up extra spaces
+    text = text.replace(/\s+/g, ' ').trim();
+    
+    // ── VALIDATE RESULT ──
+    // If nothing meaningful remains, return null
+    if (!text || text.length < 2) return null;
+    
+    // Must contain at least one letter (not just symbols/numbers)
+    if (!/[a-zA-Z]/.test(text)) return null;
+    
+    // If result is too many words (>4), it's probably not a valid location
+    // (Indian place names are typically 1-3 words: "New Delhi", "Andhra Pradesh")
+    const words = text.split(' ').filter(w => w.length > 0);
+    if (words.length > 4) return null;
+    
+    return sanitizeLocationCandidate(text);
 }
+
+
+
+
+
+
+
+///from one
+// function extractLocationFallback(query) {
+//     const normalized = query.replace(/\s+/g, " ").trim();
+//     console.log("🔍 Extracting location from:", normalized);
+    
+//     // Common Indian location suffixes to help identify city names
+//     const locationSuffixes = /(?:pur|bad|abad|nagar|garh|ganj|palli|halli|ur|oor|ore|ere|aram|gram|gaon|pada|wadi|patnam|patna|patti|kot|kottai|pura|puram|giri|gadh|dwara|dwar|bari|sarai|hat|hatti|mandi|pet|peta|tola|palem|valasa|padu|prolu|konda|guda|gudem|uru|kere|guppe|halli|kuppam|kuppan|cheri|cheruvu|kur|ooru)\b/i;
+    
+//     // Known Indian city names (add more as needed)
+//     const knownCities = /\b(?:mumbai|delhi|kolkata|chennai|bengaluru|bangalore|hyderabad|ahmedabad|pune|jaipur|lucknow|kanpur|nagpur|indore|thane|bhopal|visakhapatnam|patna|vadodara|ghaziabad|ludhiana|agra|nashik|faridabad|meerut|rajkot|varanasi|srinagar|aurangabad|dhanbad|amritsar|allahabad|ranchi|jabalpur|gwalior|coimbatore|vijayawada|jodhpur|madurai|raipur|chandigarh|guwahati|solapur|hubli|mysore|tiruchirappalli|bareilly|aligarh|moradabad|gorakhpur|bhilai|jamshedpur|bhagalpur|bokaro|ranchi|siliguri|darjeeling|shimla|dehradun|haridwar|rishikesh|udaipur|ajmer|bikaner|jaisalmer|pushkar|pondicherry|kochi|thiruvananthapuram|kollam|kottayam|kannur|kasaragod|mangalore|udupi|belgaum|gulbarga|warangal|nellore|kurnool|rajahmundry|kakinada|eluru|ongole|tenali|guntur|anantapur|chittoor|tirupati|kadapa|khammam|nizamabad|karimnagar|ramagundam|adilabad|mancherial|nirmal|bhainsa|basar|nizamabad|medak|sangareddy|siddipet|wanaparthy|gadwal|nagarkurnool|mahbubnagar|nalgonda|suryapet|miryalaguda|bhongir|jangaon|hanamkonda|parakala|thorur|mulugu|bhadrachalam|manuguru|yellandu|kothagudem|palvancha|mandamarri|bellampalli|manchiryal|luxettipet|asifabad|jagtial|metpalli|koratla|siricilla|karimnagar|huzurabad|husnabad|warangal|hanamkonda|parakala|mahabubabad|dornakal|kesamudram|narsampet|parkal|bhupalpalle|manthani|peddapalli|godavarikhani|ramagundam|mancherial|bellampalli|mandamarri|adilabad|nirmal|bhainsa|basar|nizamabad|armoor|bodhan|kamareddy|medak|sangareddy|siddipet|zahirabad|bidar|gulbarga|yadgir|raichur|ballari|hospet|kadapa|anantapur|dharwad|hubli|belgaum|udupi)\b/i;
+    
+//     // Step 1: Try follow-up patterns
+//     const followUpPatterns = [
+//         /\b(?:how|what)\s+(?:about|for)\s+([a-z][a-z\s.'-]*?)(?=\s*\?*$)/i,
+//         /\b(?:and|also)\s+([a-z][a-z\s.'-]*?)(?=\s*\?*$)/i,
+//     ];
+    
+//     for (const pattern of followUpPatterns) {
+//         const match = normalized.match(pattern);
+//         const candidate = sanitizeLocationCandidate(match?.[1]);
+//         if (candidate) {
+//             console.log("✅ Found via follow-up pattern:", candidate);
+//             return candidate;
+//         }
+//     }
+    
+//     // Step 2: Try "Location keyword" pattern (e.g., "Gajadipur forecast")
+//     const locationBeforeKeyword = /\b([A-Z][a-z]+(?:\s+[A-Z][a-z]+)*)\s+(?:weather|forecast|air quality|aod|pollution|temp|temperature|rain|humidity|climate|pm2\.5|pm10|dust)\b/i;
+//     const match1 = normalized.match(locationBeforeKeyword);
+//     if (match1) {
+//         const candidate = sanitizeLocationCandidate(match1[1]);
+//         if (candidate) {
+//             console.log("✅ Found via 'Location keyword' pattern:", candidate);
+//             return candidate;
+//         }
+//     }
+    
+//     // Step 3: Try "keyword in Location" pattern (e.g., "weather in Mumbai")
+//     const keywordBeforeLocation = /\b(?:weather|forecast|air quality|aod|pollution|temp|temperature|rain|humidity|climate|pm2\.5|pm10|dust)\s+(?:in|at|for|of|near|over)\s+([A-Z][a-z]+(?:\s+[A-Z][a-z]+)*)/i;
+//     const match2 = normalized.match(keywordBeforeLocation);
+//     if (match2) {
+//         const candidate = sanitizeLocationCandidate(match2[1]);
+//         if (candidate) {
+//             console.log("✅ Found via 'keyword in Location' pattern:", candidate);
+//             return candidate;
+//         }
+//     }
+    
+//     // Step 4: Try preposition patterns (e.g., "in Mumbai", "at Delhi")
+//     const prepositionPattern = /\b(?:in|at|for|near|around|over)\s+([A-Z][a-z]+(?:\s+[A-Z][a-z]+)*)/i;
+//     const match3 = normalized.match(prepositionPattern);
+//     if (match3) {
+//         const candidate = sanitizeLocationCandidate(match3[1]);
+//         if (candidate) {
+//             console.log("✅ Found via preposition pattern:", candidate);
+//             return candidate;
+//         }
+//     }
+    
+//     // Step 5: Check against known cities
+//     const knownCityMatch = normalized.match(knownCities);
+//     if (knownCityMatch) {
+//         const candidate = knownCityMatch[0];
+//         console.log("✅ Found via known cities list:", candidate);
+//         return candidate;
+//     }
+    
+//     // Step 6: Look for words that look like Indian place names
+//     const words = normalized.split(/\s+/);
+//     for (const word of words) {
+//         // Check if word has location-like suffix or starts with capital letter
+//         if (word.length > 3 && 
+//             (locationSuffixes.test(word) || /^[A-Z][a-z]+$/.test(word)) &&
+//             !/^(?:what|how|when|where|why|who|which|weather|forecast|temperature|rain|humidity|show|tell|give|please|can|could|would|will|is|are|the|for|in|at|to|of|next|hours|hour|days|day|right|now|today|tomorrow)$/i.test(word)) {
+//             console.log("✅ Found via location suffix/capital pattern:", word);
+//             return word;
+//         }
+//     }
+    
+//     // Step 7: Just take the first word if it starts with capital and looks like a name
+//     const firstWordMatch = normalized.match(/^([A-Z][a-z]+(?:\s+[A-Z][a-z]+)*)/);
+//     if (firstWordMatch && !/^(?:what|how|when|where|why|who|which|weather|forecast|show|tell|please)$/i.test(firstWordMatch[1])) {
+//         const candidate = sanitizeLocationCandidate(firstWordMatch[1]);
+//         if (candidate && candidate.length > 2) {
+//             console.log("✅ Found via first capitalized word:", candidate);
+//             return candidate;
+//         }
+//     }
+    
+//     console.log("❌ No location found");
+//     return null;
+// }
+
+//???????????
+
+// function extractLocationFallback(query) {
+//     const normalized = query.replace(/\s+/g, " ").trim();
+    
+//     // ✅ ADD: Pattern for follow-up questions like "how about X", "what about X"
+//     const followUpPatterns = [
+//         /\b(?:how|what)\s+(?:about|for)\s+([a-z][a-z\s.'-]*?)(?=\s*\?*$)/i,
+//         /\b(?:and|also)\s+([a-z][a-z\s.'-]*?)(?=\s*\?*$)/i,
+//     ];
+    
+//     for (const pattern of followUpPatterns) {
+//         const match = normalized.match(pattern);
+//         const candidate = sanitizeLocationCandidate(match?.[1]);
+//         if (candidate) {
+//             console.log("Found location from follow-up pattern:", candidate);
+//             return candidate;
+//         }
+//     }
+    
+//     // Existing patterns
+//     const patterns = [
+//         /\b(?:in|at|for|near|around)\s+([a-z][a-z\s.'-]*?)(?=(?:\s+\b(?:right now|now|today|tomorrow|currently|this|next|please|give|show|plot|chart|graph|draw)\b|[?.!,]|$))/i,
+//         /\b(?:weather|forecast|air quality|aod|pollution)\s+(?:in|for)\s+([a-z][a-z\s.'-]*?)(?=(?:\s+\b(?:right now|now|today|tomorrow|currently|this|next)\b|[?.!,]|$))/i,
+//     ];
+
+//     for (const pattern of patterns) {
+//         const match = normalized.match(pattern);
+//         const candidate = sanitizeLocationCandidate(match?.[1]);
+//         if (candidate) return candidate;
+//     }
+
+//     // ✅ ADD: If query is just a location name (like "Mumbai?" or "Delhi?")
+//     const simpleLocationPattern = /^([a-z][a-z\s.'-]*?)\s*\?*$/i;
+//     const simpleMatch = normalized.match(simpleLocationPattern);
+//     const simpleCandidate = sanitizeLocationCandidate(simpleMatch?.[1]);
+//     if (simpleCandidate && simpleCandidate.length > 2) {
+//         console.log("Found location from simple pattern:", simpleCandidate);
+//         return simpleCandidate;
+//     }
+
+//     return null;
+// }
 
 // ── CHAT WITH TRIPLE FALLBACK ──────────────────────────────────
 async function chatWithFallback(messages) {
