@@ -872,7 +872,7 @@ async function chatWithFallback(messages) {
                 "Content-Type": "application/json"
             },
             body: JSON.stringify({
-                model: "compound-mini",
+                model: "groq/compound-mini",
                 messages: messages,
                 temperature: 1,
                 stream: false
