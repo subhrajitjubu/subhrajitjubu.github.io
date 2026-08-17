@@ -1,11 +1,13 @@
-<!-- <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Weather Forecast</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Weather Card | Direct Weather from API</title>
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         :root {
             --neon-blue: #00f3ff;
@@ -13,14 +15,20 @@
             --dark-bg: #0a0a0f;
         }
 
-        body {
+        * {
             margin: 0;
-            font-family: 'Segoe UI', system-ui, sans-serif;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, 'Inter', sans-serif;
             background: linear-gradient(-45deg, #00172e, #0a0a0f, #17001f);
             background-size: 400% 400%;
             animation: gradientBG 15s ease infinite;
             color: white;
             min-height: 100vh;
+            overflow-x: hidden;
         }
 
         @keyframes gradientBG {
@@ -29,723 +37,34 @@
             100% { background-position: 0% 50%; }
         }
 
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 2rem;
-            backdrop-filter: blur(10px);
-        }
-
-        .input-section {
-            display: grid;
-            gap: 1.5rem;
-            margin-bottom: 3rem;
-            background: rgba(10, 10, 15, 0.8);
-            padding: 2rem;
-            border-radius: 15px;
-            border: 1px solid var(--neon-blue);
-            box-shadow: 0 0 20px rgba(0, 243, 255, 0.2);
-        }
-
-        .input-group {
-            display: flex;
-            gap: 1rem;
-            position: relative;
-        }
-
-        input {
-            flex: 1;
-            padding: 1rem;
-            background: rgba(255, 255, 255, 0.1);
-            border: 1px solid var(--neon-blue);
-            border-radius: 8px;
-            color: white;
-            font-size: 1rem;
-            transition: all 0.3s ease;
-        }
-
-        input:focus {
-            outline: none;
-            border-color: var(--neon-purple);
-            box-shadow: 0 0 15px rgba(188, 19, 254, 0.3);
-        }
-
-        button {
-            padding: 1rem 2rem;
-            background: linear-gradient(45deg, var(--neon-blue), var(--neon-purple));
-            border: none;
-            border-radius: 8px;
-            color: white;
-            cursor: pointer;
-            font-weight: bold;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            transition: all 0.3s ease;
-            position: relative;
-            overflow: hidden;
-        }
-
-        button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 20px rgba(188, 19, 254, 0.4);
-        }
-
-        .weather-cards {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-            gap: 1.5rem;
-            margin-top: 2rem;
-        }
-
-        .weather-card {
-            background: rgba(255, 255, 255, 0.05);
-            padding: 1.5rem;
-            border-radius: 12px;
-            border: 1px solid rgba(0, 243, 255, 0.3);
-            transition: all 0.3s ease;
-            backdrop-filter: blur(5px);
-        }
-
-        .weather-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 25px rgba(0, 243, 255, 0.2);
-        }
-
-        .chart-container {
-            background: rgba(255, 255, 255, 0.05);
-            padding: 20px;
-            border-radius: 10px;
-            height: 400px;
-            margin-top: 2rem;
-        }
-
-        .location-info {
-            background: rgba(255, 255, 255, 0.05);
-            padding: 1rem;
-            border-radius: 8px;
-            margin-bottom: 2rem;
-            border: 1px solid var(--neon-purple);
-        }
-
-        .location-info h2 {
-            margin: 0 0 0.5rem 0;
-            color: var(--neon-blue);
-        }
-
-        .suggestions-dropdown {
-            position: absolute;
-            top: 100%;
-            left: 0;
-            right: 0;
-            background: rgba(10, 10, 15, 0.9);
-            border: 1px solid var(--neon-blue);
-            border-radius: 8px;
-            max-height: 200px;
-            overflow-y: auto;
-            z-index: 1000;
-            margin-top: 0.5rem;
-            display: none;
-        }
-
-        .suggestions-dropdown div {
-            padding: 0.75rem;
-            cursor: pointer;
-            color: white;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-            transition: background 0.3s ease;
-        }
-
-        .suggestions-dropdown div:hover {
-            background: rgba(255, 255, 255, 0.1);
-        }
-
-        .suggestions-dropdown div:last-child {
-            border-bottom: none;
-        }
-
-        @media (max-width: 768px) {
-            .input-group {
-                flex-direction: column;
-            }
-
-            button {
-                width: 100%;
-            }
-        }
-        nav {
-            text-align: center;
-            padding: 1rem 0;
-            background: #4a5568;
-            position: sticky;
-            top: 0;
-            z-index: 10;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-        }
-
-        nav a {
-            color: #63b3ed;
-            margin: 0 1.2rem;
-            text-decoration: none;
-            font-weight: 500;
-            transition: color 0.3s ease;
-        }
-
-        nav a:hover {
-            color: #fff;
-        }
-
-        .container {
-            width: 80%;
-            max-width: 900px;
-            margin: 2rem auto;
-            padding: 2rem;
-            position: relative;
-        }
-
-        h1 {
-            text-align: center;
-            color: #2b6cb0;
-            font-family: 'Times New Roman', Times, serif;
-            font-size: 2.5rem;
-            margin-bottom: 2rem;
-        }
-
-        .timeline {
-            position: relative;
-        }
-
-        .timeline::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            bottom: 0;
-            width: 2px;
-            background: #4299e1;
-            left: 50%;
-            transform: translateX(-50%);
-        }
-
-        .timeline-item {
-            display: flex;
-            align-items: center;
-            margin: 2rem 0;
-            position: relative;
-        }
-
-        .timeline-item:nth-child(odd) {
-            flex-direction: row;
-        }
-
-        .timeline-item:nth-child(even) {
-            flex-direction: row-reverse;
-        }
-
-        .timeline-content {
-            width: 45%;
-            position: relative;
-            background: none; /* Remove background from container to avoid white marks */
-        }
-
-        .timeline-marker {
-            position: absolute;
-            left: 50%;
-            transform: translateX(-50%);
-            background: #4299e1;
-            width: 20px;
-            height: 20px;
-            border-radius: 50%;
-            z-index: 1;
-        }
-
-        .timeline-item:nth-child(odd) .timeline-content {
-            margin-right: 50px;
-        }
-
-        .timeline-item:nth-child(even) .timeline-content {
-            margin-left: 50px;
-        }
-
-        .position-label {
-            display: block;
-            background: #fff;
-            padding: 0.8rem 1rem; /* Reduced padding to minimize extra space */
-            border-radius: 6px;
-            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
-            cursor: pointer;
-            transition: background 0.3s ease;
-            margin: 0; /* Remove default margins */
-        }
-
-        .position-label:hover {
-            background: #edf2f7;
-        }
-
-        h2 {
-            color: #0056b3;
-            font-family: 'Times New Roman', Times, serif;
-            font-size: 1.4rem; /* Slightly smaller for compactness */
-            margin: 0; /* Remove default margins */
-        }
-
-        /* Hide checkbox */
-        .toggle-details {
-            display: none;
-        }
-
-        .details {
-            display: none;
-            background: #fff;
-            padding: 1.5rem;
-            border-radius: 8px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
-            margin-top: 0.5rem;
-        }
-
-        .toggle-details:checked ~ .details {
-            display: block;
-        }
-
-        p {
-            font-family: 'Times New Roman', Times, serif;
-            font-size: 1rem;
-            color: #4a5568;
-        }
-
-        h3 {
-            color: #4c30ca;
-            font-family: 'Times New Roman', Times, serif;
-            font-size: 1.2rem;
-            margin-top: 1rem;
-        }
-
-        h4 {
-            font-family: 'Times New Roman', Times, serif;
-            font-size: 1.1rem;
-            color: #2d3748;
-            margin-top: 0.5rem;
-        }
-
-        ul {
-            list-style-type: none;
-            padding: 0;
-            margin-left: 20px;
-        }
-
-        li {
-            margin-bottom: 0.5rem;
-            position: relative;
-        }
-
-        li:before {
-            content: '•';
-            color: #4299e1;
-            position: absolute;
-            left: -15px;
-        }
-
-        .dropdown {
-            display: inline-flex;
-            position: relative;
-        }
-
-        .dropbtn {
-            padding: 14px 16px;
-            color: #63b3ed;
-            text-decoration: none;
-            font-weight: 500;
-            transition: color 0.3s ease;
-        }
-
-        .dropdown-content {
-            display: none;
-            position: absolute;
-            top: 100%;
-            background-color: #fff;
-            min-width: 160px;
-            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
-            border-radius: 8px;
-            z-index: 1;
-        }
-
-        .dropdown-content a {
-            color: #1461e6;
-            padding: 10px 16px;
-            text-decoration: none;
-            display: block;
-            transition: background-color 0.3s ease;
-        }
-
-        .dropdown-content a:hover {
-            background-color: #c2192765;
-        }
-
-        .dropdown:hover .dropdown-content {
-            display: block;
-        }
-
-        .dropdown:hover .dropbtn {
-            color: #fff;
-        }
-
-        footer {  text-align: center; padding: 1.5rem 0; position: fixed; bottom: 0; left: 0; right: 0; }
-
-
-        h5 {
-            color: #309bb6;
-            font-family: 'Times New Roman', Times, serif;
-            font-size: 1.1rem; /* Slightly smaller for compactness */
-            margin: 0; /* Remove default margins */
-        }
-        @media (max-width: 768px) {
-            .timeline::before {
-                left: 20px;
-            }
-            .timeline-item {
-                flex-direction: column;
-            }
-            .timeline-content {
-                width: 100%;
-                margin: 1rem 0;
-            }
-            .timeline-marker {
-                left: 20px;
-            }
-        }
-    </style>
-</head>
-<body>
-    <nav>
-        <a href="index.html">Home</a>
-        <a href="education.html">Education</a>
-        <a href="experience.html">Skills</a>
-        <a href="publications.html">Publications</a>
-        <a href="contact.html">Contact</a>
-        <a href="nwp_imd.html">NWP_IMD</a>
-        <div class="dropdown">
-            <a href="#" class="dropbtn">Weather forecast</a>
-            <div class="dropdown-content">
-                <a href="sw.html">Weather Card</a>
-                <a href="src/weatherchart.html">Weather Chart</a>
-                <a href="srcc/geomap_multiple.html">Weather GeoHEATMap</a>    
-                <a href="AQI.html">AQI HEATMap</a>    
-                <a href="Weather_web.html">Weather websites</a>    
-                <a href="meteogram.html">Meteogram_ others</a>    
-
-
-            </div>
-        </div>
-        <div class="dropdown">
-            <a href="#" class="dropbtn">Satellite view</a>
-            <div class="dropdown-content">
-                <a href="../mosdac_live.html">Mosdac/ISRO</a>
-                <a href="../gibs.html">GIBS/NASA</a>
-                   
-
-            </div>
-        </div>
-        <div class="dropdown">
-            <a href="#" class="dropbtn">Climatic info.</a>
-            <div class="dropdown-content">
-                <a href="climate\monavg/chloro.html">Monthly statistic</a>
-                <a href="climate/Dailyavg/chloro.html">Daily average</a>    
-            </div>
-        </div>
-        <div class="dropdown">
-            <a href="#" class="dropbtn">Jobs</a>
-            <div class="dropdown-content">
-                <a href="Jobs.html" target="_blank">MET Jobs</a>
-                <a href="https://www.21centuryweather.org.au/about-us/positions-vacant/" target="_blank">21st cent AUS MET Jobs</a>
-                <a href="https://www.tropmet.res.in/Careers" target="_blank">IITM Career</a>
-                <a href="https://vacancies.incois.gov.in/" target="_blank">INCOIS Career</a>
-                <a href="https://www.niot.res.in/recruitment_details.php/" target="_blank">NIOT Career</a>
-                <a href="j1.html" target="_blank">Others</a>
-
-            </div>
-        </div>
-        <a href="movies.html">Movies</a>
-        <a href="series.html">Series</a>
-    </nav>
-    
-
-    <div class="container">
-        <div class="input-section">
-            <div class="input-group">
-                <input type="text" id="location" placeholder="Enter city or address" oninput="fetchLocationSuggestions()">
-                <button onclick="getLocationWeather()"><i class="fas fa-search-location"></i> Search</button>
-                <div id="suggestions" class="suggestions-dropdown"></div>
-            </div>
-            <div class="input-group">
-                <input type="number" id="latitude" step="any" placeholder="Latitude">
-                <input type="number" id="longitude" step="any" placeholder="Longitude">
-                <button onclick="getCoordWeather()"><i class="fas fa-map-marker-alt"></i> Use Coordinates</button>
-            </div>
-        </div>
-
-        <div id="weather-display"></div>
-        <div class="chart-container">
-            <canvas id="weatherChart"></canvas>
-        </div>
-    </div>
-
-    <script>
-        let weatherChart = null;
-        const CORS_PROXY = "https://api.allorigins.win/get?url=";
-
-        async function getLocationWeather() {
-            const location = document.getElementById('location').value;
-            if (!location) return alert('Please enter a location');
-
-            try {
-                const response = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(location)}`);
-                const data = await response.json();
-                if (data.length === 0) return alert('Location not found');
-
-                const { lat, lon, display_name } = data[0];
-                document.getElementById('latitude').value = lat;
-                document.getElementById('longitude').value = lon;
-
-                fetchWeather(lat, lon, display_name);
-            } catch (error) {
-                alert('Error fetching location coordinates');
-            }
-        }
-
-        async function getCoordWeather() {
-            const lat = document.getElementById('latitude').value;
-            const lon = document.getElementById('longitude').value;
-            if (!lat || !lon) return alert('Please enter coordinates');
-
-            try {
-                const response = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}`);
-                const data = await response.json();
-                fetchWeather(lat, lon, data.display_name);
-            } catch (error) {
-                fetchWeather(lat, lon, `Custom Location (${lat}, ${lon})`);
-            }
-        }
-
-        function convertUTCtoIST(utcDate) {
-            const date = new Date(utcDate);
-            return new Date(date.getTime() + (5.5 * 60 * 60 * 1000));
-        }
-
-        async function fetchWeather(lat, lon, locationName) {
-            try {
-                const apiUrl = `https://sweatherapi.vercel.app/timeseries?lat=${lat}&lon=${lon}`;
-                const response = await fetch(encodeURIComponent(apiUrl));
-                const data = await response.json();
-                const weatherData = JSON.parse(data.contents);
-
-                displayWeather(weatherData, lat, lon, locationName);
-                updateChart(weatherData);
-            } catch (error) {
-                alert('Error fetching weather data');
-            }
-        }
-
-        function displayWeather(data, lat, lon, locationName) {
-            const container = document.getElementById('weather-display');
-            container.innerHTML = `
-                <div class="location-info">
-                    <h2>${locationName}</h2>
-                    <p>Coordinates: ${Number(lat).toFixed(4)}°N, ${Number(lon).toFixed(4)}°E</p>
-                </div>
-                <div class="weather-cards">
-                    ${data.timeseries.map(entry => {
-                        const istDate = convertUTCtoIST(entry.time);
-                        return `
-                        <div class="weather-card">
-                            <h3>${istDate.toLocaleString('en-IN', {
-                                timeZone: 'Asia/Kolkata',
-                                weekday: 'short',
-                                day: 'numeric',
-                                month: 'short',
-                                hour: '2-digit',
-                                minute: '2-digit'
-                            })}</h3>
-                            <p><i class="fas fa-thermometer-half"></i> ${(entry.temperature - 273.15).toFixed(1)}°C</p>
-                            <p><i class="fas fa-cloud-rain"></i> ${entry.rainfall} mm</p>
-                        </div>
-                        `}).join('')}
-                </div>
-            `;
-        }
-
-        function updateChart(data) {
-            const ctx = document.getElementById('weatherChart').getContext('2d');
-            if (weatherChart) weatherChart.destroy();
-
-            weatherChart = new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: data.timeseries.map(entry => {
-                        const istDate = convertUTCtoIST(entry.time);
-                        return istDate.toLocaleString('en-IN', {
-                            timeZone: 'Asia/Kolkata',
-                            month: 'short',
-                            day: 'numeric',
-                            hour: '2-digit'
-                        });
-                    }),
-                    datasets: [
-                        {
-                            label: 'Temperature (°C)',
-                            data: data.timeseries.map(entry => (entry.temperature - 273.15).toFixed(1)),
-                            borderColor: '#2196F3',
-                            tension: 0.4,
-                            yAxisID: 'y'
-                        },
-                        {
-                            label: 'Rainfall (mm)',
-                            data: data.timeseries.map(entry => entry.rainfall.toFixed(2)), 
-                            backgroundColor: '#607D8B55',
-                            borderColor: '#607D8B',
-                            tension: 0.4,
-                            type: 'bar',
-                            yAxisID: 'y1'
-                        }
-                    ]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    scales: {
-                        y: {
-                            type: 'linear',
-                            display: true,
-                            position: 'left',
-                            title: {
-                                display: true,
-                                text: 'Temperature (°C)'
-                            }
-                        },
-                        y1: {
-                            type: 'linear',
-                            display: true,
-                            position: 'right',
-                            title: {
-                                display: true,
-                                text: 'Rainfall (mm)'
-                            },
-                            grid: {
-                                drawOnChartArea: false
-                            }
-                        }
-                    }
-                }
-            });
-        }
-
-        let timeoutId;
-
-        async function fetchLocationSuggestions() {
-            const locationInput = document.getElementById('location').value;
-            const suggestionsContainer = document.getElementById('suggestions');
-
-            if (!locationInput) {
-                suggestionsContainer.style.display = 'none';
-                return;
-            }
-
-            clearTimeout(timeoutId);
-            timeoutId = setTimeout(async () => {
-                try {
-                    const response = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(locationInput)}&limit=5`);
-                    const data = await response.json();
-
-                    if (data.length > 0) {
-                        suggestionsContainer.innerHTML = data.map(item => `
-                            <div onclick="selectSuggestion('${item.lat}', '${item.lon}', '${item.display_name.replace(/'/g, "\\'")}')">
-                                ${item.display_name}
-                            </div>
-                        `).join('');
-                        suggestionsContainer.style.display = 'block';
-                    } else {
-                        suggestionsContainer.style.display = 'none';
-                    }
-                } catch (error) {
-                    console.error('Error fetching suggestions:', error);
-                    suggestionsContainer.style.display = 'none';
-                }
-            }, 300);
-        }
-
-        function selectSuggestion(lat, lon, displayName) {
-            document.getElementById('latitude').value = lat;
-            document.getElementById('longitude').value = lon;
-            document.getElementById('location').value = displayName;
-            document.getElementById('suggestions').style.display = 'none';
-            fetchWeather(lat, lon, displayName);
-        }
-    </script>
-</body>
-</html> -->
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>Weater Card| Direct Weather from API</title>
-    <link rel="preconnect" href="https://cdnjs.cloudflare.com">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <style>
-        /* CRITICAL CSS - minimal & fast */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        :root {
-            --neon-cyan: #00f7ff;
-            --neon-magenta: #e100ff;
-        }
-
-        body {
-            font-family: 'Segoe UI', system-ui, -apple-system, 'Inter', sans-serif;
-            background: radial-gradient(circle at 10% 20%, #0a0f2a, #020617);
-            color: #f0f9ff;
-            min-height: 100vh;
-            overflow-x: hidden;
-        }
-
-        body::before {
-            content: "";
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-image: radial-gradient(2px 2px at 25% 40%, rgba(255,255,240,0.08) 1px, transparent 1px);
-            background-size: 48px 48px;
-            pointer-events: none;
-            z-index: 0;
-        }
-
         .glass-nav {
-            background: rgba(8, 18, 32, 0.85);
+            background: rgba(10, 10, 15, 0.85);
             backdrop-filter: blur(12px);
-            border-bottom: 1px solid rgba(0, 247, 255, 0.3);
+            border-bottom: 1px solid var(--neon-blue);
             position: sticky;
             top: 0;
             z-index: 100;
-            padding: 0.6rem 1rem;
+            padding: 0.8rem 1rem;
             display: flex;
             flex-wrap: wrap;
             justify-content: center;
             gap: 0.3rem 0.8rem;
+            box-shadow: 0 0 20px rgba(0, 243, 255, 0.1);
         }
 
         .glass-nav a, .glass-nav .dropbtn {
-            color: #caf0ff;
+            color: #63b3ed;
             text-decoration: none;
             font-weight: 500;
-            font-size: 0.8rem;
-            padding: 0.3rem 0.2rem;
-            transition: 0.2s;
+            font-size: 0.85rem;
+            padding: 0.4rem 0.3rem;
+            transition: 0.3s ease;
             cursor: pointer;
+        }
+
+        .glass-nav a:hover, .glass-nav .dropbtn:hover {
+            color: #fff;
+            text-shadow: 0 0 10px rgba(0, 243, 255, 0.3);
         }
 
         .dropdown {
@@ -756,12 +75,13 @@
         .dropdown-content {
             display: none;
             position: absolute;
-            background: rgba(10, 20, 35, 0.98);
+            background: rgba(10, 10, 15, 0.98);
             backdrop-filter: blur(12px);
-            min-width: 160px;
-            top: 26px;
+            min-width: 180px;
+            top: 28px;
             border-radius: 12px;
-            border: 1px solid var(--neon-cyan);
+            border: 1px solid var(--neon-blue);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.5);
             z-index: 200;
         }
 
@@ -769,39 +89,59 @@
             display: block;
         }
 
+        .dropdown-content a {
+            color: #63b3ed;
+            padding: 0.6rem 1.2rem;
+            display: block;
+            font-size: 0.8rem;
+            text-decoration: none;
+            border-bottom: 1px solid rgba(0, 243, 255, 0.05);
+            transition: 0.3s ease;
+        }
+
+        .dropdown-content a:hover {
+            background: rgba(188, 19, 254, 0.15);
+            color: #fff;
+        }
+
+        .dropdown-content a:last-child {
+            border-bottom: none;
+        }
+
         .container {
             max-width: 1400px;
             margin: 0 auto;
-            padding: 1rem 1rem 2.5rem;
+            padding: 1.5rem 1.5rem 2.5rem;
             position: relative;
             z-index: 2;
         }
 
         .hero-panel {
-            background: rgba(8, 18, 32, 0.6);
+            background: rgba(10, 10, 15, 0.8);
             backdrop-filter: blur(10px);
-            border-radius: 32px;
-            border: 1px solid rgba(0, 247, 255, 0.3);
-            padding: 1.2rem 1.5rem;
+            border-radius: 15px;
+            border: 1px solid var(--neon-blue);
+            padding: 1.5rem 2rem;
             margin-bottom: 1.5rem;
+            box-shadow: 0 0 20px rgba(0, 243, 255, 0.2);
         }
 
         .input-grid {
             display: flex;
             flex-wrap: wrap;
-            gap: 0.8rem;
+            gap: 1rem;
             align-items: flex-end;
         }
 
         .input-field {
             flex: 2;
-            min-width: 180px;
+            min-width: 200px;
             position: relative;
         }
 
         .coord-field {
             flex: 1;
-            min-width: 130px;
+            min-width: 140px;
         }
 
         .input-field label, .coord-field label {
@@ -809,37 +149,43 @@
             font-size: 0.7rem;
             text-transform: uppercase;
             letter-spacing: 1px;
-            margin-bottom: 0.3rem;
-            color: var(--neon-cyan);
+            margin-bottom: 0.4rem;
+            color: var(--neon-blue);
             font-weight: 600;
         }
 
         input {
             width: 100%;
-            padding: 0.7rem 1rem;
-            background: rgba(0, 10, 25, 0.7);
-            border: 1px solid rgba(0, 247, 255, 0.4);
-            border-radius: 40px;
+            padding: 0.8rem 1.2rem;
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid var(--neon-blue);
+            border-radius: 8px;
             color: white;
-            font-size: 0.9rem;
-            transition: 0.2s;
+            font-size: 0.95rem;
+            transition: 0.3s ease;
         }
 
         input:focus {
             outline: none;
-            border-color: var(--neon-magenta);
-            box-shadow: 0 0 12px rgba(225, 0, 255, 0.3);
+            border-color: var(--neon-purple);
+            box-shadow: 0 0 15px rgba(188, 19, 254, 0.3);
+        }
+
+        input::placeholder {
+            color: rgba(255, 255, 255, 0.4);
         }
 
         button {
-            background: linear-gradient(135deg, #00c6ff, #0072ff);
+            background: linear-gradient(45deg, var(--neon-blue), var(--neon-purple));
             border: none;
-            border-radius: 40px;
-            padding: 0.7rem 1.5rem;
+            border-radius: 8px;
+            padding: 0.8rem 1.8rem;
             color: white;
             font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
             cursor: pointer;
-            transition: 0.2s;
+            transition: 0.3s ease;
             display: inline-flex;
             align-items: center;
             gap: 8px;
@@ -848,63 +194,60 @@
 
         button:hover {
             transform: translateY(-2px);
-            background: linear-gradient(135deg, #00e0ff, #805aff);
+            box-shadow: 0 5px 20px rgba(188, 19, 254, 0.4);
         }
 
-        /* LCP optimized location badge */
         .location-badge {
-            background: rgba(0, 20, 40, 0.75);
+            background: rgba(255, 255, 255, 0.05);
             backdrop-filter: blur(8px);
-            border-radius: 40px;
+            border-radius: 8px;
+            border: 1px solid var(--neon-purple);
             display: inline-flex;
             align-items: center;
-            gap: 10px;
-            padding: 0.5rem 1.2rem;
-            margin-bottom: 1.2rem;
-            border-left: 3px solid var(--neon-cyan);
+            gap: 12px;
+            padding: 0.7rem 1.5rem;
+            margin-bottom: 1.5rem;
         }
 
         .location-badge h2 {
             margin: 0;
             font-weight: 600;
-            font-size: 1.3rem;
-            background: linear-gradient(135deg, #fff, #aaffff);
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
+            font-size: 1.4rem;
+            color: var(--neon-blue);
         }
 
         .coord-text {
             font-size: 0.75rem;
             font-family: monospace;
-            color: #aad0ff;
+            color: rgba(255, 255, 255, 0.6);
         }
 
         .weather-cards {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-            gap: 1rem;
+            gap: 1.2rem;
             margin-top: 1rem;
         }
 
         .weather-card {
-            background: rgba(12, 22, 38, 0.7);
-            backdrop-filter: blur(8px);
-            border-radius: 24px;
-            padding: 1rem 1.2rem;
-            border: 1px solid rgba(0, 247, 255, 0.2);
-            transition: transform 0.2s ease;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(5px);
+            border-radius: 12px;
+            padding: 1.2rem 1.4rem;
+            border: 1px solid rgba(0, 243, 255, 0.3);
+            transition: 0.3s ease;
         }
 
         .weather-card:hover {
-            transform: translateY(-4px);
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 243, 255, 0.2);
         }
 
         .weather-card h3 {
-            font-size: 0.95rem;
+            font-size: 0.9rem;
             margin-bottom: 0.8rem;
-            color: var(--neon-cyan);
-            border-left: 3px solid cyan;
+            color: var(--neon-blue);
+            border-left: 3px solid var(--neon-blue);
             padding-left: 10px;
         }
 
@@ -913,31 +256,28 @@
             align-items: center;
             gap: 10px;
             margin: 8px 0;
-            font-size: 0.9rem;
+            font-size: 0.95rem;
         }
 
         .weather-detail i {
             width: 28px;
             font-size: 1.2rem;
-            color: #80f0ff;
+            color: var(--neon-blue);
         }
 
         .temp-value {
-            font-size: 1.4rem;
+            font-size: 1.6rem;
             font-weight: 700;
-            background: linear-gradient(145deg, #fff, #9ad8ff);
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
+            color: white;
         }
 
         .extra-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 8px;
+            gap: 6px;
             margin-top: 10px;
-            padding-top: 8px;
-            border-top: 1px solid rgba(0,247,255,0.15);
+            padding-top: 10px;
+            border-top: 1px solid rgba(0, 243, 255, 0.15);
         }
 
         .extra-item {
@@ -945,15 +285,48 @@
             display: flex;
             align-items: center;
             gap: 6px;
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .extra-item i {
+            color: var(--neon-blue);
+            width: 16px;
         }
 
         .chart-wrapper {
-            background: rgba(8, 18, 32, 0.5);
-            backdrop-filter: blur(8px);
-            border-radius: 28px;
-            padding: 1rem;
-            margin-top: 1.5rem;
-            border: 1px solid rgba(0, 255, 255, 0.2);
+            background: rgba(255, 255, 255, 0.05);
+            padding: 1.5rem;
+            border-radius: 10px;
+            margin-top: 2rem;
+            border: 1px solid rgba(0, 243, 255, 0.2);
+        }
+
+        .chart-wrapper h3 {
+            color: var(--neon-blue);
+            font-size: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .chart-legend {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1.2rem;
+            margin-bottom: 1rem;
+            font-size: 0.75rem;
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .chart-legend span {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .legend-dot {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
         }
 
         .suggestions-dropdown {
@@ -961,10 +334,10 @@
             top: 100%;
             left: 0;
             right: 0;
-            background: rgba(10, 20, 35, 0.98);
+            background: rgba(10, 10, 15, 0.95);
             backdrop-filter: blur(12px);
-            border-radius: 20px;
-            border: 1px solid var(--neon-cyan);
+            border: 1px solid var(--neon-blue);
+            border-radius: 8px;
             max-height: 200px;
             overflow-y: auto;
             z-index: 99;
@@ -973,22 +346,26 @@
         }
 
         .suggestions-dropdown div {
-            padding: 0.6rem 1rem;
+            padding: 0.7rem 1rem;
             cursor: pointer;
-            font-size: 0.85rem;
-            border-bottom: 1px solid rgba(0,247,255,0.1);
+            color: white;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            transition: 0.3s ease;
         }
 
         .suggestions-dropdown div:hover {
-            background: rgba(0, 247, 255, 0.15);
+            background: rgba(0, 243, 255, 0.1);
         }
 
-        /* Skeleton loader for better perceived performance */
+        .suggestions-dropdown div:last-child {
+            border-bottom: none;
+        }
+
         .skeleton-badge {
             width: 280px;
             height: 60px;
             background: rgba(255, 255, 255, 0.05);
-            border-radius: 40px;
+            border-radius: 8px;
             margin-bottom: 1.2rem;
             animation: pulse 1.5s ease-in-out infinite;
         }
@@ -996,13 +373,13 @@
         .skeleton-cards {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-            gap: 1rem;
+            gap: 1.2rem;
             margin-top: 1rem;
         }
 
         .skeleton-card {
             background: rgba(255, 255, 255, 0.05);
-            border-radius: 24px;
+            border-radius: 12px;
             padding: 1rem;
             height: 150px;
             animation: pulse 1.5s ease-in-out infinite;
@@ -1010,57 +387,78 @@
 
         @keyframes pulse {
             0%, 100% { opacity: 0.4; }
-            50% { opacity: 0.7; }
+            50% { opacity: 0.8; }
         }
 
         .footer-note {
             text-align: center;
             margin-top: 2rem;
-            font-size: 0.7rem;
-            opacity: 0.6;
+            font-size: 0.75rem;
+            color: rgba(255, 255, 255, 0.4);
         }
 
         .hidden {
             display: none;
         }
 
-        @media (max-width: 780px) {
+        @media (max-width: 768px) {
             .container { padding: 0.8rem; }
             .hero-panel { padding: 1rem; }
             .input-grid { flex-direction: column; }
             button { width: 100%; justify-content: center; }
-            .location-badge h2 { font-size: 1.1rem; }
+            .location-badge { flex-direction: column; text-align: center; }
+            .location-badge h2 { font-size: 1.2rem; }
+            .chart-legend { gap: 0.6rem; font-size: 0.65rem; }
         }
     </style>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js" defer></script>
 </head>
 <body>
     <nav class="glass-nav">
-        <a href="#">Home</a>
-        <a href="#">Education</a>
-        <a href="#">Skills</a>
-        <a href="#">Publications</a>
-        <a href="#">Contact</a>
-        <a href="#">NWP_IMD</a>
+        <a href="index.html">Home</a>
+        <a href="education.html">Education</a>
+        <a href="experience.html">Skills</a>
+        <a href="publications.html">Publications</a>
+        <a href="contact.html">Contact</a>
+        <a href="nwp_imd.html">NWP_IMD</a>
         <div class="dropdown">
-            <span class="dropbtn">Weather ▼</span>
+            <span class="dropbtn">Weather forecast <i class="fas fa-chevron-down" style="font-size:0.6rem;"></i></span>
             <div class="dropdown-content">
-                <a href="#">Weather Card</a><a href="#">Weather Chart</a><a href="#">GeoHEATMap</a><a href="#">AQI</a>
+                <a href="sw.html">Weather Card</a>
+                <a href="src/weatherchart.html">Weather Chart</a>
+                <a href="srcc/geomap_multiple.html">Weather GeoHEATMap</a>
+                <a href="AQI.html">AQI HEATMap</a>
+                <a href="Weather_web.html">Weather websites</a>
+                <a href="meteogram.html">Meteogram_ others</a>
             </div>
         </div>
         <div class="dropdown">
-            <span class="dropbtn">Satellite ▼</span>
-            <div class="dropdown-content"><a href="#">Mosdac/ISRO</a><a href="#">GIBS/NASA</a></div>
+            <span class="dropbtn">Satellite view <i class="fas fa-chevron-down" style="font-size:0.6rem;"></i></span>
+            <div class="dropdown-content">
+                <a href="mosdac_live.html">Mosdac/ISRO</a>
+                <a href="gibs.html">GIBS/NASA</a>
+            </div>
         </div>
         <div class="dropdown">
-            <span class="dropbtn">Climate ▼</span>
-            <div class="dropdown-content"><a href="#">Monthly</a><a href="#">Daily avg</a></div>
+            <span class="dropbtn">Climatic info. <i class="fas fa-chevron-down" style="font-size:0.6rem;"></i></span>
+            <div class="dropdown-content">
+                <a href="climate/monavg/chloro.html">Monthly statistic</a>
+                <a href="climate/Dailyavg/chloro.html">Daily average</a>
+            </div>
         </div>
         <div class="dropdown">
-            <span class="dropbtn">Jobs ▼</span>
-            <div class="dropdown-content"><a href="#">MET Jobs</a><a href="#">IITM</a><a href="#">INCOIS</a></div>
+            <span class="dropbtn">Jobs <i class="fas fa-chevron-down" style="font-size:0.6rem;"></i></span>
+            <div class="dropdown-content">
+                <a href="Jobs.html" target="_blank">MET Jobs</a>
+                <a href="https://www.21centuryweather.org.au/about-us/positions-vacant/" target="_blank">21st cent AUS MET Jobs</a>
+                <a href="https://www.tropmet.res.in/Careers" target="_blank">IITM Career</a>
+                <a href="https://vacancies.incois.gov.in/" target="_blank">INCOIS Career</a>
+                <a href="https://www.niot.res.in/recruitment_details.php/" target="_blank">NIOT Career</a>
+                <a href="j1.html" target="_blank">Others</a>
+            </div>
         </div>
-        <a href="#">Movies</a><a href="#">Series</a>
+        <a href="movies.html">Movies</a>
+        <a href="series.html">Series</a>
     </nav>
 
     <div class="container">
@@ -1068,12 +466,12 @@
             <div class="input-grid">
                 <div class="input-field">
                     <label><i class="fas fa-city"></i> CITY / LOCATION</label>
-                    <input type="text" id="location" placeholder="e.g., Bhubaneswar, London" oninput="fetchLocationSuggestions()" autocomplete="off">
+                    <input type="text" id="location" placeholder="Enter city or address" oninput="fetchLocationSuggestions()" autocomplete="off">
                     <div id="suggestions" class="suggestions-dropdown"></div>
                 </div>
                 <button onclick="getLocationWeather()"><i class="fas fa-search-location"></i> SEARCH</button>
             </div>
-            <div style="display: flex; flex-wrap: wrap; gap: 0.8rem; margin-top: 1rem;">
+            <div style="display: flex; flex-wrap: wrap; gap: 1rem; margin-top: 1.2rem;">
                 <div class="coord-field">
                     <label><i class="fas fa-latitude"></i> LATITUDE</label>
                     <input type="number" step="any" id="latitude" placeholder="e.g. 20.5">
@@ -1089,14 +487,21 @@
         <div id="weather-display">
             <div class="skeleton-badge"></div>
             <div class="skeleton-cards">
-                <div class="skeleton-card"></div><div class="skeleton-card"></div><div class="skeleton-card"></div>
+                <div class="skeleton-card"></div>
+                <div class="skeleton-card"></div>
+                <div class="skeleton-card"></div>
             </div>
         </div>
 
         <div class="chart-wrapper hidden" id="chartSection">
-            <div style="display: flex; justify-content: space-between; margin-bottom: 0.8rem;">
-                <h3 style="font-size:1rem;"><i class="fas fa-chart-line"></i> FORECAST TREND</h3>
-                <span style="font-size:0.7rem;">🌡️ Temp | 💧 Dew | ☁️ Cloud</span>
+            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem;">
+                <h3><i class="fas fa-chart-line"></i> WEATHER TREND</h3>
+                <div class="chart-legend">
+                    <span><span class="legend-dot" style="background: #00f3ff;"></span> Temp (°C)</span>
+                    <span><span class="legend-dot" style="background: #bc13fe;"></span> Dew Point (°C)</span>
+                    <span><span class="legend-dot" style="background: #ff6b6b;"></span> Cloud Cover (%)</span>
+                    <span><span class="legend-dot" style="background: #ffd93d;"></span> Rainfall (mm)</span>
+                </div>
             </div>
             <canvas id="weatherChart"></canvas>
         </div>
@@ -1106,7 +511,6 @@
     </div>
 
     <script>
-        // NO PROXY - Direct API calls only
         let weatherChart = null;
 
         function kelvinToC(k) { return (k - 273.15).toFixed(1); }
@@ -1123,12 +527,8 @@
             });
         }
 
-        // Direct fetch without any proxy - using the original weather API endpoint
         async function loadWeatherData(lat, lon, locationName) {
-            const displayDiv = document.getElementById('weather-display');
-
             try {
-                // DIRECT API CALL - NO PROXY
                 const apiUrl = `https://sweatherapi.vercel.app/timeseries?lat=${lat}&lon=${lon}`;
                 const response = await fetch(apiUrl);
 
@@ -1143,8 +543,6 @@
                 }
             } catch (err) {
                 console.warn("API fetch error:", err.message);
-                // Fallback to embedded sample data that includes all variables (MSLP, DEWpoint, cloud cover)
-                // This ensures the UI still works and demonstrates all atmospheric variables
                 const sampleData = {
                     latitude: parseFloat(lat),
                     longitude: parseFloat(lon),
@@ -1178,11 +576,10 @@
         function renderWeatherInstant(apiResponse, lat, lon, locationName) {
             const series = apiResponse.timeseries;
             if (!series || series.length === 0) {
-                document.getElementById('weather-display').innerHTML = `<div style="padding:2rem; text-align:center;">⚠️ No forecast data available</div>`;
+                document.getElementById('weather-display').innerHTML = `<div style="padding:2rem; text-align:center; color: var(--neon-blue);">⚠️ No forecast data available</div>`;
                 return;
             }
 
-            // Show first 10 cards for optimal performance
             const cardsData = series.slice(0, 10);
             let cardsHtml = '';
 
@@ -1199,7 +596,7 @@
                     <h3><i class="far fa-clock"></i> ${timeLabel}</h3>
                     <div class="weather-detail">
                         <i class="fas fa-temperature-high"></i>
-                        <span><span class="temp-value">${tempC}°C</span> <span style="opacity:0.7">actual</span></span>
+                        <span><span class="temp-value">${tempC}°C</span></span>
                     </div>
                     <div class="extra-grid">
                         <div class="extra-item"><i class="fas fa-tint"></i> Dew pt: ${dewC}°C</div>
@@ -1210,29 +607,26 @@
                 </div>`;
             }
 
-            // Extract city name for cleaner display
             let shortName = locationName;
             if (locationName.includes(',')) shortName = locationName.split(',')[0];
 
             const finalHtml = `
                 <div class="location-badge">
-                    <i class="fas fa-map-pin" style="font-size: 1.5rem; color: #0ff;"></i>
+                    <i class="fas fa-map-pin" style="font-size: 1.8rem; color: var(--neon-blue);"></i>
                     <div>
                         <h2>${escapeHtml(shortName)}</h2>
                         <div class="coord-text">📍 ${Number(lat).toFixed(3)}°N, ${Number(lon).toFixed(3)}°E • ${new Date().toLocaleDateString('en-IN')}</div>
                     </div>
                 </div>
                 <div class="weather-cards">${cardsHtml}</div>
-                ${series.length > 10 ? `<div style="text-align: center; margin-top: 0.8rem; font-size: 0.7rem; opacity:0.7;">✨ +${series.length-10} more hours — see chart below for full trend</div>` : ''}
+                ${series.length > 10 ? `<div style="text-align: center; margin-top: 1rem; font-size: 0.75rem; color: rgba(255,255,255,0.4);">✨ +${series.length-10} more hours — see chart below for full trend</div>` : ''}
             `;
 
             document.getElementById('weather-display').innerHTML = finalHtml;
 
-            // Show and render chart
             const chartSection = document.getElementById('chartSection');
             chartSection.classList.remove('hidden');
 
-            // Defer chart rendering for better LCP
             if (requestIdleCallback) {
                 requestIdleCallback(() => renderMultiChart(series));
             } else {
@@ -1256,6 +650,7 @@
             const tempData = limited.map(e => parseFloat(kelvinToC(e.temperature)));
             const dewData = limited.map(e => parseFloat((e.DEWpoint)));
             const cloudData = limited.map(e => e['total cloud cover'] !== undefined ? e['total cloud cover'] : 0);
+            const rainData = limited.map(e => e.rainfall !== undefined ? parseFloat((e.rainfall).toFixed(2)) : 0);
 
             try {
                 weatherChart = new Chart(ctx, {
@@ -1263,34 +658,101 @@
                     data: {
                         labels: labels,
                         datasets: [
-                            { label: '🌡️ Temperature (°C)', data: tempData, borderColor: '#ffaa44', borderWidth: 2.5, pointRadius: 1.5, tension: 0.3, yAxisID: 'y' },
-                            { label: '💧 Dew Point (°C)', data: dewData, borderColor: '#4cc9f0', borderWidth: 2, borderDash: [5,5], tension: 0.3, yAxisID: 'y' },
-                            { label: '☁️ Cloud Cover (%)', data: cloudData, borderColor: '#a5f0ff', backgroundColor: 'rgba(165,240,255,0.08)', borderWidth: 2, fill: true, tension: 0.3, yAxisID: 'y1' }
+                            { 
+                                label: '🌡️ Temperature (°C)', 
+                                data: tempData, 
+                                borderColor: '#00f3ff', 
+                                borderWidth: 2.5, 
+                                pointRadius: 1.5, 
+                                tension: 0.3, 
+                                yAxisID: 'y' 
+                            },
+                            { 
+                                label: '💧 Dew Point (°C)', 
+                                data: dewData, 
+                                borderColor: '#bc13fe', 
+                                borderWidth: 2, 
+                                borderDash: [5,5], 
+                                tension: 0.3, 
+                                yAxisID: 'y' 
+                            },
+                            { 
+                                label: '☁️ Cloud Cover (%)', 
+                                data: cloudData, 
+                                borderColor: '#ff6b6b', 
+                                backgroundColor: 'rgba(255,107,107,0.08)', 
+                                borderWidth: 2, 
+                                fill: true, 
+                                tension: 0.3, 
+                                yAxisID: 'y1' 
+                            },
+                            { 
+                                label: '🌧️ Rainfall (mm)', 
+                                data: rainData, 
+                                borderColor: '#ffd93d', 
+                                backgroundColor: 'rgba(255,217,61,0.15)', 
+                                borderWidth: 2, 
+                                fill: true, 
+                                tension: 0.3, 
+                                yAxisID: 'y2',
+                                pointBackgroundColor: '#ffd93d',
+                                pointRadius: 3
+                            }
                         ]
                     },
                     options: {
                         responsive: true,
                         maintainAspectRatio: true,
                         plugins: {
-                            legend: { labels: { color: '#eef', font: { size: 10 } } },
-                            tooltip: { mode: 'index', intersect: false, backgroundColor: '#0a142fe6' }
+                            legend: { 
+                                labels: { 
+                                    color: '#caf0ff', 
+                                    font: { size: 10 },
+                                    boxWidth: 12,
+                                    padding: 8
+                                } 
+                            },
+                            tooltip: { 
+                                mode: 'index', 
+                                intersect: false, 
+                                backgroundColor: 'rgba(10,10,15,0.9)',
+                                borderColor: 'rgba(0,243,255,0.3)',
+                                borderWidth: 1,
+                                padding: 10
+                            }
                         },
                         scales: {
-                            y: { title: { display: true, text: '°C', color: '#ffd966', font: { size: 10 } }, ticks: { color: '#ffefc0' } },
-                            y1: { position: 'right', title: { display: true, text: 'Cloud %', color: '#b5ffff' }, grid: { drawOnChartArea: false }, ticks: { color: '#9eeeff', min: 0, max: 100 } },
-                            x: { ticks: { color: '#bbd9ff', maxRotation: 30, autoSkip: true, font: { size: 9 } } }
+                            y: { 
+                                title: { display: true, text: '°C', color: '#00f3ff', font: { size: 10 } }, 
+                                ticks: { color: '#caf0ff' },
+                                position: 'left'
+                            },
+                            y1: { 
+                                position: 'right', 
+                                title: { display: true, text: 'Cloud %', color: '#ff6b6b', font: { size: 10 } }, 
+                                grid: { drawOnChartArea: false }, 
+                                ticks: { color: '#ff6b6b', min: 0, max: 100 } 
+                            },
+                            y2: {
+                                position: 'right',
+                                title: { display: true, text: 'Rain mm', color: '#ffd93d', font: { size: 10 } },
+                                grid: { drawOnChartArea: false },
+                                ticks: { color: '#ffd93d', min: 0 },
+                                display: true
+                            },
+                            x: { 
+                                ticks: { color: '#caf0ff', maxRotation: 30, autoSkip: true, font: { size: 8 } } 
+                            }
                         }
                     }
                 });
             } catch(e) { console.warn("Chart error:", e); }
         }
 
-        // Geocoding - direct fetch without proxy
         async function getLocationWeather() {
             const location = document.getElementById('location').value;
             if (!location.trim()) return alert("Please enter a city or address");
 
-            // Show skeleton
             document.getElementById('weather-display').innerHTML = `<div class="skeleton-badge"></div><div class="skeleton-cards"><div class="skeleton-card"></div><div class="skeleton-card"></div><div class="skeleton-card"></div></div>`;
             document.getElementById('chartSection').classList.add('hidden');
 
@@ -1304,7 +766,7 @@
                 await loadWeatherData(lat, lon, display_name);
             } catch (err) {
                 alert("Geocoding error: " + err.message);
-                document.getElementById('weather-display').innerHTML = `<div style="padding:2rem; text-align:center;">❌ ${err.message}</div>`;
+                document.getElementById('weather-display').innerHTML = `<div style="padding:2rem; text-align:center; color: var(--neon-blue);">❌ ${err.message}</div>`;
             }
         }
 
@@ -1329,7 +791,6 @@
             }
         }
 
-        // Autocomplete suggestions
         let suggestionTimeout;
         async function fetchLocationSuggestions() {
             const query = document.getElementById('location').value;
@@ -1341,7 +802,7 @@
                     const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&limit=5`);
                     const data = await res.json();
                     if (data.length) {
-                        suggestionsDiv.innerHTML = data.map(item => `<div onclick="selectSuggestion('${item.lat}', '${item.lon}', '${escapeHtml(item.display_name)}')"><i class="fas fa-location-dot"></i> ${escapeHtml(item.display_name)}</div>`).join('');
+                        suggestionsDiv.innerHTML = data.map(item => `<div onclick="selectSuggestion('${item.lat}', '${item.lon}', '${escapeHtml(item.display_name)}')"><i class="fas fa-location-dot" style="color: var(--neon-blue);"></i> ${escapeHtml(item.display_name)}</div>`).join('');
                         suggestionsDiv.style.display = 'block';
                     } else suggestionsDiv.style.display = 'none';
                 } catch(e) { suggestionsDiv.style.display = 'none'; }
@@ -1371,7 +832,6 @@
             }
         });
 
-        // Initialize with sample coordinates (Bhubaneswar region)
         window.addEventListener('DOMContentLoaded', () => {
             document.getElementById('latitude').value = "20.5";
             document.getElementById('longitude').value = "85.8";
