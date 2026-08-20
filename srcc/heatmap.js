@@ -426,7 +426,7 @@ async function loadData() {
     }
 
     // Load map topology
-    const topology = await fetch('IND.json').then(r => r.json());
+    const topology = await fetch('IND_1.json').then(r => r.json());
 
     const selectedIndex = parseInt(timeSelector.value, 10);
     renderHeatmap(selectedIndex, sstData, latData, lonData, topology, timeData);
