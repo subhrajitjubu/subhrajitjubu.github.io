@@ -44,9 +44,31 @@
   }
   header h1 { font-size: 15px; font-weight: 500; color: var(--text); }
   header .tag {
-    margin-left: auto; font-size: 11px; color: var(--muted);
+    font-size: 11px; color: var(--muted);
     font-family: monospace; background: var(--surface2);
     padding: 2px 8px; border-radius: 4px; border: 1px solid var(--border);
+  }
+  .ver-sel {
+    margin-left: auto; display: flex; align-items: center; gap: 8px;
+  }
+  .ver-sel label {
+    font-size: 11px; color: var(--muted); font-family: monospace;
+  }
+  .ver-sel select {
+    background: var(--surface2); border: 1px solid var(--accent);
+    color: var(--accent); font-family: monospace; font-size: 12px;
+    font-weight: 700; padding: 3px 10px; border-radius: 5px; cursor: pointer;
+  }
+  .ver-badge {
+    font-size: 10px; padding: 2px 7px; border-radius: 10px;
+    font-family: monospace; font-weight: 700;
+  }
+  .ver-badge.v4 { background: #1a3a2a; color: #34d399; border: 1px solid #34d399; }
+  .ver-badge.v3 { background: #2a2a1a; color: #fbbf24; border: 1px solid #fbbf24; }
+  .ver-only-note {
+    font-size: 10px; color: var(--warn); font-family: monospace;
+    padding: 4px 8px; background: #2a2000; border-radius: 4px;
+    border-left: 3px solid var(--warn); margin-bottom: 8px; display: none;
   }
 
   /* ── Layout ── */
@@ -253,7 +275,15 @@
 <header>
   <span class="logo">WRF//NL</span>
   <h1>Namelist Builder</h1>
-  <span class="tag">ARW · v4.x</span>
+  <span class="tag">ARW</span>
+  <div class="ver-sel">
+    <label>WRF version:</label>
+    <select id="wrf_version" onchange="onVersionChange()">
+      <option value="4" selected>v4.5.2</option>
+      <option value="3">v3.9.6</option>
+    </select>
+    <span class="ver-badge v4" id="ver-badge">v4.5.2</span>
+  </div>
 </header>
 
 <div class="workspace">
@@ -331,9 +361,13 @@
         <div class="field"><label>io_form_geogrid</label>
           <select id="io_form_geogrid"><option value="2" selected>2 (NetCDF)</option></select>
         </div>
-        <div class="field"><label>wps_path (geog_data)</label>
-          <input type="text" id="geog_data_path" value="/path/to/WPS_GEOG/">
+        <div class="field"><label>ungrib prefix</label>
+          <input type="text" id="wps_prefix" value="FILE" maxlength="16"
+            placeholder="FILE or PL or ERA5…">
         </div>
+      </div>
+      <div class="field"><label>geog_data_path</label>
+        <input type="text" id="geog_data_path" value="/home/users/fsai/wrf_wps/WPS_GEOG">
       </div>
     </div>
 
@@ -341,20 +375,7 @@
     <div class="tab-content" id="tab-physics">
       <div class="section-label">Microphysics</div>
       <div class="field"><label>mp_physics</label>
-        <select id="mp_physics">
-          <option value="0">0 — None</option>
-          <option value="1">1 — Kessler</option>
-          <option value="2" selected>2 — Lin et al.</option>
-          <option value="3">3 — WSM3</option>
-          <option value="4">4 — WSM5</option>
-          <option value="6">6 — WSM6</option>
-          <option value="8">8 — Thompson</option>
-          <option value="10">10 — Morrison</option>
-          <option value="14">14 — WDM5</option>
-          <option value="16">16 — WDM6</option>
-          <option value="17">17 — NSSL 2-moment</option>
-          <option value="28">28 — Thompson aerosol-aware</option>
-        </select>
+        <select id="mp_physics"></select>
       </div>
 
       <div class="section-label">Radiation</div>
@@ -448,20 +469,7 @@
 
       <div class="section-label">Cumulus</div>
       <div class="field"><label>cu_physics (d01)</label>
-        <select id="cu_physics">
-          <option value="0">0 — None</option>
-          <option value="1" selected>1 — Kain-Fritsch</option>
-          <option value="2">2 — BMJ</option>
-          <option value="3">3 — Grell-Freitas</option>
-          <option value="4">4 — SAS</option>
-          <option value="5">5 — Grell-3</option>
-          <option value="6">6 — Tiedtke</option>
-          <option value="7">7 — Zhang-McFarlane</option>
-          <option value="10">10 — Grell-Devenyi</option>
-          <option value="11">11 — CAMZMF</option>
-          <option value="14">14 — New SAS</option>
-          <option value="16">16 — KF-CuP</option>
-        </select>
+        <select id="cu_physics"></select>
       </div>
       <div class="field"><label>cudt (min)</label><input type="number" id="cudt" value="5"></div>
 
@@ -486,6 +494,21 @@
 
     <!-- DYNAMICS TAB -->
     <div class="tab-content" id="tab-dynamics">
+      <div class="ver-only-note" id="hybrid-note">⚠ hybrid_opt &amp; etac are v4.x only — omitted for v3.9.6</div>
+      <div id="hybrid-block">
+        <div class="section-label">Vertical coordinate</div>
+        <div class="row2">
+          <div class="field"><label>hybrid_opt</label>
+            <select id="hybrid_opt">
+              <option value="2" selected>2 — Klemp cubic (default)</option>
+              <option value="0">0 — terrain-following (V3 style)</option>
+            </select>
+          </div>
+          <div class="field"><label>etac</label>
+            <input type="number" id="etac" value="0.2" step="0.05" min="0.1" max="0.5">
+          </div>
+        </div>
+      </div>
       <div class="section-label">Vertical levels</div>
       <div class="row2">
         <div class="field"><label>e_vert</label><input type="number" id="e_vert" value="51"></div>
@@ -565,6 +588,18 @@
           <option value="2">2 — smoothing-desmoothing</option>
         </select>
       </div>
+      <!-- v3 only -->
+      <div id="v3-bdy-block">
+        <div class="section-label">Boundary (v3.9.6)</div>
+        <div class="toggle"><input type="checkbox" id="spec_bdy_final_mu" checked>
+          <label for="spec_bdy_final_mu">spec_bdy_final_mu = 1</label></div>
+      </div>
+      <!-- v4 only -->
+      <div id="v4-bdy-block">
+        <div class="section-label">Boundary (v4.5.2)</div>
+        <div class="toggle"><input type="checkbox" id="multi_bdy_files">
+          <label for="multi_bdy_files">multi_bdy_files (multiple boundary files)</label></div>
+      </div>
     </div>
   </div><!-- /panel -->
 
@@ -609,12 +644,98 @@ let map, centerMarker;
 let domainRects = [];
 let lastWPS = '', lastINPUT = '';
 
+// ── Version-specific option tables ─────────────────────────────────────────
+const VER_OPTIONS = {
+  mp_physics: {
+    common: [
+      [0,'None'],[1,'Kessler'],[2,'Lin et al.'],[3,'WSM 3-class'],
+      [4,'WSM 5-class'],[5,'Ferrier (Eta)'],[6,'WSM 6-class'],
+      [8,'Thompson'],[9,'Milbrandt-Yau 2-mom'],[10,'Morrison 2-mom'],
+      [11,'CAM 5.1'],[13,'SBU_YLIN'],[14,'WDM 5-class'],[16,'WDM 6-class'],
+      [17,'NSSL 2-mom (steady CCN)'],[18,'NSSL 2-mom (predict CCN)'],
+      [19,'NSSL 1-mom 7-class'],[21,'NSSL 1-mom 6-class'],
+      [28,'Thompson aerosol-aware'],[30,'HUJI spectral bin fast'],
+      [32,'HUJI spectral bin full'],[50,'P3 1-cat'],[51,'P3 1-cat + 2M cloud'],
+      [95,'Ferrier old Eta']
+    ],
+    v3_only: [
+      [7,'Goddard GCE']
+    ],
+    v4_only: [
+      [7,'Goddard 4-ice'],[24,'WSM 7-class'],[26,'WDM 7-class'],
+      [38,'Thompson 2-mom graupel'],[40,'Morrison w/ sea spray'],
+      [52,'P3 2-ice + 2M cloud'],[53,'P3 1-ice 3-mom'],[55,'Jensen-ISHMAEL'],
+      [56,'NTU multi-moment'],[96,'Madwrf'],[97,'Goddard GCE (legacy)']
+    ]
+  },
+  cu_physics: {
+    common: [
+      [0,'None'],[1,'Kain-Fritsch'],[2,'Betts-Miller-Janjic'],
+      [3,'Grell-Freitas'],[4,'Scale-aware SAS'],[5,'Grell-3D'],
+      [6,'Modified Tiedtke'],[7,'Zhang-McFarlane (CAM5)'],
+      [10,'Modified KF w/ trigger'],[11,'Multi-scale KF'],
+      [16,'Newer Tiedtke'],
+      [93,'Grell-Devenyi ensemble'],[94,'2015 GFS SAS'],
+      [95,'Previous GFS SAS'],[99,'Previous KF']
+    ],
+    v3_only: [
+      [14,'New GFS SAS (YSU)']
+    ],
+    v4_only: [
+      [14,'KIM SAS (KSAS)'],[96,'Previous new GFS SAS']
+    ]
+  }
+};
+
+function getWRFVersion() {
+  return parseInt(document.getElementById('wrf_version').value);
+}
+
+function buildSelect(id, defaultVal) {
+  const sel = document.getElementById(id);
+  if (!sel) return;
+  const data = VER_OPTIONS[id];
+  if (!data) return;
+  const ver = getWRFVersion();
+  const prev = sel.value || String(defaultVal);
+
+  let opts = [...data.common];
+  if (ver === 3) opts = opts.concat(data.v3_only || []);
+  else           opts = opts.concat(data.v4_only || []);
+  opts.sort((a,b) => a[0]-b[0]);
+
+  sel.innerHTML = opts.map(([v,l]) =>
+    `<option value="${v}"${String(v)===prev?' selected':''}>${v} — ${l}</option>`
+  ).join('');
+  // restore default if prev not in new list
+  if (!opts.find(o => String(o[0]) === prev)) sel.value = String(defaultVal);
+}
+
+function onVersionChange() {
+  const ver = getWRFVersion();
+  const badge = document.getElementById('ver-badge');
+  badge.textContent = ver === 4 ? 'v4.5.2' : 'v3.9.6';
+  badge.className = `ver-badge ${ver===4?'v4':'v3'}`;
+
+  // Show/hide version-specific blocks
+  document.getElementById('hybrid-block').style.display = ver===4 ? '' : 'none';
+  document.getElementById('hybrid-note').style.display  = ver===3 ? 'block' : 'none';
+  document.getElementById('v3-bdy-block').style.display = ver===3 ? '' : 'none';
+  document.getElementById('v4-bdy-block').style.display = ver===4 ? '' : 'none';
+
+  // Rebuild version-specific dropdowns
+  buildSelect('mp_physics', 2);
+  buildSelect('cu_physics', 1);
+
+  generateAll();
+}
+
 // ── Map init ───────────────────────────────────────────────────────────────
 function initMap() {
   map = L.map('map', { zoomControl: true }).setView([20.6245, 77.7569], 4);
-  L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
-    attribution: '© OpenStreetMap © CARTO',
-    maxZoom: 19
+  L.tileLayer('https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png', {
+    attribution: '© <a href="https://openstreetmap.org/copyright">OpenStreetMap</a> contributors, © <a href="https://opentopomap.org">OpenTopoMap</a> (CC-BY-SA)',
+    maxZoom: 17
   }).addTo(map);
 
   map.on('click', e => {
@@ -691,7 +812,7 @@ function drawDomainBoxes() {
     const lat1 = b.lat0 + (ny * dx) / mPerDegLat;
     const col = DOM_COLORS[i];
     const rect = L.rectangle([[b.lat0, b.lon0],[lat1, lon1]], {
-      color: col, weight: 2, fillOpacity: 0.08,
+      color: col, weight: 2.5, fillOpacity: 0.15,
       dashArray: i > 0 ? '6 3' : null
     }).addTo(map)
       .bindTooltip(`d0${i+1} — Δx=${d.dx} km — ${d.ewe-1}×${d.esn-1} pts`);
@@ -816,102 +937,134 @@ function fmtDate(dt) {
   return dt.replace('T','_') + ':00';
 }
 
+// domList: space-padded values joined by commas, NO trailing comma on the line
 function domList(vals) { return vals.map(v => ` ${v}`).join(','); }
+
+// Align a key to column 36, matching WRF namelist.wps style
+function wl(key, val, noComma) {
+  const pad = Math.max(1, 36 - key.length - 1);
+  return ` ${key}${' '.repeat(pad)}= ${val}${noComma ? '' : ','}`;
+}
 
 function generateWPS() {
   const nd = domains.length;
   if (!nd) return '! No domains configured';
-  const dates = Array(nd).fill(fmtDate(g('start_date')));
-  const datesEnd = Array(nd).fill(fmtDate(g('end_date')));
-  const parentId    = domains.map(d => d.parent);
-  parentId[0] = 1;
-  const ratios  = domains.map(d => d.ratio);
-  ratios[0] = 1;
-  const istart  = domains.map(d => d.istart);
-  istart[0] = 1;
-  const jstart  = domains.map(d => d.jstart);
-  jstart[0] = 1;
-  const ewe = domains.map(d => d.ewe);
-  const esn = domains.map(d => d.esn);
-  const dx = gn('ref_lat');  // use d01 dx
+
+  const prefix = g('wps_prefix') || 'FILE';
+  const startFmt = fmtDate(g('start_date'));
+  const endFmt   = fmtDate(g('end_date'));
+
+  // &share: dates as 'date1','date2',... (no space between comma and quote)
+  // Each nest gets same start/end as d01 — user can edit manually if needed
+  const startDates = Array(nd).fill(`'${startFmt}'`).join(',');
+  const endDates   = Array(nd).fill(`'${endFmt}'`).join(',');
+
+  // &geogrid arrays — NO trailing comma, compact spacing like working namelist
+  const parentId = domains.map((d,i) => i===0 ? 1 : d.parent);
+  const ratios   = domains.map((d,i) => i===0 ? 1 : d.ratio);
+  const istart   = domains.map((d,i) => i===0 ? 1 : d.istart);
+  const jstart   = domains.map((d,i) => i===0 ? 1 : d.jstart);
+  const ewe      = domains.map(d => d.ewe);
+  const esn      = domains.map(d => d.esn);
+
+  // geog_data_res: one entry per domain, no trailing comma
+  const gdr = Array(nd).fill("'default'").join(',');
+
+  // dx/dy in metres from d01 (stored as km in UI)
+  const dx_m = domains[0].dx * 1000;
 
   return `&share
- wrf_core                            = 'ARW',
- max_dom                             = ${nd},
- start_date                          =${domList(dates.map(d=>`'${d}'`))},
- end_date                            =${domList(datesEnd.map(d=>`'${d}'`))},
- interval_seconds                    = ${g('interval_seconds')},
- io_form_geogrid                     = ${g('io_form_geogrid')},
+ wrf_core = 'ARW',
+ max_dom = ${nd},
+ start_date = ${startDates}
+ end_date   = ${endDates}
+ interval_seconds =${g('interval_seconds')},
+ io_form_geogrid = ${g('io_form_geogrid')},
 /
 
 &geogrid
- parent_id                           =${domList(parentId)},
- parent_grid_ratio                   =${domList(ratios)},
- i_parent_start                      =${domList(istart)},
- j_parent_start                      =${domList(jstart)},
- e_we                                =${domList(ewe)},
- e_sn                                =${domList(esn)},
- geog_data_res                       =${domList(Array(nd).fill("'default'"))},
- dx                                  = ${domains[0].dx * 1000},
- dy                                  = ${domains[0].dx * 1000},
- map_proj                            = '${g('map_proj')}',
- ref_lat                             = ${gn('ref_lat').toFixed(4)},
- ref_lon                             = ${gn('ref_lon').toFixed(4)},
- truelat1                            = ${gn('truelat1').toFixed(4)},
- truelat2                            = ${gn('truelat2').toFixed(4)},
- stand_lon                           = ${gn('stand_lon').toFixed(4)},
- geog_data_path                      = '${g('geog_data_path')}',
- opt_output_from_geogrid_path        = './',
+ parent_id         =${domList(parentId)}
+ parent_grid_ratio =${domList(ratios)}
+ i_parent_start    =${domList(istart)}
+ j_parent_start    =${domList(jstart)}
+ e_we              =${domList(ewe)}
+ e_sn              =${domList(esn)}
+ geog_data_res = ${gdr},
+ dx = ${dx_m}
+ dy = ${dx_m}
+ map_proj = '${g('map_proj')}',
+ ref_lat   = ${gn('ref_lat').toFixed(4)},
+ ref_lon   = ${gn('ref_lon').toFixed(4)},
+ truelat1  = ${gn('truelat1').toFixed(4)},
+ truelat2  = ${gn('truelat2').toFixed(4)},
+ stand_lon = ${gn('stand_lon').toFixed(4)},
+ geog_data_path = '${g('geog_data_path')}'
 /
 
 &ungrib
- out_format                          = 'WPS',
- prefix                              = 'FILE',
+ out_format = 'WPS',
+ prefix = '${prefix}',
 /
 
 &metgrid
- fg_name                             = 'FILE',
- io_form_metgrid                     = 2,
+ fg_name = '${prefix}'
+ io_form_metgrid = 2,
 /`;
 }
 
 function generateInput() {
   const nd = domains.length;
   if (!nd) return '! No domains configured';
+  const ver = getWRFVersion();
+  const isV4 = ver === 4;
+  const verTag = isV4 ? '! WRF v4.5.2' : '; WRF v3.9.6';
+  const cm = isV4 ? '!' : ';';   // comment char differs between versions
 
-  // Per-domain physics: nest ≥ d02 with fine dx gets cu_physics=0
+  // Per-domain cu_physics: nests < 4 km get 0
   const cuArr = domains.map((d,i) => {
     if (i === 0) return gi('cu_physics');
-    // rough threshold — nested < 4 km get 0
     let dx = domains[0].dx * 1000;
-    for(let k=1;k<=i;k++) dx /= domains[k].ratio;
+    for (let k=1;k<=i;k++) dx /= domains[k].ratio;
     return dx < 4000 ? 0 : gi('cu_physics');
   });
 
-  const dt = g('start_date');
-  const [startYMD, startHM] = dt.split('T');
-  const [yr,mo,dy] = startYMD.split('-');
-  const [hr,mn]    = startHM.split(':');
-
+  const dt    = g('start_date');
   const endDt = g('end_date');
+  const [startYMD, startHM] = dt.split('T');
+  const [yr,mo,dy2] = startYMD.split('-');
+  const [hr]        = startHM.split(':');
   const [eYMD, eHM] = endDt.split('T');
   const [eyr,emo,edy] = eYMD.split('-');
-  const [ehr,emn]    = eHM.split(':');
+  const [ehr]         = eHM.split(':');
+  const runHours = Math.round((new Date(endDt)-new Date(dt))/3600000);
 
-  // run_hours from diff
-  const s1 = new Date(dt), s2 = new Date(endDt);
-  const runHours = Math.round((s2-s1)/3600000);
+  // &dynamics section differs by version
+  const dynV4 = `
+ hybrid_opt                          = ${gi('hybrid_opt')},
+ etac                                = ${g('etac')},`;
+  const dynV3 = `
+ use_theta_m                         = 0,
+ use_q_diabatic                      = 0,`;
 
-  const ones = Array(nd).fill(1);
+  const gwdLine = isV4
+    ? `\n gwd_opt                             =${domList(Array(nd).fill(1))},`
+    : `\n gwd_opt                             = 1,`;
 
-  return `&time_control
+  // v3-only bdy param
+  const bdyExtra = !isV4
+    ? `\n spec_bdy_final_mu                   = ${document.getElementById('spec_bdy_final_mu').checked?1:0},`
+    : (document.getElementById('multi_bdy_files').checked
+        ? `\n multi_bdy_files                     = .true.,` : '');
+
+  return `${cm} Generated for ${isV4?'WRF v4.5.2':'WRF v3.9.6'} — ARW core
+&time_control
  run_days                            = 0,
  run_hours                           = ${runHours},
  run_minutes                         = 0,
  run_seconds                         = 0,
  start_year                          =${domList(Array(nd).fill(yr))},
  start_month                         =${domList(Array(nd).fill(mo))},
- start_day                           =${domList(Array(nd).fill(dy))},
+ start_day                           =${domList(Array(nd).fill(dy2))},
  start_hour                          =${domList(Array(nd).fill(hr))},
  end_year                            =${domList(Array(nd).fill(eyr))},
  end_month                           =${domList(Array(nd).fill(emo))},
@@ -975,7 +1128,7 @@ function generateInput() {
 /
 
 &dynamics
- hybrid_opt                          = 2,
+ rk_ord                              = 3,${isV4 ? dynV4 : dynV3}
  w_damping                           = 1,
  diff_opt                            =${domList(Array(nd).fill(gi('diff_opt')))},
  km_opt                              =${domList(Array(nd).fill(gi('km_opt')))},
@@ -989,8 +1142,7 @@ function generateInput() {
  kvdif                               =${domList(Array(nd).fill(0))},
  non_hydrostatic                     =${domList(Array(nd).fill(gc('non_hydrostatic')))},
  moist_adv_opt                       =${domList(Array(nd).fill(gi('moist_adv_opt')))},
- scalar_adv_opt                      =${domList(Array(nd).fill(gi('scalar_adv_opt')))},
- gwd_opt                             =${domList(Array(nd).fill(1))},
+ scalar_adv_opt                      =${domList(Array(nd).fill(gi('scalar_adv_opt')))},${gwdLine}
 /
 
 &bdy_control
@@ -998,7 +1150,7 @@ function generateInput() {
  spec_zone                           = 1,
  relax_zone                          = 4,
  specified                           =${domList(domains.map((_,i)=>i===0?'.true.':'.false.'))},
- nested                              =${domList(domains.map((_,i)=>i===0?'.false.':'.true.'))},
+ nested                              =${domList(domains.map((_,i)=>i===0?'.false.':'.true.'))},${bdyExtra}
 /
 
 &grib2
@@ -1059,7 +1211,7 @@ initMap();
 domains.push(defaultDomain(1));
 renderDomains();
 updateMap();
-generateAll();
+onVersionChange();   // builds dropdowns + generates
 </script>
 </body>
 </html>
