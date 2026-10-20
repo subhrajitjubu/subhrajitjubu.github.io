@@ -1,0 +1,5 @@
+# keep shell scripts LF even when the repo is checked out on Windows
+*.sh text eol=lf
+
+# the JSON is generated data: no diff, no line-ending conversion
+UKMO/*.json -text -diff
