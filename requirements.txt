@@ -10,3 +10,6 @@ cfgrib
 rioxarray 
 ecmwf.opendata
 colormaps
+orjson
+h5py
+netCDF4
