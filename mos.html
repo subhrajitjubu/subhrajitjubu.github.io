@@ -1,0 +1,646 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>IMD RAPID — WMS Weather Explorer</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet"/>
+<style>
+:root{
+  --bg:#0a0f1c; --panel:rgba(13,20,36,.9); --panel2:rgba(20,29,50,.95);
+  --border:rgba(148,163,184,.16); --text:#e2e8f0; --muted:#8b98ad;
+  --accent:#ff9933; --accent2:#38bdf8; --green:#34d399;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{font-family:'Space Grotesk',system-ui,sans-serif;background:var(--bg);color:var(--text);overflow:hidden}
+#app{display:flex;height:100vh;width:100vw}
+.hidden{display:none!important}
+.muted{color:var(--muted)}
+.small{font-size:11px}
+
+/* ---------- sidebar ---------- */
+#sidebar{width:340px;flex:none;position:relative;z-index:1400;background:var(--panel);backdrop-filter:blur(14px);
+  border-right:1px solid var(--border);display:flex;flex-direction:column;transition:margin-left .3s ease}
+#sidebar.collapsed{margin-left:-340px}
+#sidebar header{padding:16px 18px 12px;border-bottom:1px solid var(--border)}
+#sidebar h1{font-size:22px;letter-spacing:.5px;background:linear-gradient(90deg,#ff9933,#ffd9ab 55%,#38bdf8);-webkit-background-clip:text;background-clip:text;color:transparent}
+#sidebar header p{color:var(--muted);font-size:12px;margin-top:2px}
+#istClock{position:absolute;top:18px;right:16px;font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--accent2)}
+.searchWrap{padding:12px 14px 4px}
+#search{width:100%;background:rgba(2,6,23,.6);border:1px solid var(--border);color:var(--text);border-radius:10px;padding:9px 12px;font:inherit;font-size:13px;outline:none}
+#search:focus{border-color:var(--accent)}
+#statusLine{padding:4px 16px 8px;font-size:11px;color:var(--muted)}
+#layerList{flex:1;overflow-y:auto;padding:0 10px 10px}
+.group{border:1px solid var(--border);border-radius:12px;margin:8px 0;background:rgba(2,6,23,.35);overflow:hidden}
+.groupHead{width:100%;display:flex;align-items:center;gap:8px;background:rgba(30,41,59,.5);border:0;color:var(--text);
+  font:inherit;font-size:13px;font-weight:600;padding:10px 12px;cursor:pointer;text-align:left;border-radius:0}
+.groupHead:hover{border-color:transparent;background:rgba(30,41,59,.85)}
+.groupHead .count{margin-left:auto;font-size:11px;color:var(--muted);background:rgba(148,163,184,.12);padding:1px 8px;border-radius:99px}
+.group.closed .groupBody{display:none}
+.group.closed .chev{transform:rotate(-90deg)}
+.chev{transition:transform .2s;color:var(--accent)}
+.groupBody{padding:6px}
+.layerItem{padding:8px 10px;border-radius:9px;cursor:pointer;border:1px solid transparent}
+.layerItem:hover{background:rgba(56,189,248,.08)}
+.layerItem.active{background:rgba(255,153,51,.12);border-color:rgba(255,153,51,.45)}
+.liTitle{font-size:13px;font-weight:500;display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.liName{font-family:'JetBrains Mono',monospace;font-size:10.5px;color:var(--muted);margin-top:2px;word-break:break-all}
+.badge{font-size:10px;background:rgba(56,189,248,.15);color:var(--accent2);border-radius:6px;padding:0 5px}
+.badge.b2{background:rgba(52,211,153,.15);color:var(--green)}
+#sidebar footer{padding:10px 14px;border-top:1px solid var(--border);font-size:11px}
+.styleRow{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.styleRow label{color:var(--muted);flex:none}
+select{background:rgba(2,6,23,.7);color:var(--text);border:1px solid var(--border);border-radius:8px;padding:5px 8px;font:inherit;font-size:12px;max-width:100%;min-width:0}
+.legendBox{background:rgba(2,6,23,.4);border:1px solid var(--border);border-radius:10px;padding:8px;margin-bottom:8px}
+.legendTitle{font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--muted);margin-bottom:6px}
+#legendWrap img{max-width:100%;border-radius:6px;display:block}
+#aboutLayer{margin-bottom:8px;line-height:1.4;max-height:56px;overflow:auto}
+.credit{color:var(--muted);line-height:1.5}
+
+/* ---------- map area ---------- */
+#mapWrap{flex:1;position:relative;min-width:0}
+#map{position:absolute;inset:0;background:#060a14}
+#sidebarToggle{position:absolute;top:14px;left:14px;z-index:1200;width:38px;height:38px;border-radius:10px;border:1px solid var(--border);
+  background:var(--panel);color:var(--text);font-size:16px;cursor:pointer;backdrop-filter:blur(10px)}
+#controls{position:absolute;top:14px;right:14px;z-index:1200;width:212px;background:var(--panel);border:1px solid var(--border);
+  border-radius:14px;padding:12px;backdrop-filter:blur(12px);display:flex;flex-direction:column;gap:10px}
+.ctlRow{display:flex;align-items:center;gap:8px;font-size:12px}
+.ctlRow label{width:56px;color:var(--muted);flex:none}
+.ctlRow select,.ctlRow input[type=range]{flex:1;min-width:0}
+.ctlRow.btns button{flex:1}
+button{font:inherit;font-size:12px;color:var(--text);background:rgba(56,189,248,.1);border:1px solid var(--border);border-radius:9px;padding:7px 10px;cursor:pointer}
+button:hover{border-color:var(--accent2)}
+button.on{background:rgba(255,153,51,.2);border-color:var(--accent);color:#ffd9ab}
+button:disabled{opacity:.5;cursor:default}
+.pill{width:100%}
+input[type=range]{-webkit-appearance:none;appearance:none;height:4px;border-radius:99px;background:rgba(148,163,184,.3);outline:none}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;height:14px;border-radius:50%;background:var(--accent);cursor:pointer;border:2px solid #0a0f1c}
+input[type=range]::-moz-range-thumb{width:12px;height:12px;border-radius:50%;background:var(--accent);cursor:pointer;border:2px solid #0a0f1c}
+
+/* ---------- time bar ---------- */
+#timeBar{position:absolute;left:50%;transform:translateX(-50%);bottom:22px;z-index:1200;display:flex;align-items:center;gap:12px;
+  background:var(--panel);border:1px solid var(--border);border-radius:14px;padding:10px 16px;backdrop-filter:blur(12px);width:min(660px,calc(100% - 40px))}
+#timeBar button{flex:none}
+#playBtn{width:36px;height:36px;border-radius:50%;font-size:13px;padding:0}
+#timeSlider{flex:1}
+#timeLabel{font-size:12.5px;white-space:nowrap;font-weight:600}
+#timeLabel .muted{font-weight:400}
+
+/* ---------- probe card ---------- */
+#probeCard{position:absolute;right:14px;bottom:84px;z-index:1200;width:300px;max-width:calc(100% - 28px);background:var(--panel);
+  border:1px solid var(--border);border-radius:14px;backdrop-filter:blur(12px);overflow:hidden}
+.probeHead{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:10px 12px;border-bottom:1px solid var(--border);font-weight:600;font-size:13px}
+.probeHead button{border:0;background:none;font-size:16px;padding:0 4px}
+#probeLoc{padding:6px 12px 0;font-size:11px}
+#probePre{padding:8px 12px 12px;font-family:'JetBrains Mono',monospace;font-size:11px;white-space:pre-wrap;word-break:break-word;max-height:200px;overflow:auto;color:#c8d3e0}
+
+/* ---------- compare divider ---------- */
+#divider{position:absolute;top:0;bottom:0;width:0;z-index:1150;pointer-events:none}
+#divider .line{position:absolute;top:0;bottom:0;left:-1.5px;width:3px;background:var(--accent);box-shadow:0 0 12px rgba(255,153,51,.7)}
+#dividerHandle{position:absolute;top:50%;left:0;transform:translate(-50%,-50%);pointer-events:auto;cursor:ew-resize;background:var(--accent);
+  color:#1a1005;font-weight:700;border-radius:99px;padding:8px 10px;font-size:13px;box-shadow:0 4px 14px rgba(0,0,0,.5);user-select:none;touch-action:none}
+
+/* ---------- loader / error / toasts ---------- */
+#loader{position:absolute;inset:0;z-index:2000;display:flex;flex-direction:column;gap:16px;align-items:center;justify-content:center;background:rgba(6,10,20,.85);backdrop-filter:blur(6px)}
+.spinner{width:46px;height:46px;border-radius:50%;border:3px solid rgba(255,153,51,.2);border-top-color:var(--accent);animation:spin 1s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+#loaderMsg{font-size:13px;color:var(--muted)}
+#errorPanel{position:absolute;z-index:2000;top:50%;left:50%;transform:translate(-50%,-50%);width:min(430px,90%);background:var(--panel2);
+  border:1px solid var(--border);border-radius:16px;padding:22px;text-align:center}
+#errorPanel h3{font-size:16px;margin-bottom:8px}
+#errorPanel p{color:var(--muted);font-size:12px;margin-bottom:12px;word-break:break-word}
+#errorPanel .row{display:flex;gap:8px;justify-content:center;margin-top:8px}
+#errorPanel input{flex:1;background:rgba(2,6,23,.7);border:1px solid var(--border);border-radius:9px;color:var(--text);padding:8px 10px;font:inherit;font-size:12px;min-width:0}
+#toasts{position:absolute;left:50%;transform:translateX(-50%);top:16px;z-index:3000;display:flex;flex-direction:column;gap:8px;align-items:center;pointer-events:none;width:max-content;max-width:92%}
+.toast{background:var(--panel2);border:1px solid var(--border);border-left:3px solid var(--accent);color:var(--text);font-size:12.5px;
+  padding:9px 16px;border-radius:10px;opacity:0;transform:translateY(-8px);transition:all .35s;box-shadow:0 8px 24px rgba(0,0,0,.4);text-align:center}
+.toast.show{opacity:1;transform:none}
+
+/* ---------- leaflet overrides ---------- */
+.leaflet-control-attribution{background:rgba(10,15,28,.75)!important;color:#7c8aa0!important;font-size:10px!important}
+.leaflet-control-attribution a{color:#9db4d0!important}
+.leaflet-bar a{background:rgba(13,20,36,.9)!important;color:var(--text)!important;border-color:var(--border)!important}
+.leaflet-control-scale-line{background:rgba(10,15,28,.6)!important;color:#9db4d0!important;border-color:#4b5b74!important}
+::-webkit-scrollbar{width:9px;height:9px}
+::-webkit-scrollbar-thumb{background:rgba(148,163,184,.25);border-radius:99px}
+::-webkit-scrollbar-track{background:transparent}
+
+@media (max-width:760px){
+  #sidebar{width:300px}
+  #sidebar.collapsed{margin-left:-300px}
+  #controls{width:172px;padding:10px}
+  #timeBar{bottom:64px;gap:8px;padding:8px 12px}
+  #timeLabel{font-size:11px}
+  #probeCard{bottom:130px}
+}
+</style>
+</head>
+<body>
+<div id="app">
+  <aside id="sidebar">
+    <header>
+      <h1>IMD RAPID</h1>
+      <p>Live Indian weather layers · WMS explorer</p>
+      <div id="istClock"></div>
+    </header>
+    <div class="searchWrap"><input id="search" placeholder="Search layers… (rain, wind, radar, temp)"/></div>
+    <div id="statusLine">Connecting…</div>
+    <div id="layerList"></div>
+    <footer>
+      <div id="aboutLayer" class="muted small"></div>
+      <div class="styleRow hidden" id="styleRow"><label>Style</label><select id="styleSelect"></select></div>
+      <div class="legendBox">
+        <div class="legendTitle">Legend</div>
+        <div id="legendWrap"><span class="muted">Select a layer</span></div>
+      </div>
+      <div class="credit">⏱ time-animated · ⓘ click map to probe values<br/>Data © IMD · rapid.imd.gov.in · Built with Leaflet</div>
+    </footer>
+  </aside>
+
+  <div id="mapWrap">
+    <div id="map"></div>
+    <button id="sidebarToggle" title="Toggle panel">☰</button>
+
+    <div id="controls">
+      <div class="ctlRow"><label>Basemap</label>
+        <select id="basemapSel"><option>Dark</option><option>Streets</option><option>Satellite</option></select>
+      </div>
+      <div class="ctlRow"><label>Opacity</label><input id="opacity" type="range" min="0.1" max="1" step="0.05" value="1"/></div>
+      <div class="ctlRow"><label>Compare</label><button id="compareBtn" class="pill">Swipe: Off</button></div>
+      <div class="ctlRow hidden" id="compareRow"><label>Layer B</label><select id="compareSel"></select></div>
+      <div class="ctlRow btns"><button id="homeBtn" title="Zoom to India">⌂ India</button><button id="refreshBtn" title="Re-fetch capabilities & tiles">⟳ Refresh</button></div>
+    </div>
+
+    <div id="divider" class="hidden"><div class="line"></div><div id="dividerHandle">◂ ▸</div></div>
+
+    <div id="timeBar" class="hidden">
+      <button id="playBtn" title="Play / pause (Space)">▶</button>
+      <input id="timeSlider" type="range" min="0" max="0" value="0"/>
+      <div id="timeLabel"></div>
+      <button id="latestBtn">Latest</button>
+    </div>
+
+    <div id="probeCard" class="hidden">
+      <div class="probeHead"><span id="probeTitle">Probe</span><button id="probeClose">×</button></div>
+      <div id="probeLoc" class="muted"></div>
+      <pre id="probePre"></pre>
+    </div>
+
+    <div id="loader"><div class="spinner"></div><div id="loaderMsg">Contacting IMD RAPID…</div></div>
+
+    <div id="errorPanel" class="hidden">
+      <h3>⚠ Couldn't reach the WMS service</h3>
+      <p id="errorMsg"></p>
+      <div class="row"><button id="retryBtn">↻ Retry</button></div>
+      <div class="row"><input id="manualLayer" placeholder="…or type a layer name manually"/><button id="manualAdd">Add</button></div>
+    </div>
+
+    <div id="toasts"></div>
+  </div>
+</div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+'use strict';
+/* ================= config ================= */
+const WMS = 'https://rapid.imd.gov.in/r2wms/wms';
+const CAPS_URL = WMS + '?SERVICE=WMS&REQUEST=GetCapabilities&VERSION=1.3.0';
+const PROXIES = [
+  u => u,
+  u => 'https://corsproxy.io/?url=' + encodeURIComponent(u),
+  u => 'https://api.allorigins.win/raw?url=' + encodeURIComponent(u),
+  u => 'https://api.codetabs.com/v1/proxy?quest=' + encodeURIComponent(u)
+];
+const PROXY_NAMES = ['direct connection','proxy 1/3 · corsproxy.io','proxy 2/3 · allorigins','proxy 3/3 · codetabs'];
+
+/* ================= element refs ================= */
+const $ = id => document.getElementById(id);
+const sidebar=$('sidebar'), sidebarToggle=$('sidebarToggle'), searchEl=$('search'), statusLine=$('statusLine'),
+  layerListEl=$('layerList'), aboutEl=$('aboutLayer'), styleRow=$('styleRow'), styleSelect=$('styleSelect'),
+  legendWrap=$('legendWrap'), mapWrap=$('mapWrap'), basemapSel=$('basemapSel'), opacityEl=$('opacity'),
+  compareBtn=$('compareBtn'), compareRow=$('compareRow'), compareSel=$('compareSel'), homeBtn=$('homeBtn'),
+  refreshBtn=$('refreshBtn'), divider=$('divider'), dividerHandle=$('dividerHandle'), timeBar=$('timeBar'),
+  playBtn=$('playBtn'), timeSlider=$('timeSlider'), timeLabel=$('timeLabel'), latestBtn=$('latestBtn'),
+  probeCard=$('probeCard'), probeTitle=$('probeTitle'), probeLoc=$('probeLoc'), probePre=$('probePre'),
+  probeClose=$('probeClose'), loader=$('loader'), loaderMsg=$('loaderMsg'), errorPanel=$('errorPanel'),
+  errorMsg=$('errorMsg'), retryBtn=$('retryBtn'), manualLayer=$('manualLayer'), manualAdd=$('manualAdd'),
+  toastsEl=$('toasts'), istClock=$('istClock');
+
+/* ================= net ================= */
+async function fetchText(url, onAttempt){
+  let err;
+  for (let i=0;i<PROXIES.length;i++){
+    onAttempt && onAttempt(i);
+    try{
+      const ctl=new AbortController(); const t=setTimeout(()=>ctl.abort(),25000);
+      const res=await fetch(PROXIES[i](url),{signal:ctl.signal});
+      clearTimeout(t);
+      if(!res.ok) throw new Error('HTTP '+res.status);
+      const txt=await res.text();
+      if(!txt) throw new Error('empty response');
+      return txt;
+    }catch(e){ err=e; }
+  }
+  throw err||new Error('All connection attempts failed');
+}
+
+/* ================= xml helpers ================= */
+const kids=(el,n)=>[...el.children].filter(c=>c.localName===n);
+const kid=(el,n)=>kids(el,n)[0];
+const txt=(el,n)=>{const k=kid(el,n);return k?k.textContent.trim():'';};
+const esc=s=>(s||'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const stripMs=d=>d.toISOString().replace(/\.\d{3}Z$/,'Z');
+
+function parseISODuration(d){
+  const m=/P(?:(\d+)D)?(?:T(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?)?/i.exec(d||'');
+  if(!m) return 3600e3;
+  return ((((+m[1]||0)*24+(+m[2]||0))*60+(+m[3]||0))*60+(+m[4]||0))*1000;
+}
+function parseTimeDimension(text){
+  const out=[];
+  for(const part of (text||'').split(',')){
+    const p=part.trim(); if(!p) continue;
+    if(p.includes('/')){
+      const [s,e,per]=p.split('/');
+      const t0=new Date(s).getTime(), t1=new Date(e).getTime(), step=parseISODuration(per);
+      if(isNaN(t0)||isNaN(t1)||!step) continue;
+      for(let t=t0;t<=t1;t+=step) out.push(stripMs(new Date(t)));
+      const last=stripMs(new Date(t1));
+      if(out[out.length-1]!==last) out.push(last);
+    } else out.push(p);
+  }
+  return [...new Set(out)];
+}
+function layerInfo(l){
+  const timeDim=kids(l,'Dimension').find(d=>(d.getAttribute('name')||'').toLowerCase()==='time');
+  return {
+    name:txt(l,'Name'), title:txt(l,'Title')||txt(l,'Name'), abstract:txt(l,'Abstract'),
+    queryable:l.getAttribute('queryable')==='1',
+    styles:kids(l,'Style').map(s=>({name:txt(s,'Name'),title:txt(s,'Title')||txt(s,'Name')})),
+    times:timeDim?parseTimeDimension(timeDim.textContent):null,
+    timeDefault:timeDim?(timeDim.getAttribute('default')||null):null
+  };
+}
+function collectLayers(node,out){
+  for(const l of kids(node,'Layer')){
+    if(txt(l,'Name')) out.push(layerInfo(l));
+    collectLayers(l,out);
+  }
+}
+function parseCaps(xmlText){
+  const doc=new DOMParser().parseFromString(xmlText,'text/xml');
+  const root=doc.documentElement;
+  if(!root||/parsererror/i.test(root.localName)) throw new Error('Invalid XML in GetCapabilities response');
+  if(/ServiceException/i.test(root.localName)) throw new Error('WMS error: '+(root.textContent||'').trim().slice(0,200));
+  const gfiNode=[...doc.getElementsByTagName('*')].find(e=>e.localName==='GetFeatureInfo');
+  const formats=gfiNode?kids(gfiNode,'Format').map(f=>f.textContent.trim()):[];
+  gfiFormat=['application/json','text/plain','text/html'].find(f=>formats.includes(f))||formats[0]||'text/plain';
+  const cap=kid(root,'Capability'); if(!cap) throw new Error('No Capability section in response');
+  const rootLayer=kid(cap,'Layer'); if(!rootLayer) throw new Error('No layers advertised');
+  const groups=[];
+  for(const c of kids(rootLayer,'Layer')){
+    if(kids(c,'Layer').length){
+      const layers=[]; collectLayers(c,layers);
+      if(layers.length) groups.push({title:txt(c,'Title')||'Layer group',layers});
+    } else if(txt(c,'Name')){
+      let g=groups.find(g=>g.title==='Layers');
+      if(!g){g={title:'Layers',layers:[]};groups.push(g);}
+      g.layers.push(layerInfo(c));
+    }
+  }
+  if(!groups.length){
+    const layers=[]; collectLayers(rootLayer,layers);
+    if(layers.length) groups.push({title:'All layers',layers});
+  }
+  return groups;
+}
+
+/* ================= map ================= */
+const INDIA_BOUNDS=[[5.5,66],[38.5,98]];
+const map=L.map('map',{zoomControl:false,center:[23,80],zoom:5,minZoom:4,maxZoom:14});
+map.fitBounds(INDIA_BOUNDS);
+map.attributionControl.setPrefix(false);
+map.attributionControl.addAttribution('Weather: <a href="https://rapid.imd.gov.in" target="_blank" rel="noopener">IMD RAPID</a>');
+L.control.zoom({position:'bottomright'}).addTo(map);
+L.control.scale({position:'bottomright',imperial:false}).addTo(map);
+map.createPane('wmsA'); map.getPane('wmsA').style.zIndex=350;
+map.createPane('wmsB'); map.getPane('wmsB').style.zIndex=360;
+
+const basemaps={
+  Dark:L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',{attribution:'© OpenStreetMap · © CARTO',maxZoom:19}),
+  Streets:L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{attribution:'© OpenStreetMap contributors',maxZoom:19}),
+  Satellite:L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',{attribution:'Esri · Maxar · Earthstar',maxZoom:19})
+};
+basemaps.Dark.addTo(map);
+basemapSel.onchange=()=>{
+  const cur=basemaps[basemapSel.value];
+  Object.values(basemaps).forEach(b=>{ if(b!==cur&&map.hasLayer(b)) map.removeLayer(b); });
+  if(!map.hasLayer(cur)) cur.addTo(map);
+};
+homeBtn.onclick=()=>map.flyToBounds(INDIA_BOUNDS,{duration:1.2});
+
+/* ================= state ================= */
+let allLayers=[], groups=[];
+let activeInfo=null, activeLayer=null, activeStyle='';
+let compareOn=false, compareInfo=null, compareLayerB=null, dividerX=200;
+let currentTime=null, timeIndex=0, playing=false, playTimer=null;
+let gfiFormat='text/plain', probeMarker=null;
+
+/* ================= layer list ================= */
+function renderList(){
+  layerListEl.innerHTML='';
+  for(const g of groups){
+    const gEl=document.createElement('div'); gEl.className='group'; g._el=gEl;
+    const head=document.createElement('button'); head.className='groupHead';
+    head.innerHTML=`<span class="chev">▾</span><span>${esc(g.title)}</span><span class="count">${g.layers.length}</span>`;
+    head.onclick=()=>gEl.classList.toggle('closed');
+    const body=document.createElement('div'); body.className='groupBody';
+    for(const l of g.layers){
+      const it=document.createElement('div'); it.className='layerItem'; it.dataset.name=l.name;
+      it.title=l.abstract||l.title||l.name;
+      it.innerHTML=`<div class="liTitle">${esc(l.title)}${l.times&&l.times.length?'<span class="badge" title="Time-enabled layer">⏱</span>':''}${l.queryable?'<span class="badge b2" title="Queryable — click map for values">ⓘ</span>':''}</div><div class="liName">${esc(l.name)}</div>`;
+      it.onclick=()=>activateLayer(l);
+      l._el=it; body.appendChild(it);
+    }
+    gEl.appendChild(head); gEl.appendChild(body); layerListEl.appendChild(gEl);
+  }
+  compareSel.innerHTML='<option value="">— none —</option>'+allLayers.map(l=>`<option value="${esc(l.name)}">${esc(l.title)}</option>`).join('');
+  updateStatus(null);
+}
+function updateStatus(filtered){
+  statusLine.textContent=filtered==null
+    ? `${allLayers.length} layers · ${groups.length} groups`
+    : `${filtered} of ${allLayers.length} layers match`;
+}
+function applySearch(){
+  const q=searchEl.value.trim().toLowerCase(); let shown=0;
+  for(const g of groups){
+    let gs=0;
+    for(const l of g.layers){
+      const hit=!q||(l.name+' '+l.title+' '+(l.abstract||'')).toLowerCase().includes(q);
+      if(l._el) l._el.style.display=hit?'':'none';
+      if(hit) gs++;
+    }
+    if(g._el){
+      g._el.style.display=gs?'':'none';
+      const c=g._el.querySelector('.count'); if(c) c.textContent=gs;
+      if(q&&gs) g._el.classList.remove('closed');
+    }
+    shown+=gs;
+  }
+  updateStatus(q?shown:null);
+}
+searchEl.addEventListener('input',applySearch);
+
+/* ================= wms layers ================= */
+function makeWms(info,{pane,opacity=1,style='',time=null}={}){
+  const params={layers:info.name,format:'image/png',transparent:true,version:'1.3.0',crs:L.CRS.EPSG4326,opacity,pane};
+  if(style) params.styles=style;
+  if(time) params.time=time;
+  return L.tileLayer.wms(WMS,params);
+}
+function activateLayer(info){
+  stopPlay();
+  activeInfo=info;
+  activeStyle=info.styles&&info.styles.length?info.styles[0].name:'';
+  if(activeLayer){map.removeLayer(activeLayer);activeLayer=null;}
+  currentTime=null;
+  if(info.times&&info.times.length){
+    let idx=info.times.length-1;
+    if(info.timeDefault){const i=info.times.indexOf(info.timeDefault);if(i>=0)idx=i;}
+    timeIndex=idx; currentTime=info.times[idx];
+  }
+  activeLayer=makeWms(info,{pane:'wmsA',opacity:+opacityEl.value,style:activeStyle,time:currentTime});
+  activeLayer.addTo(map);
+  document.querySelectorAll('.layerItem.active').forEach(e=>e.classList.remove('active'));
+  if(info._el){info._el.classList.add('active');info._el.scrollIntoView({block:'nearest'});}
+  updateTimeUI(); updateLegend(); updateAbout(); buildStyleSelect(); syncCompareTime();
+  toast('Layer on: '+info.title,2200);
+}
+opacityEl.addEventListener('input',()=>{activeLayer&&activeLayer.setOpacity(+opacityEl.value);});
+styleSelect.onchange=()=>{
+  activeStyle=styleSelect.value;
+  activeLayer&&activeLayer.setParams({styles:activeStyle});
+  updateLegend();
+};
+function buildStyleSelect(){
+  const st=activeInfo?activeInfo.styles||[]:[];
+  styleRow.classList.toggle('hidden',st.length<2);
+  styleSelect.innerHTML=st.map(s=>`<option value="${esc(s.name)}" ${s.name===activeStyle?'selected':''}>${esc(s.title)}</option>`).join('');
+}
+function updateAbout(){ aboutEl.textContent=activeInfo?(activeInfo.abstract||activeInfo.title):''; }
+function updateLegend(){
+  legendWrap.innerHTML='';
+  if(!activeInfo){legendWrap.innerHTML='<span class="muted">Select a layer</span>';return;}
+  const img=new Image(); img.alt='legend';
+  img.src=WMS+`?SERVICE=WMS&VERSION=1.3.0&REQUEST=GetLegendGraphic&LAYER=${encodeURIComponent(activeInfo.name)}&FORMAT=image/png&STYLE=${encodeURIComponent(activeStyle)}&_=${Date.now()}`;
+  img.onerror=()=>{legendWrap.innerHTML='<span class="muted">No legend available</span>';};
+  legendWrap.appendChild(img);
+}
+
+/* ================= time ================= */
+function fmtTime(iso){
+  const d=new Date(iso); if(isNaN(d)) return iso;
+  const pad=n=>String(n).padStart(2,'0');
+  const ist=new Date(d.getTime()+19800000);
+  const months=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  return `${pad(ist.getUTCDate())} ${months[ist.getUTCMonth()]} ${pad(ist.getUTCHours())}:${pad(ist.getUTCMinutes())} IST`;
+}
+function updateTimeUI(){
+  const has=activeInfo&&activeInfo.times&&activeInfo.times.length>1;
+  timeBar.classList.toggle('hidden',!has);
+  if(has){ timeSlider.max=activeInfo.times.length-1; timeSlider.value=timeIndex; setTimeLabel(); }
+}
+function setTimeLabel(){
+  timeLabel.innerHTML=`${fmtTime(activeInfo.times[timeIndex])}<span class="muted"> · ${timeIndex+1}/${activeInfo.times.length}</span>`;
+}
+function applyTime(){
+  currentTime=activeInfo.times[timeIndex];
+  setTimeLabel();
+  activeLayer&&activeLayer.setParams({time:currentTime});
+  syncCompareTime();
+}
+timeSlider.addEventListener('input',()=>{timeIndex=+timeSlider.value;applyTime();});
+latestBtn.onclick=()=>{if(activeInfo&&activeInfo.times){timeIndex=activeInfo.times.length-1;timeSlider.value=timeIndex;applyTime();}};
+playBtn.onclick=()=>playing?stopPlay():startPlay();
+function startPlay(){
+  if(!activeInfo||!activeInfo.times||!activeInfo.times.length) return;
+  playing=true; playBtn.textContent='⏸'; playBtn.classList.add('on');
+  clearInterval(playTimer);
+  playTimer=setInterval(()=>{timeIndex=(timeIndex+1)%activeInfo.times.length;timeSlider.value=timeIndex;applyTime();},900);
+}
+function stopPlay(){playing=false;playBtn.textContent='▶';playBtn.classList.remove('on');clearInterval(playTimer);}
+window.addEventListener('keydown',e=>{
+  if(e.code==='Space'&&!timeBar.classList.contains('hidden')&&!/INPUT|SELECT|TEXTAREA/.test(document.activeElement.tagName)){
+    e.preventDefault(); playing?stopPlay():startPlay();
+  }
+});
+function nearestTime(times,targetIso){
+  const target=new Date(targetIso).getTime(); let best=null,bd=Infinity;
+  for(const t of times){const d=Math.abs(new Date(t).getTime()-target);if(d<bd){bd=d;best=t;}}
+  return best;
+}
+function syncCompareTime(){
+  if(compareLayerB&&compareInfo&&compareInfo.times&&compareInfo.times.length&&currentTime)
+    compareLayerB.setParams({time:nearestTime(compareInfo.times,currentTime)});
+}
+
+/* ================= probe (GetFeatureInfo) ================= */
+function markProbe(ll){
+  if(probeMarker) probeMarker.remove();
+  probeMarker=L.circleMarker(ll,{radius:7,color:'#ff9933',weight:2,fillColor:'#ff9933',fillOpacity:.35}).addTo(map);
+}
+map.on('click',async e=>{
+  if(!activeInfo){toast('Select a layer from the panel first');return;}
+  const ll=e.latlng; markProbe(ll);
+  probeCard.classList.remove('hidden');
+  probeTitle.textContent=activeInfo.title;
+  probeLoc.textContent=`Lat ${ll.lat.toFixed(3)} · Lon ${ll.lng.toFixed(3)}`;
+  probePre.textContent='Querying…';
+  const size=map.getSize(), b=map.getBounds(), sw=b.getSouthWest(), ne=b.getNorthEast();
+  const pt=map.latLngToContainerPoint(ll);
+  const p=new URLSearchParams({
+    SERVICE:'WMS',VERSION:'1.3.0',REQUEST:'GetFeatureInfo',
+    LAYERS:activeInfo.name,QUERY_LAYERS:activeInfo.name,STYLES:activeStyle||'',
+    CRS:'CRS:84',BBOX:`${sw.lng},${sw.lat},${ne.lng},${ne.lat}`,
+    WIDTH:Math.round(size.x),HEIGHT:Math.round(size.y),
+    I:Math.round(pt.x),J:Math.round(pt.y),
+    INFO_FORMAT:gfiFormat,FEATURE_COUNT:'10'
+  });
+  if(currentTime) p.set('TIME',currentTime);
+  try{ showProbe(await fetchText(WMS+'?'+p.toString())); }
+  catch(err){ probePre.textContent='⚠ Could not fetch feature info (network/CORS).'; }
+});
+function showProbe(text){
+  let t=(text||'').trim(), pretty=t;
+  if(/^[{[]/.test(t)){try{pretty=JSON.stringify(JSON.parse(t),null,2);}catch{}}
+  else if(t.startsWith('<')){
+    if(/ServiceException/i.test(t)) pretty='⚠ No data at this point (server returned an exception).';
+    else{const d=new DOMParser().parseFromString(t,'text/html');pretty=(d.body?d.body.textContent:t).replace(/[ \t]+/g,' ').trim();}
+  }
+  probePre.textContent=pretty||'No data at this location.';
+}
+probeClose.onclick=()=>{probeCard.classList.add('hidden');probeMarker&&probeMarker.remove();};
+
+/* ================= compare / swipe ================= */
+compareBtn.onclick=()=>{
+  compareOn=!compareOn;
+  compareBtn.textContent='Swipe: '+(compareOn?'On':'Off');
+  compareBtn.classList.toggle('on',compareOn);
+  compareRow.classList.toggle('hidden',!compareOn);
+  divider.classList.toggle('hidden',!compareOn);
+  if(compareOn){
+    dividerX=map.getSize().x/2; applyDivider();
+    if(compareSel.value) setCompareLayer(compareSel.value);
+    else toast('Pick “Layer B” — then drag the orange handle');
+  }else if(compareLayerB){map.removeLayer(compareLayerB);compareLayerB=null;compareInfo=null;}
+};
+compareSel.onchange=()=>setCompareLayer(compareSel.value);
+function setCompareLayer(name){
+  if(compareLayerB){map.removeLayer(compareLayerB);compareLayerB=null;}
+  compareInfo=allLayers.find(l=>l.name===name)||null;
+  if(!compareInfo) return;
+  let t=null;
+  if(compareInfo.times&&compareInfo.times.length&&currentTime) t=nearestTime(compareInfo.times,currentTime);
+  compareLayerB=makeWms(compareInfo,{pane:'wmsB',opacity:1,style:compareInfo.styles[0]?compareInfo.styles[0].name:'',time:t});
+  compareLayerB.addTo(map);
+  updateClip(); setTimeout(updateClip,300);
+}
+function applyDivider(){ divider.style.left=dividerX+'px'; updateClip(); }
+function updateClip(){
+  if(!compareLayerB) return;
+  const c=compareLayerB.getContainer(); if(!c) return;
+  const s=map.getSize();
+  const nw=map.containerPointToLayerPoint([0,0]);
+  const se=map.containerPointToLayerPoint([s.x,s.y]);
+  const clipX=nw.x+dividerX;
+  c.style.clip=`rect(${nw.y}px, ${clipX}px, ${se.y}px, ${nw.x}px)`;
+}
+map.on('move zoom viewreset resize zoomend moveend',updateClip);
+dividerHandle.addEventListener('pointerdown',e=>{
+  e.preventDefault();
+  const move=ev=>{
+    const r=mapWrap.getBoundingClientRect();
+    dividerX=Math.max(0,Math.min(ev.clientX-r.left,r.width));
+    applyDivider();
+  };
+  window.addEventListener('pointermove',move);
+  window.addEventListener('pointerup',()=>window.removeEventListener('pointermove',move),{once:true});
+});
+
+/* ================= misc ui ================= */
+sidebarToggle.onclick=()=>{sidebar.classList.toggle('collapsed');setTimeout(()=>map.invalidateSize(),330);};
+if(matchMedia('(max-width:760px)').matches) sidebar.classList.add('collapsed');
+function toast(msg,ms=3500){
+  const t=document.createElement('div');t.className='toast';t.textContent=msg;
+  toastsEl.appendChild(t);
+  requestAnimationFrame(()=>t.classList.add('show'));
+  setTimeout(()=>{t.classList.remove('show');setTimeout(()=>t.remove(),400);},ms);
+}
+setInterval(()=>{istClock.textContent=new Date(Date.now()+19800000).toUTCString().slice(17,25)+' IST';},1000);
+
+refreshBtn.onclick=async()=>{
+  refreshBtn.disabled=true; toast('Refreshing layer catalogue…');
+  try{
+    const xml=await fetchText(CAPS_URL);
+    groups=parseCaps(xml);
+    allLayers=groups.flatMap(g=>g.layers);
+    renderList(); applySearch();
+    if(activeInfo){
+      const nu=allLayers.find(l=>l.name===activeInfo.name);
+      if(nu){
+        activeInfo=nu;
+        if(nu.times&&nu.times.length){timeIndex=nu.times.length-1;currentTime=nu.times[timeIndex];}
+        updateTimeUI(); nu._el&&nu._el.classList.add('active');
+      }
+      const sp={_:Date.now()}; if(currentTime) sp.time=currentTime;
+      activeLayer&&activeLayer.setParams(sp);
+      compareLayerB&&compareLayerB.setParams({_:Date.now()});
+      updateLegend();
+    }
+    toast(`✓ Refreshed — ${allLayers.length} layers`);
+  }catch(e){ toast('Refresh failed: '+(e.message||e),5000); }
+  refreshBtn.disabled=false;
+};
+
+retryBtn.onclick=()=>{errorPanel.classList.add('hidden');init();};
+manualAdd.onclick=()=>{
+  const n=manualLayer.value.trim(); if(!n) return;
+  errorPanel.classList.add('hidden');
+  const info={name:n,title:n,abstract:'Manually added layer',queryable:true,styles:[],times:null};
+  allLayers.push(info);
+  compareSel.insertAdjacentHTML('beforeend',`<option value="${esc(n)}">${esc(n)}</option>`);
+  activateLayer(info);
+};
+
+/* ================= init ================= */
+async function init(){
+  loader.classList.remove('hidden');
+  loaderMsg.textContent='Contacting IMD RAPID…';
+  try{
+    const xml=await fetchText(CAPS_URL,i=>{
+      loaderMsg.textContent=i===0?'Contacting IMD RAPID…':`Direct blocked (CORS) — trying ${PROXY_NAMES[i]}…`;
+    });
+    loaderMsg.textContent='Parsing capabilities…';
+    groups=parseCaps(xml);
+    allLayers=groups.flatMap(g=>g.layers);
+    if(!allLayers.length) throw new Error('Service advertised zero layers');
+    renderList();
+    loader.classList.add('hidden');
+    toast(`✓ Discovered ${allLayers.length} live layers from IMD RAPID`,4500);
+    setTimeout(()=>toast('Tip: ⏱ layers animate in time · click the map to probe values',5500),1400);
+    const first=allLayers.find(l=>/radar|reflect/i.test(l.name+' '+l.title))||allLayers[0];
+    activateLayer(first);
+  }catch(e){
+    console.error(e);
+    loader.classList.add('hidden');
+    errorPanel.classList.remove('hidden');
+    errorMsg.textContent=String(e.message||e);
+  }
+}
+init();
+</script>
+</body>
+</html>

@@ -1,0 +1,677 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weather GeoMap — Subhrajit Rath</title>
+    <script defer src="https://code.highcharts.com/highcharts.js"></script>
+    <script defer src="https://code.highcharts.com/maps/modules/map.js"></script>
+    <script defer src="https://code.highcharts.com/maps/modules/geoheatmap.js"></script>
+    <script defer src="https://code.highcharts.com/modules/accessibility.js"></script>
+    <script src="heatmap.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap" rel="stylesheet">
+
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        /* ── Dark theme (default) ────────────────────────────── */
+        :root {
+            --bg:         #080e1a;
+            --surface:    #0d1627;
+            --surface2:   #111e35;
+            --border:     #1e2f4a;
+            --border2:    #243550;
+            --text:       #d8e4f5;
+            --text-dim:   #6b83a6;
+            --text-faint: #3d5070;
+            --accent:     #38bdf8;
+            --accent2:    #0ea5e9;
+            --glow:       rgba(56,189,248,0.18);
+            --glow-sm:    rgba(56,189,248,0.07);
+            --map-null:   #0d1627;
+            --map-border: #243550;
+            --shadow:     0 4px 20px rgba(0,0,0,0.45);
+            --mono:       'Space Mono', monospace;
+            --sans:       'DM Sans', sans-serif;
+            --radius:     8px;
+        }
+
+        /* ── Light theme ─────────────────────────────────────── */
+        :root.light {
+            --bg:         #edf1f7;
+            --surface:    #ffffff;
+            --surface2:   #f4f7fb;
+            --border:     #d4dceb;
+            --border2:    #beccdf;
+            --text:       #18263d;
+            --text-dim:   #4a6080;
+            --text-faint: #8aa0bf;
+            --accent:     #0077cc;
+            --accent2:    #005fa3;
+            --glow:       rgba(0,119,204,0.16);
+            --glow-sm:    rgba(0,119,204,0.06);
+            --map-null:   #dce4ef;
+            --map-border: #8aa0c0;
+            --shadow:     0 4px 20px rgba(0,0,0,0.10);
+        }
+
+        /* Smooth color transitions only — exclude dropdown-panel so display:none toggling isn't broken */
+        html, body, nav, aside, footer, .map-badge,
+        .status-card, select, .toggle-btn,
+        .loading-overlay { transition: background-color 0.35s, border-color 0.35s, color 0.25s, box-shadow 0.3s; }
+        .dropdown-panel { transition: background-color 0.35s, border-color 0.35s; }
+        .spinner, .dot, .nav-brand { transition: none !important; }
+
+        html, body {
+            height: 100%;
+            background: var(--bg);
+            color: var(--text);
+            font-family: var(--sans);
+            font-size: 15px;
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        ::-webkit-scrollbar { width: 5px; }
+        ::-webkit-scrollbar-track { background: var(--bg); }
+        ::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 3px; }
+
+        /* ── Shell ───────────────────────────────────────────── */
+        .shell {
+            display: grid;
+            grid-template-rows: auto 1fr auto;
+            min-height: 100vh;
+        }
+
+        /* ── Nav ─────────────────────────────────────────────── */
+        .topnav {
+            display: flex;
+            align-items: center;
+            padding: 0 1.5rem;
+            height: 50px;
+            background: var(--surface);
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            gap: 0;
+            /* Must be visible so dropdown panels can escape the nav bounds */
+            overflow: visible;
+        }
+
+        .nav-brand {
+            font-family: var(--mono);
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--accent);
+            letter-spacing: 0.06em;
+            margin-right: 1.4rem;
+            white-space: nowrap;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 9px;
+            flex-shrink: 0;
+        }
+        .dot {
+            width: 8px; height: 8px;
+            border-radius: 50%;
+            background: var(--accent);
+            box-shadow: 0 0 8px var(--accent);
+            animation: pulse 2.6s ease-in-out infinite;
+            flex-shrink: 0;
+        }
+        @keyframes pulse {
+            0%,100% { opacity:1; box-shadow:0 0 8px var(--accent); }
+            50%      { opacity:0.3; box-shadow:0 0 3px var(--accent); }
+        }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+            list-style: none;
+            height: 100%;
+            flex: 1;
+            /* overflow must be visible so absolute dropdowns aren't clipped */
+            overflow: visible;
+        }
+
+        .nav-links > li {
+            position: relative;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            flex-shrink: 0;
+        }
+
+        .nav-links > li > a,
+        .nav-links > li > .dropbtn {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            height: 100%;
+            padding: 0 13px;
+            color: var(--text-dim);
+            text-decoration: none;
+            font-size: 18px;
+            font-weight: 400;
+            white-space: nowrap;
+            cursor: pointer;
+            border: none;
+            background: none;
+            font-family: var(--sans);
+            transition: color 0.2s, background 0.2s;
+        }
+        .nav-links > li > a:hover,
+        .nav-links > li:hover > .dropbtn {
+            color: var(--text);
+            background: var(--glow-sm);
+        }
+
+        .dropbtn::after {
+            content: '▾';
+            font-size: 10px;
+            opacity: 0.4;
+            transition: transform 0.2s;
+        }
+        .nav-links > li:hover > .dropbtn::after { transform: rotate(180deg); }
+
+        .dropdown-panel {
+            display: none;
+            position: absolute;
+            top: 100%; left: 0;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-top: none;
+            border-radius: 0 0 var(--radius) var(--radius);
+            min-width: 210px;
+            box-shadow: var(--shadow);
+            z-index: 200;
+        }
+        .nav-links > li:hover .dropdown-panel { display: block; }
+        .dropdown-panel a {
+            display: block;
+            padding: 10px 16px;
+            color: var(--text-dim);
+            text-decoration: none;
+            font-size: 13.5px;
+            border-left: 2px solid transparent;
+            transition: all 0.15s;
+        }
+        .dropdown-panel a:hover {
+            color: var(--accent);
+            border-left-color: var(--accent);
+            background: var(--glow-sm);
+        }
+        .dropdown-panel a + a { border-top: 1px solid var(--border); }
+
+        /* ── Theme toggle ────────────────────────────────────── */
+        .theme-toggle {
+            display: flex;
+            align-items: center;
+            gap: 9px;
+            margin-left: auto;
+            flex-shrink: 0;
+            padding-left: 12px;
+        }
+        .toggle-label {
+            font-family: var(--mono);
+            font-size: 10px;
+            color: var(--text-faint);
+            letter-spacing: 0.1em;
+            min-width: 36px;
+            text-align: right;
+            user-select: none;
+        }
+        .toggle-btn {
+            position: relative;
+            width: 46px; height: 25px;
+            background: var(--border2);
+            border: 1.5px solid var(--border2);
+            border-radius: 13px;
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+        .toggle-btn::after {
+            content: '';
+            position: absolute;
+            top: 3px; left: 3px;
+            width: 17px; height: 17px;
+            border-radius: 50%;
+            background: #fff;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.35);
+            transition: transform 0.28s cubic-bezier(0.4,0,0.2,1);
+        }
+        .toggle-btn.active { background: var(--accent); border-color: var(--accent); }
+        .toggle-btn.active::after { transform: translateX(21px); }
+
+        /* ── Workspace ───────────────────────────────────────── */
+        .workspace {
+            display: grid;
+            grid-template-columns: 290px 1fr;
+            height: calc(100vh - 54px - 42px);
+            overflow: hidden;
+        }
+
+        /* ── Sidebar ─────────────────────────────────────────── */
+        .sidebar {
+            background: var(--surface);
+            border-right: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+        }
+        .sidebar-header {
+            padding: 20px 20px 16px;
+            border-bottom: 1px solid var(--border);
+        }
+        .sidebar-header h2 {
+            font-family: var(--mono);
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 0.18em;
+            text-transform: uppercase;
+            color: var(--text-faint);
+            margin-bottom: 4px;
+        }
+        .sidebar-header .tagline {
+            font-size: 15px;
+            color: var(--text-dim);
+            font-weight: 300;
+        }
+
+        .section-label {
+            font-family: var(--mono);
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 0.16em;
+            text-transform: uppercase;
+            color: var(--text-faint);
+            padding: 18px 20px 7px;
+        }
+
+        .select-wrap {
+            padding: 0 16px 14px;
+            position: relative;
+        }
+        .select-wrap::after {
+            content: '▾';
+            position: absolute;
+            right: 28px; top: 50%;
+            transform: translateY(-65%);
+            color: var(--text-dim);
+            font-size: 11px;
+            pointer-events: none;
+        }
+
+        select {
+            width: 100%;
+            padding: 10px 34px 10px 13px;
+            background: var(--surface2);
+            border: 1px solid var(--border2);
+            border-radius: var(--radius);
+            color: var(--text);
+            font-family: var(--sans);
+            font-size: 14px;
+            appearance: none;
+            -webkit-appearance: none;
+            cursor: pointer;
+            outline: none;
+        }
+        select:hover { border-color: var(--accent2); }
+        select:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--glow); }
+        select option, select optgroup { background: var(--surface2); color: var(--text); }
+
+        .sep { border: none; border-top: 1px solid var(--border); margin: 2px 16px 0; }
+
+        .status-card {
+            margin: 14px 16px;
+            padding: 14px 15px;
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+        }
+        .status-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            padding: 5px 0;
+        }
+        .status-row + .status-row {
+            border-top: 1px solid var(--border);
+            padding-top: 9px;
+            margin-top: 4px;
+        }
+        .status-key {
+            font-family: var(--mono);
+            font-size: 10px;
+            color: var(--text-faint);
+            letter-spacing: 0.08em;
+            flex-shrink: 0;
+        }
+        .status-val {
+            font-family: var(--mono);
+            font-size: 12px;
+            color: var(--accent);
+            text-align: right;
+            max-width: 155px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        /* ── Map area ────────────────────────────────────────── */
+        .map-area {
+            position: relative;
+            background: var(--bg);
+            overflow: hidden;
+        }
+        #container { width: 100%; height: 100%; }
+
+        .loading-overlay {
+            position: absolute;
+            inset: 0;
+            background: var(--bg);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 16px;
+            z-index: 50;
+        }
+        .loading-overlay.hidden { opacity: 0; pointer-events: none; }
+
+        .spinner {
+            width: 34px; height: 34px;
+            border: 2px solid var(--border2);
+            border-top-color: var(--accent);
+            border-radius: 50%;
+            animation: spin 0.85s linear infinite;
+            transition: none !important;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        .loading-text {
+            font-family: var(--mono);
+            font-size: 11px;
+            color: var(--text-dim);
+            letter-spacing: 0.12em;
+        }
+
+        .map-badge {
+            position: absolute;
+            top: 12px; right: 12px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 6px 13px;
+            font-family: var(--mono);
+            font-size: 10px;
+            color: var(--text-dim);
+            box-shadow: var(--shadow);
+            z-index: 10;
+            pointer-events: none;
+            letter-spacing: 0.06em;
+            opacity: 0.85;
+        }
+        .map-badge span { color: var(--accent); font-weight: 700; }
+
+        /* ── Footer ──────────────────────────────────────────── */
+        footer {
+            height: 42px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 1.5rem;
+            background: var(--surface);
+            border-top: 1px solid var(--border);
+        }
+        .footer-left {
+            font-family: var(--mono);
+            font-size: 11px;
+            color: var(--text-faint);
+            letter-spacing: 0.08em;
+        }
+        .footer-right { font-size: 12px; color: var(--text-faint); }
+        .footer-right a { color: var(--text-dim); text-decoration: none; }
+        .footer-right a:hover { color: var(--accent); }
+
+        /* Highcharts */
+        .highcharts-background { fill: transparent !important; }
+
+        /* ── Responsive ──────────────────────────────────────── */
+        @media (max-width: 860px) {
+            .workspace { grid-template-columns: 1fr; grid-template-rows: auto 1fr; height: auto; overflow: visible; }
+            .sidebar { border-right: none; border-bottom: 1px solid var(--border); }
+            .map-area { height: 70vw; min-height: 380px; }
+            .topnav { padding: 0 1rem; }
+            .toggle-label { display: none; }
+        }
+    </style>
+</head>
+<body>
+<div class="shell">
+
+    <!-- Nav -->
+    <nav class="topnav">
+        <a href="../index.html" class="nav-brand">
+            <span class="dot"></span>SR / WX
+        </a>
+
+        <ul class="nav-links">
+            <li><a href="../index.html">Home</a></li>
+            <li><a href="../education.html">Education</a></li>
+            <li><a href="../experience.html">Skills</a></li>
+            <li><a href="../publications.html">Publications</a></li>
+            <li><a href="../contact.html">Contact</a></li>
+            <li><a href="../nwp_imd.html">NWP_IMD</a></li>
+            <li>
+                <button class="dropbtn">Weather Forecast</button>
+                <div class="dropdown-panel">
+                    <a href="../sw.html">Weather Card</a>
+                    <a href="../src/weatherchart.html">Weather Chart</a>
+                    <a href="../AQI.html">AQI HeatMap</a>
+                    <a href="../Weather_web.html">Weather Websites</a>
+                    <a href="../meteogram.html">Meteogram</a>
+                </div>
+            </li>
+            <li>
+                <button class="dropbtn">Satellite</button>
+                <div class="dropdown-panel">
+                    <a href="../mosdac_live.html">Mosdac / ISRO</a>
+                    <a href="../gibs.html">GIBS / NASA</a>
+                </div>
+            </li>
+            <li>
+                <button class="dropbtn">Climate</button>
+                <div class="dropdown-panel">
+                    <a href="../climate/monavg/chloro.html">Monthly Statistics</a>
+                    <a href="../climate/Dailyavg/chloro.html">Daily Average</a>
+                </div>
+            </li>
+            <li>
+                <button class="dropbtn">Jobs</button>
+                <div class="dropdown-panel">
+                    <a href="../Jobs.html" target="_blank">MET Jobs</a>
+                    <a href="https://www.21centuryweather.org.au/about-us/positions-vacant/" target="_blank">21st Century AUS</a>
+                    <a href="https://www.tropmet.res.in/Careers" target="_blank">IITM Career</a>
+                    <a href="https://vacancies.incois.gov.in/" target="_blank">INCOIS Career</a>
+                    <a href="https://www.niot.res.in/recruitment_details.php/" target="_blank">NIOT Career</a>
+                    <a href="j1.html" target="_blank">Others</a>
+                </div>
+            </li>
+            <li><a href="../movies.html">Movies</a></li>
+            <li><a href="../series.html">Series</a></li>
+        </ul>
+
+        <!-- Theme toggle (right side of nav) -->
+        <div class="theme-toggle">
+            <span class="toggle-label" id="theme-label">DARK</span>
+            <div class="toggle-btn" id="theme-btn"
+                 role="switch" aria-checked="false"
+                 tabindex="0" title="Toggle light / dark theme"></div>
+        </div>
+    </nav>
+
+    <!-- Workspace -->
+    <div class="workspace">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h2>GeoHeatmap</h2>
+                <div class="tagline">India Meteorological Fields</div>
+            </div>
+
+            <div class="section-label">Variable</div>
+            <div class="select-wrap">
+                <select id="data-selector">
+                    <optgroup label="Surface">
+                        <option value="../src/2m_temp">2m Temperature</option>
+                        <option value="D2M">Dew Point Temp.</option>
+                        <option value="../src/rf">Rainfall</option>
+                        <option value="CP">Convective Rainfall</option>
+                        <option value="../src/msl">Mean Sea Level Pressure</option>
+                        <option value="../src/tcwv">Total Col. Water Vapour</option>
+                    </optgroup>
+                    <optgroup label="Instability">
+                        <option value="CAPE">CAPE</option>
+                        <option value="CIN">Convective Inhibition</option>
+                    </optgroup>
+                    <optgroup label="850 hPa">
+                        <option value="..\src\div850">Divergence</option>
+                        <option value="..\src\rh850">Relative Humidity</option>
+                        <option value="..\src\vo850">Vorticity</option>
+                        <option value="..\src\gh850">Geopotential Height</option>
+                    </optgroup>
+                    <optgroup label="500 hPa">
+                        <option value="..\src\div500">Divergence</option>
+                        <option value="..\src\rh500">Relative Humidity</option>
+                        <option value="..\src\vo500">Vorticity</option>
+                        <option value="..\src\gh500">Geopotential Height</option>
+                    </optgroup>
+                    <optgroup label="Cloud Cover">
+                        <option value="LCC">Low Cloud Cover</option>
+                        <option value="MCC">Mid Cloud Cover</option>
+                        <option value="HCC">High Cloud Cover</option>
+                        <option value="TCC">Total Cloud Cover</option>
+                    </optgroup>
+                    <optgroup label="Air Quality">
+                        <option value="PM25">PM 2.5</option>
+                        <option value="PM10">PM 10</option>
+                        <option value="AOD_TOT">Total AOD (550nm)</option>
+                        <option value="AOD_DUST">Dust AOD (550nm)</option>
+                        <option value="AOD_SEA">Sea Salt AOD (550nm)</option>
+                        <option value="AOD_SUL">Sulphate AOD (550nm)</option>
+                        <option value="AOD_NIT">Nitrate AOD (550nm)</option>
+                    </optgroup>
+                </select>
+            </div>
+
+            <div class="section-label">Time Step</div>
+            <div class="select-wrap">
+                <select id="time-selector">
+                    <option value="0">Loading…</option>
+                </select>
+            </div>
+
+            <hr class="sep">
+
+            <div class="status-card">
+                <div class="status-row">
+                    <span class="status-key">VARIABLE</span>
+                    <span class="status-val" id="stat-var">—</span>
+                </div>
+                <div class="status-row">
+                    <span class="status-key">UNIT</span>
+                    <span class="status-val" id="stat-unit">—</span>
+                </div>
+                <div class="status-row">
+                    <span class="status-key">TIME</span>
+                    <span class="status-val" id="stat-time">—</span>
+                </div>
+            </div>
+        </aside>
+
+        <div class="map-area">
+            <div class="loading-overlay" id="loading">
+                <div class="spinner"></div>
+                <div class="loading-text">FETCHING DATA…</div>
+            </div>
+            <div class="map-badge">PROJ: <span>MERCATOR</span></div>
+            <div id="container"></div>
+        </div>
+    </div>
+
+    <footer>
+        <div class="footer-left">© 2024 SUBHRAJIT RATH</div>
+        <div class="footer-right">
+            Data: ECMWF IFS /  ADS &nbsp;·&nbsp;
+            Vis: <a href="https://www.highcharts.com" target="_blank">Highcharts</a>
+        </div>
+    </footer>
+</div>
+
+<script>
+    // ── Theme ─────────────────────────────────────────────────────────────
+    const html    = document.documentElement;
+    const btn     = document.getElementById('theme-btn');
+    const lbl     = document.getElementById('theme-label');
+    let   isLight = localStorage.getItem('theme') === 'light';
+
+    function applyTheme() {
+        html.classList.toggle('light', isLight);
+        btn.classList.toggle('active', isLight);
+        btn.setAttribute('aria-checked', isLight);
+        lbl.textContent = isLight ? 'LIGHT' : 'DARK';
+    }
+    applyTheme(); // apply on load before first paint
+
+    function toggleTheme() {
+        isLight = !isLight;
+        localStorage.setItem('theme', isLight ? 'light' : 'dark');
+        applyTheme();
+        // Re-render so Highcharts text/border colors update
+        if (window._lastRenderArgs) {
+            const a = window._lastRenderArgs;
+            renderHeatmap(a.timeIndex, a.sstData, a.latData, a.lonData, a.topology, a.timeData);
+        }
+    }
+
+    btn.addEventListener('click', toggleTheme);
+    btn.addEventListener('keydown', e => {
+        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggleTheme(); }
+    });
+
+    // ── Theme color helper (used in heatmap.js) ───────────────────────────
+    function getThemeColors() {
+        return isLight
+            ? { text: '#18263d', textDim: '#4a6080', tooltipBg: 'rgba(255,255,255,0.97)',
+                mapNull: '#dce4ef', mapBorder: '#8aa0c0' }
+            : { text: '#d8e4f5', textDim: '#6b83a6', tooltipBg: 'rgba(13,22,39,0.96)',
+                mapNull: '#0d1627', mapBorder: '#1e2f4a' };
+    }
+
+    // ── Loading ───────────────────────────────────────────────────────────
+    function showLoading() { document.getElementById('loading').classList.remove('hidden'); }
+    function hideLoading() { document.getElementById('loading').classList.add('hidden'); }
+
+    // ── Status card (called from heatmap.js) ──────────────────────────────
+    function updateStatusCard(varLabel, unit, time) {
+        document.getElementById('stat-var').textContent  = varLabel || '—';
+        document.getElementById('stat-unit').textContent = unit     || '—';
+        document.getElementById('stat-time').textContent = time     || '—';
+    }
+
+    // ── App bootstrap ─────────────────────────────────────────────────────
+    let currentData = '../src/2m_temp';
+
+    document.getElementById('data-selector').addEventListener('change', function () {
+        currentData = this.value;
+        showLoading();
+        loadData().then(hideLoading).catch(hideLoading);
+    });
+
+    showLoading();
+    loadData().then(hideLoading).catch(hideLoading);
+</script>
+</body>
+</html>
