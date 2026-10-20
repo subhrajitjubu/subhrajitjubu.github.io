@@ -1,0 +1,65 @@
+
+name: Remove Historical JSON Files
+
+on:
+  workflow_dispatch:
+    inputs:
+      confirm:
+        description: "Confirm permanent Git history rewrite"
+        required: true
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+
+jobs:
+  clean-history:
+    if: inputs.confirm == true
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout full history
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Configure Git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+      - name: Back up current JSON files
+        shell: bash
+        run: |
+          mapfile -d '' files < <(git ls-files -z -- '*.json')
+          if ((${#files[@]})); then
+            tar -cf /tmp/current-json.tar "${files[@]}"
+            echo "JSON_BACKUP=yes" >> "$GITHUB_ENV"
+          else
+            echo "JSON_BACKUP=no" >> "$GITHUB_ENV"
+          fi
+
+      - name: Install git-filter-repo
+        run: |
+          pip install git-filter-repo
+
+      - name: Remove JSON files from all historical commits
+        run: |
+          git filter-repo --path-glob '*.json' --invert-paths --force
+
+      - name: Restore latest JSON files
+        shell: bash
+        run: |
+          if [ "$JSON_BACKUP" = "yes" ]; then
+            tar -xf /tmp/current-json.tar
+            git add -A -- '*.json'
+            git commit -m "Restore current JSON data after history cleanup"
+          fi
+
+      - name: Push rewritten main history
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          git remote add origin "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
+          git push origin main --force
