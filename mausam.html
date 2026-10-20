@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weather App with Location Details and Charts</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6;
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+            user-select: none; /* Prevent text selection */
+        }
+
+        #map {
+            width: 50%;
+            height: 100%;
+            border-right: 1px solid #e5e7eb;
+        }
+
+        #weather {
+            width: 50%;
+            padding: 24px;
+            overflow-y: auto;
+            background-color: #ffffff;
+        }
+
+        #info {
+            background-color: #dbeafe;
+            color: #1e40af;
+            padding: 16px;
+            border-radius: 8px;
+            margin-bottom: 24px;
+            font-size: 16px;
+            font-weight: 500;
+        }
+
+        #datetime-selector {
+            background-color: #f9fafb;
+            padding: 16px;
+            border-radius: 8px;
+            margin-bottom: 24px;
+            display: flex;
+            gap: 16px;
+            align-items: center;
+        }
+
+        #datetime-selector label {
+            font-weight: 500;
+            color: #1f2937;
+        }
+
+        #datetime-selector input,
+        #datetime-selector select {
+            padding: 8px;
+            border: 1px solid #d1d5db;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        #location-details {
+            background-color: #f9fafb;
+            padding: 16px;
+            border-radius: 8px;
+            margin-bottom: 24px;
+            line-height: 1.6;
+        }
+
+        #location-details strong {
+            color: #1f2937;
+            font-weight: 600;
+        }
+
+        .weather-cards-container {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .weather-card {
+            background-color: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(9, 226, 81, 0.6);
+            padding: 16px;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .weather-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(98, 214, 235, 0.58);
+        }
+
+        .weather-card-header {
+            font-size: 16px;
+            font-weight: 600;
+            color: #356dbb;
+            margin-bottom: 12px;
+        }
+
+        .weather-card-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(60px, 1fr));
+            gap: 12px;
+        }
+
+        .weather-card-item {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .weather-card-item label {
+            font-size: 12px;
+            color: #b50ddf;
+            font-weight: 500;
+        }
+
+        .weather-card-item span {
+            font-size: 14px;
+            color: #1f2937;
+            font-weight: 500;
+        }
+
+        .chart-container {
+            background-color: #ffffff;
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 24px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            position: relative;
+            height: 300px;
+        }
+
+        canvas {
+            width: 100% !important;
+            height: 100% !important;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+            color: #4b5563;
+            font-weight: 500;
+        }
+
+        .error {
+            background-color: #fee2e2;
+            color: #991b1b;
+            padding: 16px;
+            border-radius: 8px;
+            margin-bottom: 24px;
+            display: none;
+        }
+
+        @media (max-width: 768px) {
+            body {
+                flex-direction: column;
+            }
+            #map {
+                width: 100%;
+                height: 40%;
+            }
+            #weather {
+                width: 100%;
+                height: 60%;
+            }
+            #datetime-selector {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .weather-card-content {
+                grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="map"></div>
+    <div id="weather">
+         <div class="header">
+                <h1>🌤️ Weather Insights</h1>
+                <p>Click anywhere on the map to view detailed weather forecasts</p>
+            </div>
+
+        <div id="datetime-selector">
+            <label for="date-picker">Select Date:</label>
+            <input type="date" id="date-picker" value="2025-10-07">
+            <label for="time-picker">Select Time:</label>
+            <select id="time-picker">
+                <option value="00">00:00 IST</option>
+                <option value="12">12:00 IST</option>
+            </select>
+        </div>
+        <div id="info">Click on the map to get weather data for that location.</div>
+        <div id="error" class="error"></div>
+        <div id="loading" class="loading">Loading weather data...</div>
+        <div id="location-details"></div>
+        <div class="weather-cards-container" id="weather-cards" style="display: none;"></div>
+        <div class="chart-container"><canvas id="tempChart"></canvas></div>
+        <div class="chart-container"><canvas id="precipChart"></canvas></div>
+        <div class="chart-container"><canvas id="windSpeedChart"></canvas></div>
+        <div class="chart-container"><canvas id="windDirChart"></canvas></div>
+        <div class="chart-container"><canvas id="rhChart"></canvas></div>
+        <div class="chart-container"><canvas id="cloudCoverChart"></canvas></div>
+        <!-- <div class="chart-container"><canvas id="ghiChart"></canvas></div> -->
+    </div>
+
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+    <script>
+        // Disable right-click context menu
+        document.addEventListener('contextmenu', function(e) {
+            e.preventDefault();
+            alert('Right-click is disabled to protect the application.');
+        });
+
+        // Disable developer tools keyboard shortcuts
+        document.addEventListener('keydown', function(e) {
+            // Block F12
+            if (e.key === 'F12') {
+                e.preventDefault();
+                alert('Developer tools are disabled to protect the application.');
+                return false;
+            }
+            // Block Ctrl+Shift+I, Ctrl+Shift+J, Ctrl+Shift+C
+            if (e.ctrlKey && e.shiftKey && ['i', 'I', 'j', 'J', 'c', 'C'].includes(e.key)) {
+                e.preventDefault();
+                alert('Developer tools are disabled to protect the application.');
+                return false;
+            }
+            // Block Ctrl+U (view source)
+            if (e.ctrlKey && (e.key === 'u' || e.key === 'U')) {
+                e.preventDefault();
+                alert('View source is disabled to protect the application.');
+                return false;
+            }
+        });
+
+        // Initialize the map centered on India
+        const map = L.map('map').setView([20.5937, 78.9629], 5);
+
+        // Add OpenStreetMap tiles
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        }).addTo(map);
+
+        let marker = null;
+        let charts = {};
+
+        // Function to round coordinates to nearest 0.125 degree
+        function roundToGrid(coord) {
+            return Math.round(coord / 0.125) * 0.125;
+        }
+
+        // Function to convert UTC to IST (UTC+5:30)
+        function toIST(date) {
+            const istOffset = 5.5 * 60 * 60 * 1000;
+            return new Date(date.getTime() + istOffset);
+        }
+
+        // Function to format date for API (YYYYMMDDHH)
+        function formatDateForAPI(date, hour) {
+            const year = date.getFullYear();
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const day = String(date.getDate()).padStart(2, '0');
+            return `${year}${month}${day}${hour}`;
+        }
+
+        // Function to show/hide loading state
+        function toggleLoading(show) {
+            document.getElementById('loading').style.display = show ? 'block' : 'none';
+            document.getElementById('weather-cards').style.display = show ? 'none' : 'flex';
+        }
+
+        // Function to show error message
+        function showError(message) {
+            const errorDiv = document.getElementById('error');
+            errorDiv.innerText = message;
+            errorDiv.style.display = 'block';
+            setTimeout(() => errorDiv.style.display = 'none', 5000);
+        }
+
+        // Function to fetch location details from Nominatim
+        async function getLocationDetails(lat, lng) {
+            const url = `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=json`;
+            try {
+                const response = await fetch(url, {
+                    headers: {
+                        'User-Agent': 'WeatherApp/1.0 (contact@example.com)'
+                    }
+                });
+                const data = await response.json();
+                const address = data.address || {};
+                return {
+                    village: address.village || address.hamlet || 'N/A',
+                    tehsil: address.county || 'N/A',
+                    district: address.state_district || 'N/A',
+                    state: address.state || 'N/A',
+                    country: address.country || 'N/A',
+                    display_name: data.display_name || 'N/A'
+                };
+            } catch (error) {
+                console.error('Error fetching location details:', error);
+                return null;
+            }
+        }
+
+        // Function to create or update a Chart.js chart
+        function updateChart(canvasId, label, data, unit, startTime) {
+            if (typeof Chart === 'undefined') {
+                console.error(`Chart.js is not loaded. Cannot render ${canvasId}.`);
+                return;
+            }
+            const canvas = document.getElementById(canvasId);
+            if (!canvas) {
+                console.error(`Canvas element ${canvasId} not found`);
+                return;
+            }
+            const ctx = canvas.getContext('2d');
+            if (!ctx) {
+                console.error(`Failed to get context for ${canvasId}`);
+                return;
+            }
+            if (!data || data.length <= 1 || data.every(val => isNaN(val) || val === null)) {
+                console.warn(`Invalid or empty data for ${label} chart`);
+                return;
+            }
+
+            if (charts[canvasId]) {
+                charts[canvasId].destroy();
+            }
+
+            const labels = Array.from({ length: data.length - 1 }, (_, i) => {
+                const time = new Date(startTime.getTime());
+                time.setHours(time.getHours() + (i + 1) * 3);
+                return toIST(time).toLocaleString('en-IN', { timeZone: 'Asia/Kolkata', hour: '2-digit', minute: '2-digit', day: '2-digit', month: 'short' });
+            });
+
+            charts[canvasId] = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: `${label} (${unit})`,
+                        data: data.slice(1),
+                        borderColor: getColorForChart(label),
+                        backgroundColor: getColorForChart(label) + '33',
+                        fill: true,
+                        tension: 0.3,
+                        pointRadius: 4,
+                        pointHoverRadius: 6
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        x: {
+                            title: { display: true, text: 'Time (IST)', font: { size: 14, weight: '500' } },
+                            ticks: {
+                                maxRotation: 45,
+                                minRotation: 45,
+                                font: { size: 12 }
+                            }
+                        },
+                        y: {
+                            title: { display: true, text: `${label} (${unit})`, font: { size: 14, weight: '500' } },
+                            beginAtZero: false,
+                            ticks: { font: { size: 12 } }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: true,
+                            labels: { font: { size: 14 } }
+                        },
+                        tooltip: {
+                            backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                            titleFont: { size: 14 },
+                            bodyFont: { size: 12 }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Function to get color for each chart
+        function getColorForChart(label) {
+            const colors = {
+                'Temperature': '#ef4444',
+                'Precipitation': '#3b82f6',
+                'Wind Speed': '#10b981',
+                'Wind Direction': '#f59e0b',
+                'Relative Humidity': '#8b5cf6',
+                'Cloud Cover': '#6b7280',
+                'GHI': '#facc15'
+            };
+            return colors[label] || '#000000';
+        }
+
+        // Function to fetch and display weather data
+        async function getWeather(lat, lng) {
+            toggleLoading(true);
+            const roundedLat = roundToGrid(lat);
+            const roundedLng = roundToGrid(lng);
+
+            // Get selected date and time
+            const dateInput = document.getElementById('date-picker').value;
+            const timeInput = document.getElementById('time-picker').value;
+            const selectedDate = new Date(dateInput);
+            selectedDate.setHours(parseInt(timeInput), 0, 0, 0);
+            const apiDateTime = formatDateForAPI(selectedDate, timeInput);
+
+            const locationDetails = await getLocationDetails(lat, lng);
+            const locationDiv = document.getElementById('location-details');
+            if (locationDetails) {
+                locationDiv.innerHTML = `
+                    <strong>Location Details:</strong><br>
+                     Village: ${locationDetails.village}<br>
+                    Tehsil: ${locationDetails.tehsil}<br>
+                    District: ${locationDetails.district}<br>
+                    State: ${locationDetails.state}<br>
+                    Country: ${locationDetails.country}<br>
+                    Full Address: ${locationDetails.display_name}
+                `;
+            } else {
+                locationDiv.innerText = 'Unable to fetch location details.';
+            }
+
+            const url = `https://mausamgram.imd.gov.in/test4_mme.php?lat_gfs=${roundedLat}&lon_gfs=${roundedLng}&date=${apiDateTime}_3hr_0p125`;
+            try {
+                const response = await fetch(url);
+                if (!response.ok) {
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+                }
+                const data = await response.json();
+
+                const infoDiv = document.getElementById('info');
+                infoDiv.innerText = `Weather data for: Lat ${roundedLat.toFixed(3)}, Lng ${roundedLng.toFixed(3)} on ${toIST(selectedDate).toLocaleString('en-IN', { timeZone: 'Asia/Kolkata', dateStyle: 'medium', timeStyle: 'short' })}`;
+                infoDiv.style.display = 'block';
+
+                const cardsContainer = document.getElementById('weather-cards');
+                cardsContainer.innerHTML = '';
+                cardsContainer.style.display = 'flex';
+
+                for (let i = 1; i < data.temp.length; i++) {
+                    const time = new Date(selectedDate.getTime());
+                    time.setHours(time.getHours() + i * 3);
+                    const timeStr = toIST(time).toLocaleString('en-IN', { timeZone: 'Asia/Kolkata', hour: '2-digit', minute: '2-digit', day: '2-digit', month: 'short' });
+
+                    const card = document.createElement('div');
+                    card.className = 'weather-card';
+                    card.innerHTML = `
+                        <div class="weather-card-header">${timeStr}</div>
+                        <div class="weather-card-content">
+                            <div class="weather-card-item">
+                                <label>Temperature</label>
+                                <span>${data.temp[i].toFixed(1)} °C</span>
+                            </div>
+                            <div class="weather-card-item">
+                                <label>Precipitation</label>
+                                <span>${data.apcp[i].toFixed(1)} mm</span>
+                            </div>
+                            <div class="weather-card-item">
+                                <label>Wind Speed</label>
+                                <span>${data.wspd[i].toFixed(1)} m/s</span>
+                            </div>
+                            <div class="weather-card-item">
+                                <label>Wind Direction</label>
+                                <span>${data.wdir[i].toFixed(0)}°</span>
+                            </div>
+                            <div class="weather-card-item">
+                                <label>Relative Humidity</label>
+                                <span>${data.rh[i].toFixed(0)}%</span>
+                            </div>
+                            <div class="weather-card-item">
+                                <label>Cloud Cover</label>
+                                <span>${data.tcdc[i].toFixed(0)}%</span>
+                            </div>
+                           <!--  <div class="weather-card-item">
+                                <label>GHI</label>
+                                <span>${data.ghi[i].toFixed(0)} W/m²</span>
+                            </div> -->
+
+                        </div>
+                    `;
+                    cardsContainer.appendChild(card);
+                }
+
+                if (typeof Chart !== 'undefined') {
+                    updateChart('tempChart', 'Temperature', data.temp, '°C', selectedDate);
+                    updateChart('precipChart', 'Precipitation', data.apcp, 'mm', selectedDate);
+                    updateChart('windSpeedChart', 'Wind Speed', data.wspd, 'm/s', selectedDate);
+                    updateChart('windDirChart', 'Wind Direction', data.wdir, '°', selectedDate);
+                    updateChart('rhChart', 'Relative Humidity', data.rh, '%', selectedDate);
+                    updateChart('cloudCoverChart', 'Cloud Cover', data.tcdc, '%', selectedDate);
+                    updateChart('ghiChart', 'GHI', data.ghi, 'W/m²', selectedDate);
+                } else {
+                    showError('Charts unavailable: Chart.js not loaded');
+                }
+                toggleLoading(false);
+            } catch (error) {
+                console.error('Error fetching weather data:', error);
+                showError('Error fetching weather data. Please try again.');
+                toggleLoading(false);
+            }
+        }
+
+        // Handle map click
+        map.on('click', function(e) {
+            const lat = e.latlng.lat;
+            const lng = e.latlng.lng;
+
+            if (marker) {
+                map.removeLayer(marker);
+            }
+
+            marker = L.marker([lat, lng]).addTo(map);
+            getWeather(lat, lng);
+        });
+
+        // Handle date and time change
+        document.getElementById('date-picker').addEventListener('change', function() {
+            if (marker) {
+                getWeather(marker.getLatLng().lat, marker.getLatLng().lng);
+            }
+        });
+        document.getElementById('time-picker').addEventListener('change', function() {
+            if (marker) {
+                getWeather(marker.getLatLng().lat, marker.getLatLng().lng);
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,12 @@
+jupyter
+nbconvert
+pandas
+numpy
+geopandas
+metpy
+xarray[complete]
+eccodes
+cfgrib
+rioxarray 
+ecmwf.opendata
+colormaps

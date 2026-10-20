@@ -1,0 +1,90 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 20px;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+th, td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: left;
+}
+
+th {
+    background-color: #f2f2f2;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f4f4f4;
+    color: #333;
+}
+header {
+    background-color: #333;
+    color: #fff;
+    padding: 1rem 0;
+    text-align: center;
+}
+nav {
+    text-align: center;
+    padding: 1rem 0;
+    background-color: #444;
+}
+nav a {
+    color: #fff;
+    margin: 0 0.5rem;
+    text-decoration: none;
+}
+.container {
+    width: 80%;
+    margin: 2rem auto;
+    background-color: #fff;
+    padding: 2rem;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+footer {
+    text-align: center;
+    padding: 1rem 0;
+    background-color: #333;
+    color: #0cb314;
+}
+
+        /* Set the size of the map */
+        #map {
+            height: 600px; /* Set the height of the map */
+            width: 100%; /* Set the width of the map */
+        }
+
+       
+
+.map-section, .chart-section {
+    flex: 1;
+    padding: 10px;
+}
+
+.map-section {
+    /* This will adjust the map width */
+    flex-basis: 50%; /* 50% width for the map */
+    height: 100vh; /* 50% width for the map */
+
+}
+
+.chart-section {
+    /* This will adjust the chart width */
+    flex-basis: 50%; /* 50% width for the charts */
+    height: 100vh; /* 50% width for the map */
+
+}
+
+
+canvas {
+    display: block;
+    margin-bottom: 20px; /* Add some space between charts */
+}

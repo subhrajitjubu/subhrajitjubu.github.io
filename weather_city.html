@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weather Forecast</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script> <!-- Include Chart.js -->
+</head>
+<body>
+
+<h1>Weather Forecast</h1>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-chart-radial"></script>
+
+
+<nav>
+        
+    <a href="index.html">Home</a>
+        <a href="experience.html">Experience</a>
+        <a href="education.html">Education</a>
+        <a href="experience.html">Skills</a>
+        <a href="publications.html">Publications</a>
+        <a href="Jobs.html">Jobs</a>
+        <a href="contact.html">Contact</a>
+        <a href="movies_3.html">Movies</a>
+        <a href="test_series_3.html">Series</a>
+        <a href="nwp_imd.html">NWP_IMD</a>
+        <a href="weather_map.html">weather chart</a>
+        <a href="weather_city.html">weather chart city</a>
+        <a href="https://www.tropmet.res.in/Careers">IITM career</a>
+        <a href="https://vacancies.incois.gov.in/">Incois career</a>
+
+    
+</nav>
+
+<div>
+    <label for="city">Enter City: </label>
+    <input type="text" id="city" value="pune">
+    <button id="fetchWeather">Get Weather</button>
+</div>
+
+<table id="weatherTable">
+    <thead>
+        <tr>
+            <!-- <th>DateTime</th> -->
+            <!-- <th>max T(m/s)</th> -->
+            <!-- <th>Temperature (°C)</th> -->
+            <!-- <th>min T(m/s)</th> -->
+            <!-- <th>Feels Like(°C)</th>
+            <th>Humidity (%)</th>
+            <th>Wind Speed (m/s)</th>
+            <th>Weather</th>
+            <th>precip</th>
+            <th>pressure</th> -->
+        </tr>
+    </thead>
+    <tbody>
+        <!-- Weather data will be inserted here -->
+    </tbody>
+</table>
+<script src="script.js"></script>
+
+
+<!-- Canvas element for the temperature chart -->
+<canvas id="temperatureChart" width="100" height="40"></canvas>
+<canvas id="rainChart" width="100" height="30"></canvas>
+<canvas id="cloudChart" width="100" height="20"></canvas>
+<canvas id="windChart" width="100" height="30"></canvas>
+
+<footer>
+    <p>&copy; 2024 Subhrajit Rath - Personal Blog</p>
+</footer>
+</body>
+</html>
