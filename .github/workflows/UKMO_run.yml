@@ -117,7 +117,7 @@ jobs:
             --split-levels --plevels 850 500 200
             --periods PT01H
             --max-json-mb 20
-            --workers 12
+            --workers 4
             --vars "$VARS"
           )
           printf 'mo_crop.py %s\n' "${opts[*]}"
