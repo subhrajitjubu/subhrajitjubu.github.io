@@ -15,6 +15,8 @@ The writer is save_json.save_da_json, which is ~28x faster than the usual
 import argparse, glob, os, sys, time
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
+BUILD = "2026-10-21-child-exit"
+
 import numpy as np
 import xarray as xr
 
@@ -109,6 +111,7 @@ def nc_to_json(path, outdir=None, decimals=2, indent=None, include_flag=True,
 
 
 def main():
+    print(f"mo_to_json.py {BUILD}", flush=True)
     ap = argparse.ArgumentParser()
     ap.add_argument("target", nargs="+", help="NetCDF file(s) or directory(ies)")
     ap.add_argument("--outdir", default=None, help="where to write the .json files")
@@ -145,6 +148,7 @@ def main():
     if not a.quiet:
         print(f"converting {len(files)} file(s) -> json", flush=True)
     t0 = time.perf_counter()
+    nfail = 0
     for f in files:
         try:
             nc_to_json(f, outdir=a.outdir, decimals=decimals, indent=a.indent,
@@ -155,9 +159,21 @@ def main():
                        max_mb=a.max_mb,
                        quiet=a.quiet)
         except Exception as e:
+            nfail += 1
             print(f"  FAILED {os.path.basename(f)}: {e}", flush=True)
     if not a.quiet:
+        if nfail:
+            print(f"{nfail} of {len(files)} file(s) FAILED", flush=True)
         print(f"done in {time.perf_counter()-t0:.1f}s", flush=True)
+
+    # netCDF4's HDF5 teardown aborts the interpreter with
+    # "double free or corruption (!prev)" on the CI runners - after every file
+    # has already been written and closed. os._exit() skips that teardown;
+    # without it the export "fails" with SIGABRT despite being complete.
+    for s in (sys.stdout, sys.stderr):
+        try: s.flush()
+        except Exception: pass
+    os._exit(0 if nfail < len(files) else 1)
 
 
 if __name__ == "__main__":
