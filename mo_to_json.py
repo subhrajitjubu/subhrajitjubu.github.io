@@ -143,7 +143,7 @@ def main():
         sys.exit("no .nc files found")
 
     if not a.quiet:
-        print(f"converting {len(files)} file(s) -> json")
+        print(f"converting {len(files)} file(s) -> json", flush=True)
     t0 = time.perf_counter()
     for f in files:
         try:
@@ -155,9 +155,9 @@ def main():
                        max_mb=a.max_mb,
                        quiet=a.quiet)
         except Exception as e:
-            print(f"  FAILED {os.path.basename(f)}: {e}")
+            print(f"  FAILED {os.path.basename(f)}: {e}", flush=True)
     if not a.quiet:
-        print(f"done in {time.perf_counter()-t0:.1f}s")
+        print(f"done in {time.perf_counter()-t0:.1f}s", flush=True)
 
 
 if __name__ == "__main__":
