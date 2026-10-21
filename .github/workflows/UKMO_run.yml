@@ -127,7 +127,7 @@ jobs:
             --run "$RUN"
             --lat 0 40 --lon 40 100
             # short run for validation; production is --max-lead 48
-            --max-lead 6
+            --max-lead 60
             --out ./cropped
             --merge --to-json
             --split-levels --plevels 850 500 200
