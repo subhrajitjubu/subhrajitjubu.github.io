@@ -19,7 +19,7 @@ Examples
   # 12Z run (the cycle that carries the full 0-168 h forecast)
   python mo_crop.py --run 20261019T1200Z --vars wind_speed_at_10m --out ./cropped
 """
-import argparse, io, os, re, sys, time, json, glob
+import argparse, atexit, io, os, re, sys, time, json, glob, logging, subprocess
 import urllib.request
 import numpy as np
 import h5py
@@ -29,6 +29,9 @@ from mo_aws import list_runs, list_files, BASE
 import mo_vars
 
 FN = re.compile(r"^(\d{8}T\d{4})Z-PT(\d+)H\d+M-(.+)\.nc$")
+# Printed at startup and checked by the workflow, so a run can never silently
+# use an older copy of this file again.
+BUILD = "2026-10-21-json-subprocess"
 WINDOW = 512 * 1024          # read-ahead window per HTTP Range request
 SKIP_ATTRS = {"CLASS", "NAME", "DIMENSION_SCALE", "DIMENSION_LIST", "REFERENCE_LIST",
               "_Netcdf4Dimid", "_Netcdf4Coordinates", "_FillValue"}
@@ -41,9 +44,20 @@ class RangeFile(io.RawIOBase):
         self.url, self.pos, self.nbytes, self.nreq = url, 0, 0, 0
         self.window = window
         self._buf, self._buf_start = b"", 0
+        # The HEAD is a normal HTTPS round trip and can time out like any other
+        # request, so retry it instead of losing a whole lead time to one blip.
         req = urllib.request.Request(url, method="HEAD")
-        with urllib.request.urlopen(req, timeout=60) as r:
-            self.size = int(r.headers["Content-Length"])
+        last = None
+        for attempt in range(5):
+            try:
+                with urllib.request.urlopen(req, timeout=60) as r:
+                    self.size = int(r.headers["Content-Length"])
+                break
+            except Exception as e:
+                last = e
+                time.sleep(min(2 ** attempt, 20))
+        else:
+            raise last
 
     def seekable(self): return True
     def readable(self): return True
@@ -366,7 +380,24 @@ def safe_crop(job):
 
 
 # ------------------------------------------------------------------- main ---
+def _exit_cleanly(code=0):
+    """Leave without running interpreter shutdown.
+
+    On the Linux runners, netCDF4 (pulled in by xarray for the JSON export) and
+    h5py (the range reader) each bring their own HDF5 build. With both loaded,
+    HDF5's atexit handlers can double-free and abort the interpreter with
+    "double free or corruption (!prev)" / exit code 134 - but only *after* every
+    file has been written and closed. Calling _exit() skips those handlers and
+    keeps the run's result; without it the step fails despite having succeeded.
+    """
+    for s in (sys.stdout, sys.stderr):
+        try: s.flush()
+        except Exception: pass
+    os._exit(code)
+
+
 def main():
+    print(f"mo_crop.py {BUILD}", flush=True)
     ap = argparse.ArgumentParser()
     ap.add_argument("--dataset", default="global-deterministic-10km")
     ap.add_argument("--run", default="LATEST")
@@ -384,6 +415,10 @@ def main():
     ap.add_argument("--periods", default=None,
                     help="restrict accumulation variants: PT01H,PT03H,PT06H")
     ap.add_argument("--max-lead", type=int, default=None)
+    ap.add_argument("--lead-every", type=int, default=1, metavar="HOURS",
+                    help="keep every Nth forecast hour (default 1 = every lead "
+                         "the archive has). The archive is hourly to 48 h, so "
+                         "--lead-every 3 cuts a 0-48 h run from 49 to 17 steps.")
     ap.add_argument("--plevels", nargs="+", type=float, default=None,
                     help="pressure levels in hPa to keep, e.g. --plevels 850 500 200")
     ap.add_argument("--hlevels", nargs="+", type=float, default=None,
@@ -497,6 +532,11 @@ def main():
         if tok not in want: continue
         if a.max_lead is not None and int(lead) > a.max_lead: continue
         parsed.append((f, int(lead), tok, size))
+    if a.lead_every and a.lead_every > 1:
+        parsed = [r for r in parsed if r[1] % a.lead_every == 0]
+        if not parsed:
+            sys.exit(f"--lead-every {a.lead_every} left no lead times "
+                     f"(max lead {a.max_lead})")
     parsed.sort(key=lambda r: (r[2], r[1]))
 
     vgroups = {}
@@ -546,6 +586,8 @@ def main():
     if a.plevels: print(f"  pressure lvls : {', '.join(f'{x:g}' for x in a.plevels)} hPa")
     if a.hlevels: print(f"  height lvls   : {', '.join(f'{x:g}' for x in a.hlevels)} m")
     if a.max_lead is not None: print(f"  max lead      : {a.max_lead} h")
+    if a.lead_every and a.lead_every > 1:
+        print(f"  lead step     : every {a.lead_every} h")
     if pgroups:
         print(f"  split lvls    : pressure -> {len(pgroups)} file(s): "
               + ", ".join("-".join(f"{x:g}" for x in g) for g in pgroups))
@@ -606,6 +648,13 @@ def main():
         sys.exit(f"another mo_crop run appears to be writing to {outdir}\n"
                  f"(lock file {lock}); delete it if that is not the case")
 
+    def drop_lock():
+        try: os.remove(lock)
+        except OSError: pass
+
+    # _exit_cleanly() below skips atexit, so this only covers the error paths
+    atexit.register(drop_lock)
+
     import concurrent.futures as cf
     t0 = time.time()
     gs = go = 0
@@ -631,34 +680,36 @@ def main():
         print(f"{len(failed)} file(s) FAILED:")
         for name, e in failed[:20]:
             print(f"   {name}: {e}")
+        if len(failed) == len(jobs):
+            drop_lock()
+            print("every source file failed - nothing to write", flush=True)
+            _exit_cleanly(1)
 
     if a.to_json:
-        print("\nwriting JSON alongside the NetCDF files ...")
-        try:
-            from mo_to_json import nc_to_json
-        except Exception as e:
-            print(f"  cannot import mo_to_json: {e}")
-        else:
-            ncs = sorted(glob.glob(os.path.join(outdir, "*.nc")))
-            tot = 0
-            nparts = 0
-            for i, nc in enumerate(ncs, 1):
-                try:
-                    p = nc_to_json(nc, quiet=(i % 50 != 0 and i != len(ncs)),
-                                   max_mb=a.max_json_mb)
-                except Exception as e:
-                    print(f"  FAILED {os.path.basename(nc)}: {e}")
-                else:
-                    paths = p if isinstance(p, list) else [p]
-                    nparts += len(paths)
-                    tot += sum(os.path.getsize(x) for x in paths)
-            print(f"  {len(ncs)} nc -> {nparts} json file(s), {tot/1e9:.2f} GB total")
+        # Export in a child process. xarray pulls in netCDF4 and this process
+        # already has h5py; both ship their own HDF5, and loading the two in one
+        # interpreter makes HDF5's exit handlers abort with
+        # "double free or corruption (!prev)" *after* every file is written.
+        # The child only loads netCDF4, the parent only h5py, so neither can
+        # corrupt the other's HDF5 state.
+        print("\nwriting JSON alongside the NetCDF files ...", flush=True)
+        script = os.path.join(os.path.dirname(os.path.abspath(__file__)),
+                              "mo_to_json.py")
+        rc = subprocess.call([sys.executable, script, outdir,
+                              "--max-mb", str(a.max_json_mb)])
+        ncs = sorted(glob.glob(os.path.join(outdir, "*.nc")))
+        js = sorted(glob.glob(os.path.join(outdir, "*.json")))
+        tot = sum(os.path.getsize(p) for p in js)
+        print(f"  {len(ncs)} nc -> {len(js)} json file(s), {tot/1e9:.2f} GB total",
+              flush=True)
+        if rc != 0:
+            drop_lock()
+            print(f"JSON export failed (exit {rc})", flush=True)
+            _exit_cleanly(rc)
 
-    try:
-        os.remove(lock)
-    except OSError:
-        pass
-    print(f"output: {outdir}")
+    drop_lock()
+    print(f"output: {outdir}", flush=True)
+    _exit_cleanly(0)
 
 
 if __name__ == "__main__":
