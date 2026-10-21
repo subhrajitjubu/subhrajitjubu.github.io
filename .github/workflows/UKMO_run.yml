@@ -15,6 +15,7 @@ concurrency:
   group: ukmo-run
   cancel-in-progress: false
 
+
 env:
   # every variable that gets downloaded, cropped, merged and written to JSON
   VARS: >-
@@ -50,6 +51,12 @@ jobs:
     timeout-minutes: 360
 
     steps:
+      - name: Check runner resources
+        run: 
+          nproc
+          free -h
+          df -h /
+          
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
