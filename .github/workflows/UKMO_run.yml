@@ -93,7 +93,7 @@ jobs:
           python mo_crop.py \
             --run "$RUN" \
             --lat 0 40 --lon 40 100 \
-            --max-lead 48 \
+            --max-lead 4 \
             --out ./cropped \
             --to-json \
             # --merge   \
