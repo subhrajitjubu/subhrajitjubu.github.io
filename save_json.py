@@ -193,10 +193,12 @@ def save_da_json(data, fm, outdir=None, decimals=2, indent=None,
                     the "extras" key as {name: {"dims": [...], "data": [...]}}
     convert_units : apply UNIT_CONVERSIONS (K -> degC, m -> mm, m s-1 -> mm h-1)
     unit_table    : override the conversion table
-    max_bytes     : split the output into parts no bigger than this, along the
-                    time axis. One file -> <fm>.json; several -> <fm>_partNNofNN.json
-                    Each part is a complete, valid document with its own (sliced)
-                    time / forecast_period coordinates.
+    max_bytes     : split the output into parts no bigger than this. Split
+                    along the time axis; when the time axis was dropped (or the
+                    output has no time axis) split along the leading level axis
+                    instead. One file -> <fm>.json; several ->
+                    <fm>_partNNofNN.json. Each part is a complete, valid
+                    document with its own (sliced) coordinates.
 
     Returns the path written, or a list of paths when the output was split.
     """
@@ -230,41 +232,67 @@ def save_da_json(data, fm, outdir=None, decimals=2, indent=None,
         tdim = 0
 
     coords = _coords(data)
-    time_coords = {k for k, v in data.coords.items() if "time" in v.dims}
     attrs = _attrs(data) if (include_attrs and data.attrs) else None
 
-    # extras -> (dims, values, is time-indexed)
+    # extras -> (dims, values)
     ex = {}
     for name, e in (extras or {}).items():
-        ex[name] = (list(e.dims), np.asarray(e.values), "time" in e.dims)
+        ex[name] = (list(e.dims), np.asarray(e.values))
 
-    # serialise one time slice at a time: this is also the unit we split on
+    # serialise one slice at a time: the slice is also the unit we split on
+    split_dim = "time" if tdim is not None else None
+    n = arr.shape[0] if tdim is not None else None
     if tdim is None:
         slices = [_dumps(_tolist(arr, decimals, nan_to_null), indent)]
-        n = None
     else:
-        n = arr.shape[0]
         slices = [_dumps(_tolist(arr[i], decimals, nan_to_null), indent)
                   for i in range(n)]
 
     def _part_coords(a, b):
-        if a is None:
+        if a is None or split_dim is None:
             return coords
-        return {k: (v[a:b] if (k in time_coords and isinstance(v, list)) else v)
-                for k, v in coords.items()}
+        out = {}
+        for k, v in coords.items():
+            c = data.coords.get(k) if k in data.coords else None
+            if (c is not None and c.dims and c.dims[0] == split_dim
+                    and isinstance(v, list) and len(v) >= b):
+                out[k] = v[a:b]
+            else:
+                out[k] = v
+        return out
+
+    def _part_extras(a, b):
+        out = {}
+        for name, (edims, ev) in ex.items():
+            if (a is not None and split_dim and edims and edims[0] == split_dim):
+                out[name] = (edims, ev[a:b])
+            else:
+                out[name] = (edims, ev)
+        return out
 
     def _overhead(a, b):
         """Bytes a part spends on everything except its data values."""
         size = len(_dumps(_part_coords(a, b), indent)) + len(_dumps(dims, None)) + 40
         if attrs:
             size += len(_dumps(attrs, indent))
-        for name, (edims, ev, istime) in ex.items():
-            vals = ev[a:b] if (a is not None and istime) else ev
+        for name, (edims, ev) in _part_extras(a, b).items():
             size += (len(_dumps(name, None)) + len(_dumps(edims, None))
-                     + len(_dumps(_tolist(vals, decimals, nan_to_null), indent)) + 40)
+                     + len(_dumps(_tolist(ev, decimals, nan_to_null), indent)) + 40)
         return size
 
-    # pack whole time slices into parts that stay under max_bytes
+    # Dropping a length-1 time axis means time splitting cannot shrink the file,
+    # so a large level field (a 37-level pressure variable, say) would still blow
+    # the budget. Split it along the leading non-spatial axis instead.
+    if (max_bytes and tdim is None and arr.ndim >= 3
+            and dims[0] not in ("latitude", "longitude")
+            and len(slices[0]) + _overhead(None, None) > max_bytes):
+        split_dim = dims[0]
+        n = arr.shape[0]
+        del slices
+        slices = [_dumps(_tolist(arr[i], decimals, nan_to_null), indent)
+                  for i in range(n)]
+
+    # pack whole slices into parts that stay under max_bytes
     if max_bytes and n:
         # overhead grows a little as time strings are added, so size every part
         # against the full-length coordinate block - an upper bound
@@ -318,16 +346,15 @@ def save_da_json(data, fm, outdir=None, decimals=2, indent=None,
                 fh.write("]")
             if ex:
                 fh.write(',"extras":{')
-                for k, (name, (edims, ev, istime)) in enumerate(ex.items()):
+                for k, (name, (edims, ev)) in enumerate(_part_extras(a, b).items()):
                     if k:
                         fh.write(",")
                     fh.write("\n" if indent else "")
-                    vals = ev[a:b] if (a is not None and istime) else ev
                     fh.write(_dumps(name, None) + ":")
                     fh.write('{"dims":')
                     fh.write(_dumps(edims, None))
                     fh.write(',"data":')
-                    fh.write(_dumps(_tolist(vals, decimals, nan_to_null), indent))
+                    fh.write(_dumps(_tolist(ev, decimals, nan_to_null), indent))
                     fh.write("}")
                 fh.write("\n" if indent else "")
                 fh.write("}")
@@ -336,8 +363,8 @@ def save_da_json(data, fm, outdir=None, decimals=2, indent=None,
         size = os.path.getsize(path)
         log.info("Data successfully saved -> %s (%.1f MB)", path, size / 1e6)
         if max_bytes and size > max_bytes:
-            log.warning("%s is %.1f MB, over the %.1f MB budget - a single time "
-                        "slice is larger than the limit",
+            log.warning("%s is %.1f MB, over the %.1f MB budget - a single slice "
+                        "(one time step or one level) is larger than the limit",
                         os.path.basename(path), size / 1e6, max_bytes / 1e6)
         paths.append(path)
 
