@@ -52,9 +52,12 @@ jobs:
 
     steps:
       - name: Check runner resources
-        run: 
+        run: |
+          echo "CPU cores:"
           nproc
+          echo "Memory:"
           free -h
+          echo "Disk:"
           df -h /
           
       - name: Checkout repository
