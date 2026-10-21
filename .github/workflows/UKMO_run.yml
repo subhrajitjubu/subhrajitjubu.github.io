@@ -110,7 +110,7 @@ jobs:
             --split-levels --plevels 850 500 200 \
             --periods PT01H \
             --max-json-mb 20 \
-            --workers 12 \
+            --workers 4 \
             --vars "$VARS"
 
           # mo_crop writes the JSON next to the NetCDF files, nested under
