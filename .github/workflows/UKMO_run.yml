@@ -16,6 +16,7 @@ concurrency:
   cancel-in-progress: false
 
 env:
+  PYTHONFAULTHANDLER: "1"
   # every variable that gets downloaded, cropped, merged and written to JSON
   VARS: >-
     cloud_amount_of_high_cloud,
@@ -117,15 +118,28 @@ jobs:
             --split-levels --plevels 850 500 200
             --periods PT01H
             --max-json-mb 20
-            --workers 4
+            --workers 1
             --vars "$VARS"
           )
+         
           printf 'mo_crop.py %s\n' "${opts[*]}"
+          
+          python -X faulthandler mo_crop.py "${opts[@]}" || {
+            rc=$?
+            echo "ERROR: mo_crop.py failed with exit code $rc"
+            echo "Checking generated JSON files..."
+            find cropped -type f -name '*.json' -printf '%s %p\n' | sort -nr | head -20
+            exit "$rc"
+          }
+          
+          # Flatten JSON files only after successful conversion
+          find cropped -type f -name '*.json' -exec mv -f {} UKMO/ \;
+
           python mo_crop.py "${opts[@]}"
 
           # mo_crop writes the JSON next to the NetCDF files, nested under
           # cropped/global-deterministic-10km/<run>_cropped/ - flatten it into UKMO/
-          find cropped -type f -name '*.json' -exec mv -f {} UKMO/ \;
+          # find cropped -type f -name '*.json' -exec mv -f {} UKMO/ \;
 
           n=$(find UKMO -maxdepth 1 -type f -name '*.json' | wc -l)
           if [ "$n" -eq 0 ]; then
