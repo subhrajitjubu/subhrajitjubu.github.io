@@ -95,7 +95,8 @@ jobs:
             --lat 0 40 --lon 40 100 \
             --max-lead 48 \
             --out ./cropped \
-            --merge --to-json \
+            --to-json \
+            # --merge   \
             --split-levels --plevels 850 500 200 \
             --periods PT01H \
             --max-json-mb 20 \
