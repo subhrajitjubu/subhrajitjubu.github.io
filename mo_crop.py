@@ -19,7 +19,7 @@ Examples
   # 12Z run (the cycle that carries the full 0-168 h forecast)
   python mo_crop.py --run 20261019T1200Z --vars wind_speed_at_10m --out ./cropped
 """
-import argparse, atexit, io, os, re, sys, time, json, glob, logging, subprocess
+import argparse, atexit, io, os, re, sys, time, json, glob, subprocess
 import urllib.request
 import numpy as np
 import h5py
