@@ -15,7 +15,6 @@ concurrency:
   group: ukmo-run
   cancel-in-progress: false
 
-
 env:
   # every variable that gets downloaded, cropped, merged and written to JSON
   VARS: >-
@@ -59,7 +58,7 @@ jobs:
           free -h
           echo "Disk:"
           df -h /
-          
+
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
@@ -95,23 +94,34 @@ jobs:
 
       - name: Download, crop, merge and convert to JSON
         run: |
+          set -euo pipefail
+
           # start from a clean slate: a different number of parts would otherwise
           # leave stale *_part03of03.json files behind
           mkdir -p UKMO
           find UKMO -maxdepth 1 -type f -name '*.json' -delete
+          # nor should JSON left in the workspace by an earlier run leak into UKMO/
+          find cropped -type f -name '*.json' -delete 2>/dev/null || true
 
-          python mo_crop.py \
-            --run "$RUN" \
-            --lat 0 40 --lon 40 100 \
-            --max-lead 4 \
-            --out ./cropped \
-            --to-json \
-            # --merge   \
-            --split-levels --plevels 850 500 200 \
-            --periods PT01H \
-            --max-json-mb 20 \
-            --workers 4 \
+          # Keep the options in an array instead of a backslash-continued
+          # command. A comment inside such a chain silently ends the command:
+          # an earlier revision had "# --merge \" in the middle of this call and
+          # mo_crop only ever received the flags before it (53 variables,
+          # 4 workers, no level splitting) - with no error until much later.
+          opts=(
+            --run "$RUN"
+            --lat 0 40 --lon 40 100
+            --max-lead 6
+            --out ./cropped
+            --merge --to-json
+            --split-levels --plevels 850 500 200
+            --periods PT01H
+            --max-json-mb 20
+            --workers 12
             --vars "$VARS"
+          )
+          printf 'mo_crop.py %s\n' "${opts[*]}"
+          python mo_crop.py "${opts[@]}"
 
           # mo_crop writes the JSON next to the NetCDF files, nested under
           # cropped/global-deterministic-10km/<run>_cropped/ - flatten it into UKMO/
@@ -125,8 +135,17 @@ jobs:
           echo "$n JSON file(s) in UKMO/"
           du -sh UKMO/
 
+          # GitHub's web uploader refuses files over 25 MB. With --split-levels
+          # and --plevels every file is far below that; warn if that ever breaks.
+          big=$(find UKMO -maxdepth 1 -type f -name '*.json' -size +25M)
+          if [ -n "$big" ]; then
+            echo "::warning::JSON files larger than 25 MB:"
+            echo "$big"
+          fi
+
       - name: Commit and push changes
         run: |
+          set -euo pipefail
           git config --global --add safe.directory "$GITHUB_WORKSPACE"
           git config --global user.name "subhrajitjubu"
           git config --global user.email "66462700+subhrajitjubu@users.noreply.github.com"
