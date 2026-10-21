@@ -16,6 +16,7 @@ concurrency:
   cancel-in-progress: false
 
 env:
+  # dump Python stacks on SIGABRT/SIGSEGV, so a native crash leaves a traceback
   PYTHONFAULTHANDLER: "1"
   # every variable that gets downloaded, cropped, merged and written to JSON
   VARS: >-
@@ -104,6 +105,19 @@ jobs:
           # nor should JSON left in the workspace by an earlier run leak into UKMO/
           find cropped -type f -name '*.json' -delete 2>/dev/null || true
 
+          # A run once finished writing every file and then aborted with
+          # "double free or corruption (!prev)" because the runner still had an
+          # older copy of these files. Both now leave through os._exit() before
+          # HDF5's teardown; fail in two seconds if either is stale.
+          grep -q 'json-subprocess' mo_crop.py || {
+            echo "::error::mo_crop.py is stale - copy the current mo_crop.py into this repo"
+            exit 1
+          }
+          grep -q 'child-exit' mo_to_json.py || {
+            echo "::error::mo_to_json.py is stale - copy the current mo_to_json.py into this repo"
+            exit 1
+          }
+
           # Keep the options in an array instead of a backslash-continued
           # command. A comment inside such a chain silently ends the command:
           # an earlier revision had "# --merge \" in the middle of this call and
@@ -112,18 +126,20 @@ jobs:
           opts=(
             --run "$RUN"
             --lat 0 40 --lon 40 100
+            # short run for validation; production is --max-lead 48
             --max-lead 6
             --out ./cropped
             --merge --to-json
             --split-levels --plevels 850 500 200
             --periods PT01H
             --max-json-mb 20
-            --workers 1
+            --workers 12
             --vars "$VARS"
           )
-         
           printf 'mo_crop.py %s\n' "${opts[*]}"
-          
+
+          # run exactly once: a second `python mo_crop.py` after this block
+          # would repeat the whole download on success
           python -X faulthandler mo_crop.py "${opts[@]}" || {
             rc=$?
             echo "ERROR: mo_crop.py failed with exit code $rc"
@@ -131,15 +147,10 @@ jobs:
             find cropped -type f -name '*.json' -printf '%s %p\n' | sort -nr | head -20
             exit "$rc"
           }
-          
-          # Flatten JSON files only after successful conversion
-          find cropped -type f -name '*.json' -exec mv -f {} UKMO/ \;
-
-          python mo_crop.py "${opts[@]}"
 
           # mo_crop writes the JSON next to the NetCDF files, nested under
           # cropped/global-deterministic-10km/<run>_cropped/ - flatten it into UKMO/
-          # find cropped -type f -name '*.json' -exec mv -f {} UKMO/ \;
+          find cropped -type f -name '*.json' -exec mv -f {} UKMO/ \;
 
           n=$(find UKMO -maxdepth 1 -type f -name '*.json' | wc -l)
           if [ "$n" -eq 0 ]; then
