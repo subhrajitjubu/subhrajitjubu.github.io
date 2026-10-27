@@ -44,9 +44,31 @@
   }
   header h1 { font-size: 15px; font-weight: 500; color: var(--text); }
   header .tag {
-    margin-left: auto; font-size: 11px; color: var(--muted);
+    font-size: 11px; color: var(--muted);
     font-family: monospace; background: var(--surface2);
     padding: 2px 8px; border-radius: 4px; border: 1px solid var(--border);
+  }
+  .ver-sel {
+    margin-left: auto; display: flex; align-items: center; gap: 8px;
+  }
+  .ver-sel label {
+    font-size: 11px; color: var(--muted); font-family: monospace;
+  }
+  .ver-sel select {
+    background: var(--surface2); border: 1px solid var(--accent);
+    color: var(--accent); font-family: monospace; font-size: 12px;
+    font-weight: 700; padding: 3px 10px; border-radius: 5px; cursor: pointer;
+  }
+  .ver-badge {
+    font-size: 10px; padding: 2px 7px; border-radius: 10px;
+    font-family: monospace; font-weight: 700;
+  }
+  .ver-badge.v4 { background: #1a3a2a; color: #34d399; border: 1px solid #34d399; }
+  .ver-badge.v3 { background: #2a2a1a; color: #fbbf24; border: 1px solid #fbbf24; }
+  .ver-only-note {
+    font-size: 10px; color: var(--warn); font-family: monospace;
+    padding: 4px 8px; background: #2a2000; border-radius: 4px;
+    border-left: 3px solid var(--warn); margin-bottom: 8px; display: none;
   }
 
   /* ── Layout ── */
@@ -246,14 +268,40 @@
     background: var(--surface2); border-radius: 5px;
     border-left: 3px solid var(--accent); margin-bottom: 10px;
   }
+  .import-btn{padding:5px 12px;font-size:11px}
+  .modal{position:fixed;inset:0;background:rgba(0,0,0,.72);z-index:2000;display:none;align-items:center;justify-content:center}
+  .modal.open{display:flex}
+  .modal-box{background:var(--surface);border:1px solid var(--border);border-radius:10px;width:min(980px,94vw);max-height:92vh;display:flex;flex-direction:column;padding:16px;gap:10px;overflow:auto}
+  .modal-cols{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  .modal textarea{width:100%;height:40vh;background:var(--code-bg);color:#a8d0f0;border:1px solid var(--border);border-radius:6px;padding:8px;font:11px/1.5 monospace;resize:none}
+  .modal-log{font:11px/1.5 monospace;color:var(--muted);max-height:16vh;overflow:auto;white-space:pre-wrap}
+  @media(max-width:700px){.modal-cols{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
 
+<div class="modal" id="import-modal"><div class="modal-box">
+  <div style="font-size:13px;font-weight:600">Import existing namelists <span style="color:var(--muted);font-weight:400">— paste either or both; the form is filled from them</span></div>
+  <div class="modal-cols">
+    <div class="field"><label>namelist.wps <input type="file" onchange="loadFile(this,'imp-wps')" style="width:auto;border:0;padding:0;margin-left:8px"></label><textarea id="imp-wps" spellcheck="false" placeholder="&amp;share ..."></textarea></div>
+    <div class="field"><label>namelist.input <input type="file" onchange="loadFile(this,'imp-input')" style="width:auto;border:0;padding:0;margin-left:8px"></label><textarea id="imp-input" spellcheck="false" placeholder="&amp;time_control ..."></textarea></div>
+  </div>
+  <div class="modal-log" id="imp-log"></div>
+  <div style="display:flex;gap:8px;justify-content:flex-end"><button class="btn btn-ghost" onclick="closeImport()">Close</button><button class="btn btn-primary" onclick="runImport()">Parse &amp; fill form</button></div>
+</div></div>
 <header>
   <span class="logo">WRF//NL</span>
   <h1>Namelist Builder</h1>
-  <span class="tag">ARW · v4.x</span>
+  <span class="tag">ARW</span>
+  <div class="ver-sel">
+    <button class="btn btn-primary import-btn" onclick="openImport()">⇪ Import namelist</button>
+    <label>WRF version:</label>
+    <select id="wrf_version" onchange="onVersionChange()">
+      <option value="4" selected>v4.5.2</option>
+      <option value="3">v3.9.6</option>
+    </select>
+    <span class="ver-badge v4" id="ver-badge">v4.5.2</span>
+  </div>
 </header>
 
 <div class="workspace">
@@ -331,9 +379,13 @@
         <div class="field"><label>io_form_geogrid</label>
           <select id="io_form_geogrid"><option value="2" selected>2 (NetCDF)</option></select>
         </div>
-        <div class="field"><label>wps_path (geog_data)</label>
-          <input type="text" id="geog_data_path" value="/path/to/WPS_GEOG/">
+        <div class="field"><label>ungrib prefix</label>
+          <input type="text" id="wps_prefix" value="FILE" maxlength="16"
+            placeholder="FILE or PL or ERA5…">
         </div>
+      </div>
+      <div class="field"><label>geog_data_path</label>
+        <input type="text" id="geog_data_path" value="/home/users/fsai/wrf_wps/WPS_GEOG">
       </div>
     </div>
 
@@ -341,20 +393,7 @@
     <div class="tab-content" id="tab-physics">
       <div class="section-label">Microphysics</div>
       <div class="field"><label>mp_physics</label>
-        <select id="mp_physics">
-          <option value="0">0 — None</option>
-          <option value="1">1 — Kessler</option>
-          <option value="2" selected>2 — Lin et al.</option>
-          <option value="3">3 — WSM3</option>
-          <option value="4">4 — WSM5</option>
-          <option value="6">6 — WSM6</option>
-          <option value="8">8 — Thompson</option>
-          <option value="10">10 — Morrison</option>
-          <option value="14">14 — WDM5</option>
-          <option value="16">16 — WDM6</option>
-          <option value="17">17 — NSSL 2-moment</option>
-          <option value="28">28 — Thompson aerosol-aware</option>
-        </select>
+        <select id="mp_physics"></select>
       </div>
 
       <div class="section-label">Radiation</div>
@@ -448,20 +487,7 @@
 
       <div class="section-label">Cumulus</div>
       <div class="field"><label>cu_physics (d01)</label>
-        <select id="cu_physics">
-          <option value="0">0 — None</option>
-          <option value="1" selected>1 — Kain-Fritsch</option>
-          <option value="2">2 — BMJ</option>
-          <option value="3">3 — Grell-Freitas</option>
-          <option value="4">4 — SAS</option>
-          <option value="5">5 — Grell-3</option>
-          <option value="6">6 — Tiedtke</option>
-          <option value="7">7 — Zhang-McFarlane</option>
-          <option value="10">10 — Grell-Devenyi</option>
-          <option value="11">11 — CAMZMF</option>
-          <option value="14">14 — New SAS</option>
-          <option value="16">16 — KF-CuP</option>
-        </select>
+        <select id="cu_physics"></select>
       </div>
       <div class="field"><label>cudt (min)</label><input type="number" id="cudt" value="5"></div>
 
@@ -486,6 +512,21 @@
 
     <!-- DYNAMICS TAB -->
     <div class="tab-content" id="tab-dynamics">
+      <div class="ver-only-note" id="hybrid-note">⚠ etac is v4.x only — omitted for v3.9.6</div>
+      <div id="hybrid-block">
+        <div class="section-label">Vertical coordinate</div>
+        <div class="row2">
+          <div class="field"><label>hybrid_opt</label>
+            <select id="hybrid_opt">
+              <option value="2" selected>2 — Klemp cubic (default)</option>
+              <option value="0">0 — terrain-following (V3 style)</option>
+            </select>
+          </div>
+          <div class="field"><label>etac</label>
+            <input type="number" id="etac" value="0.2" step="0.05" min="0.1" max="0.5">
+          </div>
+        </div>
+      </div>
       <div class="section-label">Vertical levels</div>
       <div class="row2">
         <div class="field"><label>e_vert</label><input type="number" id="e_vert" value="51"></div>
@@ -565,6 +606,18 @@
           <option value="2">2 — smoothing-desmoothing</option>
         </select>
       </div>
+      <!-- v3 only -->
+      <div id="v3-bdy-block">
+        <div class="section-label">Boundary (v3.9.6)</div>
+        <div class="toggle"><input type="checkbox" id="spec_bdy_final_mu" checked>
+          <label for="spec_bdy_final_mu">spec_bdy_final_mu = 1</label></div>
+      </div>
+      <!-- v4 only -->
+      <div id="v4-bdy-block">
+        <div class="section-label">Boundary (v4.5.2)</div>
+        <div class="toggle"><input type="checkbox" id="multi_bdy_files">
+          <label for="multi_bdy_files">multi_bdy_files (multiple boundary files)</label></div>
+      </div>
     </div>
   </div><!-- /panel -->
 
@@ -608,6 +661,235 @@ let currentOutput = 'wps';
 let map, centerMarker;
 let domainRects = [];
 let lastWPS = '', lastINPUT = '';
+
+// ── Version-specific option tables ─────────────────────────────────────────
+const VER_OPTIONS = {
+  mp_physics: {
+    common: [
+      [0,'None'],[1,'Kessler'],[2,'Lin et al.'],[3,'WSM 3-class'],
+      [4,'WSM 5-class'],[5,'Ferrier (Eta)'],[6,'WSM 6-class'],
+      [8,'Thompson'],[9,'Milbrandt-Yau 2-mom'],[10,'Morrison 2-mom'],
+      [11,'CAM 5.1'],[13,'SBU_YLIN'],[14,'WDM 5-class'],[16,'WDM 6-class'],
+      [17,'NSSL 2-mom (steady CCN)'],[18,'NSSL 2-mom (predict CCN)'],
+      [19,'NSSL 1-mom 7-class'],[21,'NSSL 1-mom 6-class'],
+      [28,'Thompson aerosol-aware'],[30,'HUJI spectral bin fast'],
+      [32,'HUJI spectral bin full'],[50,'P3 1-cat'],[51,'P3 1-cat + 2M cloud'],
+      [95,'Ferrier old Eta']
+    ],
+    v3_only: [
+      [7,'Goddard GCE']
+    ],
+    v4_only: [
+      [7,'Goddard 4-ice'],[24,'WSM 7-class'],[26,'WDM 7-class'],
+      [38,'Thompson 2-mom graupel'],[40,'Morrison w/ sea spray'],
+      [52,'P3 2-ice + 2M cloud'],[53,'P3 1-ice 3-mom'],[55,'Jensen-ISHMAEL'],
+      [56,'NTU multi-moment'],[96,'Madwrf'],[97,'Goddard GCE (legacy)']
+    ]
+  },
+  cu_physics: {
+    common: [
+      [0,'None'],[1,'Kain-Fritsch'],[2,'Betts-Miller-Janjic'],
+      [3,'Grell-Freitas'],[4,'Scale-aware SAS'],[5,'Grell-3D'],
+      [6,'Modified Tiedtke'],[7,'Zhang-McFarlane (CAM5)'],
+      [10,'Modified KF w/ trigger'],[11,'Multi-scale KF'],
+      [16,'Newer Tiedtke'],
+      [93,'Grell-Devenyi ensemble'],[94,'2015 GFS SAS'],
+      [95,'Previous GFS SAS'],[99,'Previous KF']
+    ],
+    v3_only: [
+      [14,'New GFS SAS (YSU)']
+    ],
+    v4_only: [
+      [14,'KIM SAS (KSAS)'],[96,'Previous new GFS SAS']
+    ]
+  }
+};
+
+// ── Import: parse pasted namelists and fill the form ───────────────────────
+let extras = { wps: {}, input: {} };   // keys the form doesn't control, re-emitted verbatim
+let ovId = {};                         // ui id -> [kind, section, key] for preserved per-domain arrays
+
+function parseNL(text) {
+  const nl = {}; let sec = null, body = '';
+  const flush = () => {
+    if (!sec) return;
+    const re = /(?:^|[\s,])([A-Za-z_]\w*)\s*(?:\([^)]*\))?\s*=/g, hits = []; let m;
+    while ((m = re.exec(body))) hits.push({ k: m[1].toLowerCase(), s: m.index + m[0].length, e: m.index + m[0].indexOf(m[1]) });
+    hits.forEach((h, i) => {
+      const val = body.slice(h.s, i + 1 < hits.length ? hits[i + 1].e : body.length), toks = [];
+      (val.match(/'[^']*'|"[^"]*"|[^\s,]+/g) || []).forEach(t => {
+        const q = /^['"]/.test(t), v = q ? t.slice(1, -1) : t, r = !q && v.match(/^(\d+)\*(.+)$/);
+        if (r) for (let n = 0; n < +r[1]; n++) toks.push({ v: r[2], q }); else toks.push({ v, q });
+      });
+      nl[sec][h.k] = toks;
+    });
+  };
+  text.split('\n').forEach(line => {
+    line = line.replace(/!.*$/, '');
+    const m = line.match(/^\s*&(\w+)/);
+    if (m) { flush(); sec = m[1].toLowerCase(); body = ''; nl[sec] = nl[sec] || {}; }
+    else if (/^\s*(\/|&end)\s*$/i.test(line)) { flush(); sec = null; }
+    else if (sec) body += line + '\n';
+  });
+  flush(); return nl;
+}
+
+const vals = (nl, s, k) => nl[s] && nl[s][k] ? nl[s][k].map(t => t.v) : undefined;
+const num = v => /^[+-]?(\d+\.?\d*|\.\d+)([ed][+-]?\d+)?$/i.test(v) ? String(parseFloat(v.replace(/d/i, 'e'))) : v;
+const rawToks = toks => toks.map(t => t.q ? `'${t.v}'` : t.v).join(', ');
+const p2 = x => String(x).padStart(2, '0');
+const effDxM = i => { let d = domains[0].dx * 1000; for (let k = 1; k <= i; k++) d /= domains[k].ratio; return d; };
+
+function setVal(id, v) {
+  const el = document.getElementById(id); if (!el || v === undefined) return;
+  if (el.type === 'checkbox') { el.checked = /^(\.?t(rue)?\.?|1)$/i.test(v); return; }
+  v = num(v);
+  if (el.tagName === 'SELECT' && ![...el.options].some(o => o.value === v)) el.add(new Option(v + ' — (from file)', v));
+  el.value = v;
+}
+
+// [section, key, ui id, perDomain(1) | cu-rule(2)]
+const MAP = {
+ wps: [['share','interval_seconds','interval_seconds'],['share','io_form_geogrid','io_form_geogrid'],['geogrid','map_proj','map_proj'],['geogrid','ref_lat','ref_lat'],['geogrid','ref_lon','ref_lon'],['geogrid','truelat1','truelat1'],['geogrid','truelat2','truelat2'],['geogrid','stand_lon','stand_lon'],['geogrid','geog_data_path','geog_data_path'],['ungrib','prefix','wps_prefix']],
+ input: [['time_control','interval_seconds','interval_seconds'],['time_control','history_interval','history_interval',1],['time_control','frames_per_outfile','frames_per_file',1],['time_control','restart_interval','restart_interval'],['time_control','io_form_history','io_form_history'],['domains','time_step','time_step'],['domains','e_vert','e_vert',1],['domains','p_top_requested','p_top'],['domains','feedback','feedback'],['domains','smooth_option','smooth_option'],
+  ['physics','mp_physics','mp_physics',1],['physics','ra_lw_physics','ra_lw_physics',1],['physics','ra_sw_physics','ra_sw_physics',1],['physics','radt','radt'],['physics','sf_sfclay_physics','sf_sfclay_physics',1],['physics','sf_surface_physics','sf_surface_physics',1],['physics','bl_pbl_physics','bl_pbl_physics',1],['physics','bldt','bldt'],['physics','cu_physics','cu_physics',2],['physics','cudt','cudt'],['physics','icloud','icloud'],['physics','sf_urban_physics','sf_urban_physics',1],['physics','sf_lake_physics','sf_lake_physics',1],['physics','swint_opt','swint_opt'],
+  ['dynamics','hybrid_opt','hybrid_opt'],['dynamics','etac','etac'],['dynamics','diff_opt','diff_opt',1],['dynamics','km_opt','km_opt',1],['dynamics','damp_opt','damp_opt'],['dynamics','zdamp','zdamp',1],['dynamics','moist_adv_opt','moist_adv_opt',1],['dynamics','scalar_adv_opt','scalar_adv_opt',1],['dynamics','non_hydrostatic','non_hydrostatic',1],
+  ['bdy_control','spec_bdy_final_mu','spec_bdy_final_mu'],['bdy_control','multi_bdy_files','multi_bdy_files']]
+};
+const CTRL = {
+ wps: { share: 'max_dom start_date end_date', geogrid: 'parent_id parent_grid_ratio i_parent_start j_parent_start e_we e_sn dx dy', metgrid: 'fg_name' },
+ input: { time_control: 'start_year start_month start_day start_hour end_year end_month end_day end_hour run_days run_hours', domains: 'max_dom e_we e_sn dx dy parent_id parent_grid_ratio i_parent_start j_parent_start' }
+};
+const isCtrl = (kind, s, k) => (CTRL[kind][s] || '').split(' ').includes(k) || MAP[kind].some(m => m[0] === s && m[1] === k);
+
+function keepRaw(kind, s, k, toks, st, id) {
+  (extras[kind][s] = extras[kind][s] || {})[k] = rawToks(toks); st.kept.push(k);
+  if (id) ovId[id] = [kind, s, k];
+}
+
+function applyGrid(get, maxDom) {
+  const ewe = get('e_we'); if (!ewe) return;
+  const n = Math.min(MAX_DOMS, Math.max(1, parseInt((maxDom || [])[0]) || ewe.length));
+  const dx = parseFloat((get('dx') || [])[0]), esn = get('e_sn') || [], par = get('parent_id') || [], rat = get('parent_grid_ratio') || [], is = get('i_parent_start') || [], js = get('j_parent_start') || [];
+  const old = domains[0] ? domains[0].dx : 10;
+  domains = Array.from({ length: n }, (_, i) => ({ id: i + 1, dx: i === 0 ? (isFinite(dx) ? dx / 1000 : old) : 10, ewe: +ewe[i] || 90, esn: +esn[i] || +ewe[i] || 90, parent: i ? +par[i] || i : 1, ratio: i ? +rat[i] || 5 : 1, istart: i ? +is[i] || 31 : 1, jstart: i ? +js[i] || 31 : 1 }));
+}
+
+function applyMap(nl, kind, st) {
+  MAP[kind].forEach(([s, k, id, pd]) => {
+    const t = nl[s] && nl[s][k]; if (!t || !t.length) return;
+    setVal(id, t[0].v); st.applied++;
+    if (!pd) return;
+    const vs = t.slice(0, domains.length).map(x => x.v);
+    if (vs.some((x, i) => num(x) !== num(pd === 2 && i && effDxM(i) < 4000 ? '0' : vs[0]))) keepRaw(kind, s, k, t, st, id);
+  });
+  Object.keys(nl).forEach(s => Object.keys(nl[s]).forEach(k => { if (!isCtrl(kind, s, k) && nl[s][k].length) keepRaw(kind, s, k, nl[s][k], st); }));
+}
+
+function inDate(nl, p) {
+  const v = k => { const t = (nl.time_control || {})[p + '_' + k]; return t && t[0] && t[0].v; };
+  return v('year') && v('month') && v('day') ? `${v('year')}-${p2(v('month'))}-${p2(v('day'))}T${p2(v('hour') || 0)}:${p2(v('minute') || 0)}` : null;
+}
+const wpsDate = s => { const m = s && s.match(/^(\d{4}-\d\d-\d\d)[_T ](\d\d):(\d\d)/); return m ? `${m[1]}T${m[2]}:${m[3]}` : null; };
+
+function detectVer(nl) {
+  const ks = new Set(); Object.values(nl).forEach(s => Object.keys(s).forEach(k => ks.add(k)));
+  if (['etac','w_crit_cfl','zadvect_implicit','multi_bdy_files','nocolons','auto_levels_opt','dzbot','max_dz'].some(k => ks.has(k))) return 4;
+  return ['spec_bdy_final_mu','euler_adv','idtadc','idtadt','ptsgm'].some(k => ks.has(k)) ? 3 : 0;
+}
+
+function injectExtras(text, kv, comma) {
+  const lines = text.split('\n');
+  Object.keys(kv).forEach(sec => {
+    const ent = Object.entries(kv[sec]); if (!ent.length) return;
+    let a = lines.findIndex(l => l.trim().toLowerCase() === '&' + sec);
+    if (a < 0) { lines.push('', '&' + sec); a = lines.length - 1; lines.push('/'); }
+    let z = a + 1; while (z < lines.length && lines[z].trim() !== '/') z++;
+    ent.forEach(([k, r]) => {
+      const line = ' ' + k.padEnd(35) + '= ' + r + comma, re = new RegExp('^\\s*' + k + '\\s*=', 'i');
+      let i = -1; for (let j = a + 1; j < z; j++) if (re.test(lines[j])) { i = j; break; }
+      if (i >= 0) lines[i] = line; else { lines.splice(z, 0, line); z++; }
+    });
+  });
+  return lines.join('\n');
+}
+
+function reset(kind) { extras[kind] = {}; Object.keys(ovId).forEach(i => ovId[i][0] === kind && delete ovId[i]); }
+document.addEventListener('change', e => { const o = ovId[e.target.id]; if (o) { delete extras[o[0]][o[1]][o[2]]; delete ovId[e.target.id]; } });
+
+function openImport() { document.getElementById('import-modal').classList.add('open'); }
+function closeImport() { document.getElementById('import-modal').classList.remove('open'); }
+function loadFile(inp, id) { const f = inp.files[0]; if (!f) return; const r = new FileReader(); r.onload = () => { document.getElementById(id).value = r.result; }; r.readAsText(f); }
+
+function runImport() {
+  const logEl = document.getElementById('imp-log'), log = [], st = { applied: 0, kept: [] };
+  const wt = document.getElementById('imp-wps').value.trim(), it = document.getElementById('imp-input').value.trim();
+  if (!wt && !it) { logEl.textContent = 'Paste a namelist.wps and/or namelist.input first.'; return; }
+  const W = wt && parseNL(wt), I = it && parseNL(it);
+  if (I) { const v = detectVer(I); if (v) { document.getElementById('wrf_version').value = v; onVersionChange(); log.push('Detected WRF ' + (v === 4 ? 'v4.x' : 'v3.x') + ' namelist.input'); } }
+  if (I) applyGrid(k => vals(I, 'domains', k), vals(I, 'domains', 'max_dom'));
+  if (W) applyGrid(k => vals(W, 'geogrid', k), vals(W, 'share', 'max_dom'));   // WPS wins for the grid
+  if (I) {
+    reset('input'); applyMap(I, 'input', st);
+    const a = inDate(I, 'start'), b = inDate(I, 'end'); if (a) setVal('start_date', a); if (b) setVal('end_date', b);
+  }
+  if (W) {
+    reset('wps'); applyMap(W, 'wps', st);
+    const sh = k => vals(W, 'share', k) || [];
+    const sd = wpsDate(sh('start_date')[0]), ed = wpsDate(sh('end_date')[0]); if (sd) setVal('start_date', sd); if (ed) setVal('end_date', ed);
+    ['start_date', 'end_date'].forEach(k => { const t = W.share && W.share[k]; if (t && t.slice(0, domains.length).some(x => x.v !== t[0].v)) keepRaw('wps', 'share', k, t, st); });
+    const dx = vals(W, 'geogrid', 'dx'), dy = vals(W, 'geogrid', 'dy'); if (dx && dy && num(dx[0]) !== num(dy[0])) keepRaw('wps', 'geogrid', 'dy', W.geogrid.dy, st);
+    const fg = W.metgrid && W.metgrid.fg_name, pf = W.ungrib && W.ungrib.prefix;
+    if (fg && (!pf || fg.length !== 1 || fg[0].v !== pf[0].v)) keepRaw('wps', 'metgrid', 'fg_name', fg, st);
+  }
+  renderDomains(); updateMap(); generateAll();
+  log.push(`Filled ${st.applied} form fields, ${domains.length} domain(s).`);
+  if (st.kept.length) log.push('Kept exactly as in your file (not editable in the form): ' + [...new Set(st.kept)].join(', '));
+  logEl.textContent = log.join('\n');
+}
+
+function getWRFVersion() {
+  return parseInt(document.getElementById('wrf_version').value);
+}
+
+function buildSelect(id, defaultVal) {
+  const sel = document.getElementById(id);
+  if (!sel) return;
+  const data = VER_OPTIONS[id];
+  if (!data) return;
+  const ver = getWRFVersion();
+  const prev = sel.value || String(defaultVal);
+
+  let opts = [...data.common];
+  if (ver === 3) opts = opts.concat(data.v3_only || []);
+  else           opts = opts.concat(data.v4_only || []);
+  opts.sort((a,b) => a[0]-b[0]);
+
+  sel.innerHTML = opts.map(([v,l]) =>
+    `<option value="${v}"${String(v)===prev?' selected':''}>${v} — ${l}</option>`
+  ).join('');
+  // restore default if prev not in new list
+  if (!opts.find(o => String(o[0]) === prev)) sel.value = String(defaultVal);
+}
+
+function onVersionChange() {
+  const ver = getWRFVersion();
+  const badge = document.getElementById('ver-badge');
+  badge.textContent = ver === 4 ? 'v4.5.2' : 'v3.9.6';
+  badge.className = `ver-badge ${ver===4?'v4':'v3'}`;
+
+  // Show/hide version-specific blocks
+  document.getElementById('etac').closest('.field').style.display = ver===4 ? '' : 'none';
+  document.getElementById('hybrid-note').style.display  = ver===3 ? 'block' : 'none';
+  document.getElementById('v3-bdy-block').style.display = ver===3 ? '' : 'none';
+  document.getElementById('v4-bdy-block').style.display = ver===4 ? '' : 'none';
+
+  // Rebuild version-specific dropdowns
+  buildSelect('mp_physics', 2);
+  buildSelect('cu_physics', 1);
+
+  generateAll();
+}
 
 // ── Map init ───────────────────────────────────────────────────────────────
 function initMap() {
@@ -732,7 +1014,7 @@ function renderDomains() {
       <div class="dom-card-body${i===0?' open':''}" id="card-body-${i}">
         ${i===0 ? `
           <div class="field"><label>dx / dy (km)</label>
-            <input type="number" value="${d.dx}" step="1" onchange="domains[${i}].dx=+this.value;renderDomains();drawDomainBoxes()">
+            <input type="number" value="${d.dx}" step="any" onchange="domains[${i}].dx=+this.value;renderDomains();drawDomainBoxes()">
           </div>` : `
           <div class="row2">
             <div class="field"><label>parent_id</label>
@@ -816,102 +1098,135 @@ function fmtDate(dt) {
   return dt.replace('T','_') + ':00';
 }
 
+// domList: space-padded values joined by commas, NO trailing comma on the line
 function domList(vals) { return vals.map(v => ` ${v}`).join(','); }
+
+// Align a key to column 36, matching WRF namelist.wps style
+function wl(key, val, noComma) {
+  const pad = Math.max(1, 36 - key.length - 1);
+  return ` ${key}${' '.repeat(pad)}= ${val}${noComma ? '' : ','}`;
+}
 
 function generateWPS() {
   const nd = domains.length;
   if (!nd) return '! No domains configured';
-  const dates = Array(nd).fill(fmtDate(g('start_date')));
-  const datesEnd = Array(nd).fill(fmtDate(g('end_date')));
-  const parentId    = domains.map(d => d.parent);
-  parentId[0] = 1;
-  const ratios  = domains.map(d => d.ratio);
-  ratios[0] = 1;
-  const istart  = domains.map(d => d.istart);
-  istart[0] = 1;
-  const jstart  = domains.map(d => d.jstart);
-  jstart[0] = 1;
-  const ewe = domains.map(d => d.ewe);
-  const esn = domains.map(d => d.esn);
-  const dx = gn('ref_lat');  // use d01 dx
+
+  const prefix = g('wps_prefix') || 'FILE';
+  const startFmt = fmtDate(g('start_date'));
+  const endFmt   = fmtDate(g('end_date'));
+
+  // &share: dates as 'date1','date2',... (no space between comma and quote)
+  // Each nest gets same start/end as d01 — user can edit manually if needed
+  const startDates = Array(nd).fill(`'${startFmt}'`).join(',');
+  const endDates   = Array(nd).fill(`'${endFmt}'`).join(',');
+
+  // &geogrid arrays — NO trailing comma, compact spacing like working namelist
+  const parentId = domains.map((d,i) => i===0 ? 1 : d.parent);
+  const ratios   = domains.map((d,i) => i===0 ? 1 : d.ratio);
+  const istart   = domains.map((d,i) => i===0 ? 1 : d.istart);
+  const jstart   = domains.map((d,i) => i===0 ? 1 : d.jstart);
+  const ewe      = domains.map(d => d.ewe);
+  const esn      = domains.map(d => d.esn);
+
+  // geog_data_res: one entry per domain, no trailing comma
+  const gdr = Array(nd).fill("'default'").join(',');
+
+  // dx/dy in metres from d01 (stored as km in UI)
+  const dx_m = Math.round(domains[0].dx * 1000);
 
   return `&share
- wrf_core                            = 'ARW',
- max_dom                             = ${nd},
- start_date                          =${domList(dates.map(d=>`'${d}'`))},
- end_date                            =${domList(datesEnd.map(d=>`'${d}'`))},
- interval_seconds                    = ${g('interval_seconds')},
- io_form_geogrid                     = ${g('io_form_geogrid')},
+ wrf_core = 'ARW',
+ max_dom = ${nd},
+ start_date = ${startDates}
+ end_date   = ${endDates}
+ interval_seconds =${g('interval_seconds')},
+ io_form_geogrid = ${g('io_form_geogrid')},
 /
 
 &geogrid
- parent_id                           =${domList(parentId)},
- parent_grid_ratio                   =${domList(ratios)},
- i_parent_start                      =${domList(istart)},
- j_parent_start                      =${domList(jstart)},
- e_we                                =${domList(ewe)},
- e_sn                                =${domList(esn)},
- geog_data_res                       =${domList(Array(nd).fill("'default'"))},
- dx                                  = ${domains[0].dx * 1000},
- dy                                  = ${domains[0].dx * 1000},
- map_proj                            = '${g('map_proj')}',
- ref_lat                             = ${gn('ref_lat').toFixed(4)},
- ref_lon                             = ${gn('ref_lon').toFixed(4)},
- truelat1                            = ${gn('truelat1').toFixed(4)},
- truelat2                            = ${gn('truelat2').toFixed(4)},
- stand_lon                           = ${gn('stand_lon').toFixed(4)},
- geog_data_path                      = '${g('geog_data_path')}',
- opt_output_from_geogrid_path        = './',
+ parent_id         =${domList(parentId)}
+ parent_grid_ratio =${domList(ratios)}
+ i_parent_start    =${domList(istart)}
+ j_parent_start    =${domList(jstart)}
+ e_we              =${domList(ewe)}
+ e_sn              =${domList(esn)}
+ geog_data_res = ${gdr},
+ dx = ${dx_m}
+ dy = ${dx_m}
+ map_proj = '${g('map_proj')}',
+ ref_lat   = ${gn('ref_lat').toFixed(4)},
+ ref_lon   = ${gn('ref_lon').toFixed(4)},
+ truelat1  = ${gn('truelat1').toFixed(4)},
+ truelat2  = ${gn('truelat2').toFixed(4)},
+ stand_lon = ${gn('stand_lon').toFixed(4)},
+ geog_data_path = '${g('geog_data_path')}'
 /
 
 &ungrib
- out_format                          = 'WPS',
- prefix                              = 'FILE',
+ out_format = 'WPS',
+ prefix = '${prefix}',
 /
 
 &metgrid
- fg_name                             = 'FILE',
- io_form_metgrid                     = 2,
+ fg_name = '${prefix}'
+ io_form_metgrid = 2,
 /`;
 }
 
 function generateInput() {
   const nd = domains.length;
   if (!nd) return '! No domains configured';
+  const ver = getWRFVersion();
+  const isV4 = ver === 4;
+  const verTag = isV4 ? '! WRF v4.5.2' : '; WRF v3.9.6';
+  const cm = isV4 ? '!' : ';';   // comment char differs between versions
 
-  // Per-domain physics: nest ≥ d02 with fine dx gets cu_physics=0
+  // Per-domain cu_physics: nests < 4 km get 0
   const cuArr = domains.map((d,i) => {
     if (i === 0) return gi('cu_physics');
-    // rough threshold — nested < 4 km get 0
     let dx = domains[0].dx * 1000;
-    for(let k=1;k<=i;k++) dx /= domains[k].ratio;
+    for (let k=1;k<=i;k++) dx /= domains[k].ratio;
     return dx < 4000 ? 0 : gi('cu_physics');
   });
 
-  const dt = g('start_date');
-  const [startYMD, startHM] = dt.split('T');
-  const [yr,mo,dy] = startYMD.split('-');
-  const [hr,mn]    = startHM.split(':');
-
+  const dt    = g('start_date');
   const endDt = g('end_date');
+  const [startYMD, startHM] = dt.split('T');
+  const [yr,mo,dy2] = startYMD.split('-');
+  const [hr]        = startHM.split(':');
   const [eYMD, eHM] = endDt.split('T');
   const [eyr,emo,edy] = eYMD.split('-');
-  const [ehr,emn]    = eHM.split(':');
+  const [ehr]         = eHM.split(':');
+  const runHours = Math.round((new Date(endDt)-new Date(dt))/3600000);
 
-  // run_hours from diff
-  const s1 = new Date(dt), s2 = new Date(endDt);
-  const runHours = Math.round((s2-s1)/3600000);
+  // &dynamics section differs by version
+  const dynV4 = `
+ hybrid_opt                          = ${gi('hybrid_opt')},
+ etac                                = ${g('etac')},`;
+  const dynV3 = `
+ hybrid_opt                          = ${gi('hybrid_opt')},` + `
+ use_theta_m                         = 0,
+ use_q_diabatic                      = 0,`;
 
-  const ones = Array(nd).fill(1);
+  const gwdLine = isV4
+    ? `\n gwd_opt                             =${domList(Array(nd).fill(1))},`
+    : `\n gwd_opt                             = 1,`;
 
-  return `&time_control
+  // v3-only bdy param
+  const bdyExtra = !isV4
+    ? `\n spec_bdy_final_mu                   = ${document.getElementById('spec_bdy_final_mu').checked?1:0},`
+    : (document.getElementById('multi_bdy_files').checked
+        ? `\n multi_bdy_files                     = .true.,` : '');
+
+  return `${cm} Generated for ${isV4?'WRF v4.5.2':'WRF v3.9.6'} — ARW core
+&time_control
  run_days                            = 0,
  run_hours                           = ${runHours},
  run_minutes                         = 0,
  run_seconds                         = 0,
  start_year                          =${domList(Array(nd).fill(yr))},
  start_month                         =${domList(Array(nd).fill(mo))},
- start_day                           =${domList(Array(nd).fill(dy))},
+ start_day                           =${domList(Array(nd).fill(dy2))},
  start_hour                          =${domList(Array(nd).fill(hr))},
  end_year                            =${domList(Array(nd).fill(eyr))},
  end_month                           =${domList(Array(nd).fill(emo))},
@@ -940,8 +1255,8 @@ function generateInput() {
  p_top_requested                     = ${g('p_top')},
  num_metgrid_levels                  = 34,
  num_metgrid_soil_levels             = 4,
- dx                                  = ${domains[0].dx*1000},
- dy                                  = ${domains[0].dx*1000},
+ dx                                  = ${Math.round(domains[0].dx*1000)},
+ dy                                  = ${Math.round(domains[0].dx*1000)},
  parent_id                           =${domList(domains.map((d,i)=>i===0?1:d.parent))},
  parent_grid_ratio                   =${domList(domains.map((d,i)=>i===0?1:d.ratio))},
  i_parent_start                      =${domList(domains.map((d,i)=>i===0?1:d.istart))},
@@ -975,7 +1290,7 @@ function generateInput() {
 /
 
 &dynamics
- hybrid_opt                          = 2,
+ rk_ord                              = 3,${isV4 ? dynV4 : dynV3}
  w_damping                           = 1,
  diff_opt                            =${domList(Array(nd).fill(gi('diff_opt')))},
  km_opt                              =${domList(Array(nd).fill(gi('km_opt')))},
@@ -989,8 +1304,7 @@ function generateInput() {
  kvdif                               =${domList(Array(nd).fill(0))},
  non_hydrostatic                     =${domList(Array(nd).fill(gc('non_hydrostatic')))},
  moist_adv_opt                       =${domList(Array(nd).fill(gi('moist_adv_opt')))},
- scalar_adv_opt                      =${domList(Array(nd).fill(gi('scalar_adv_opt')))},
- gwd_opt                             =${domList(Array(nd).fill(1))},
+ scalar_adv_opt                      =${domList(Array(nd).fill(gi('scalar_adv_opt')))},${gwdLine}
 /
 
 &bdy_control
@@ -998,7 +1312,7 @@ function generateInput() {
  spec_zone                           = 1,
  relax_zone                          = 4,
  specified                           =${domList(domains.map((_,i)=>i===0?'.true.':'.false.'))},
- nested                              =${domList(domains.map((_,i)=>i===0?'.false.':'.true.'))},
+ nested                              =${domList(domains.map((_,i)=>i===0?'.false.':'.true.'))},${bdyExtra}
 /
 
 &grib2
@@ -1029,8 +1343,8 @@ function highlight(text) {
 
 function generateAll() {
   if (!domains.length) { alert('Add at least one domain first.'); return; }
-  lastWPS = generateWPS();
-  lastINPUT = generateInput();
+  lastWPS = injectExtras(generateWPS(), extras.wps, '');
+  lastINPUT = injectExtras(generateInput(), extras.input, ',');
   const el = document.getElementById('output-code');
   el.innerHTML = highlight(currentOutput === 'wps' ? lastWPS : lastINPUT);
 }
@@ -1059,7 +1373,7 @@ initMap();
 domains.push(defaultDomain(1));
 renderDomains();
 updateMap();
-generateAll();
+onVersionChange();   // builds dropdowns + generates
 </script>
 </body>
 </html>
