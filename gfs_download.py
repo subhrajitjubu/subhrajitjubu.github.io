@@ -103,16 +103,20 @@ def read_grib(path, meta):
     try:
         ds = xr.open_dataset(path, engine="cfgrib", filter_by_keys=meta["filter"])
     except Exception:
-        return None, None, None
+        return None, None, None, None
     try:
         if meta["var"] not in ds.data_vars:
             ds.close()
-            return None, None, None
+            return None, None, None, None
         da = ds[meta["var"]].load()
         lats = np.asarray(da["latitude"].values, dtype="float64")
         lons = np.asarray(da["longitude"].values, dtype="float64")
         arr = np.asarray(da.values, dtype="float64") * meta["scale"] + meta["offset"]
-        return arr, lats, lons
+        try:
+            vt = str(np.asarray(da["valid_time"].values).reshape(-1)[0])
+        except Exception:
+            vt = None
+        return arr, lats, lons, vt
     finally:
         ds.close()
 
@@ -165,27 +169,29 @@ def main():
     for stem in stems:
         meta = VARIABLES[stem]
         print(f"=== variable {stem} ===", flush=True)
-        frames, time_vals = [], []
+        frames, time_vals, vts = [], [], []
         for fh in leads:
             path = os.path.join(a.out, f"gfs_60-100E_0-40N_f{fh:03d}.grib2")
             if not os.path.isfile(path):
                 print(f"    f{fh:03d} absent, skipped", flush=True)
                 continue
-            arr, lats, lons = read_grib(path, meta)
+            arr, lats, lons, vt = read_grib(path, meta)
             if arr is None:
                 print(f"    f{fh:03d} missing field, skipped", flush=True)
                 continue
             frames.append(arr)
-            time_vals.append(fh)
+            vts.append(vt or fh)
             print(f"    f{fh:03d} done", flush=True)
         if not frames:
             print(f"    {stem}: no usable forecast hours, skipped", flush=True)
             continue
+        # real valid datetimes (from GRIB) rather than forecast-hour integers
+        time_labels = vts if all(isinstance(v, str) for v in vts) else time_vals
         da = xr.DataArray(
             np.stack(frames),
             dims=["time", "latitude", "longitude"],
             coords={
-                "time": ("time", time_vals),
+                "time": ("time", time_labels),
                 "latitude": ("latitude", lats),
                 "longitude": ("longitude", lons),
             },
