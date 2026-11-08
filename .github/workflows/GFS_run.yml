@@ -17,12 +17,11 @@ concurrency:
 
 env:
   PYTHONFAULTHANDLER: "1"
-  # output stems produced by gfs_vars.VARIABLES
+  # output stems produced by gfs_download.VARIABLES
   VARS: >-
-    apcpsfc,
-    tmpsfc,
     pressfc,
-    tcdcaveclm
+    tmp_surf,
+    cld_amt_surf
 
 jobs:
   run-preprocess:
@@ -66,12 +65,12 @@ jobs:
 
       - name: Resolve the cycle
         run: |
-          # newest GFS cycle in the last few days that NOMADS can serve
+          # newest GFS cycle in the last few days that the S3 bucket can serve
           CYCLE=00
           for delta in 0 1 2; do
             YMD=$(date -u -d "$delta days ago" +%Y%m%d)
             for hh in 18 12 06 00; do
-              if curl -sL --max-time 15 "http://nomads.ncep.noaa.gov:80/dods/gfs_0p25_1hr/gfs${YMD}/gfs_0p25_1hr_${hh}z.das" -o /dev/null -w "%{http_code}" | grep -q 200; then
+              if curl -sL --max-time 15 -o /dev/null -w "%{http_code}" "https://noaa-gfs-bdp-pds.s3.amazonaws.com/gfs.${YMD}/${hh}/atmos/gfs.t${hh}z.atmf000.nc" | grep -q 200; then
                 CYCLE=$hh
                 echo "YMD=$YMD" >> "$GITHUB_ENV"
                 echo "CYCLE=$CYCLE" >> "$GITHUB_ENV"
@@ -93,7 +92,7 @@ jobs:
           python -X faulthandler gfs_download.py \
             --date "$YMD" --cycle "$CYCLE" \
             --lat 0 40 --lon 40 100 \
-            --max-lead 60 --lead-every 3 \
+            --max-lead 12 --lead-every 3 \
             --vars "$VARS" \
             --out GFS --max-json-mb 15
 

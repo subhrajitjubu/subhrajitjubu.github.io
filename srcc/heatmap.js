@@ -599,7 +599,7 @@ const VARIABLE_META = {
     },
 
     // ─── NOAA GFS variables (unit-converted by gfs_download.py) ───
-    'tmpsfc': {
+    'tmp_surf': {
         label: 'Surface Temperature', unit: 'degC',
         scale: [
             [0.00, '#2b0fff'], [0.15, '#1e90ff'], [0.30, '#00cfff'],
@@ -614,16 +614,8 @@ const VARIABLE_META = {
             [0.50, '#ffffbf'], [0.60, '#fee090'], [0.80, '#f46d43'], [1.00, '#d73027'],
         ],
     },
-    'apcpsfc': {
-        label: 'Accumulated Precipitation', unit: 'mm',
-        scale: [
-            [0.00, '#ffffff'], [0.10, '#c6e9f7'], [0.25, '#74c8f0'],
-            [0.40, '#1e9fd4'], [0.55, '#0b5ea8'], [0.70, '#083680'],
-            [0.85, '#4b0082'], [1.00, '#8b0000'],
-        ],
-    },
-    'tcdcaveclm': {
-        label: 'Total Cloud Cover', unit: '%',
+    'cld_amt_surf': {
+        label: 'Cloud Amount (lowest layer)', unit: '%',
         scale: [
             [0.00, '#fafafa'], [0.25, '#d4e8f5'], [0.50, '#88c4e8'],
             [0.75, '#3a90c8'], [1.00, '#0a4a7c'],

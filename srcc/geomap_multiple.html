@@ -774,13 +774,12 @@
         },
         gfs: {
             label: 'NOAA GFS (0.25°)',
-            defaultValue: '../GFS/tmpsfc',
+            defaultValue: '../GFS/tmp_surf',
             groups: [
                 { label: 'Surface', items: [
-                    ['../GFS/tmpsfc', 'Surface Temperature'],
+                    ['../GFS/tmp_surf', 'Surface Temperature'],
                     ['../GFS/pressfc', 'Surface Pressure'],
-                    ['../GFS/apcpsfc', 'Accumulated Precipitation'],
-                    ['../GFS/tcdcaveclm', 'Total Cloud Cover'],
+                    ['../GFS/cld_amt_surf', 'Cloud Amount (lowest layer)'],
                 ]},
             ],
         },
