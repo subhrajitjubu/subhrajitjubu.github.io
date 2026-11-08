@@ -424,6 +424,30 @@
       return v >= 100 ? String(Math.round(v)) : v.toFixed(1);
     }
 
+    // Nearest monitoring station to an arbitrary point, for the click readout.
+    function nearestStation(lat, lon) {
+      if (!lastStations.length) return null;
+      const cosLat = Math.cos(lat * Math.PI / 180);
+      let best = null;
+      let bestD2 = Infinity;
+      for (const s of lastStations) {
+        const dy = (s.lat - lat) * KM_PER_DEG;
+        const dx = (s.lon - lon) * KM_PER_DEG * cosLat;
+        const d2 = dx * dx + dy * dy;
+        if (d2 < bestD2) { bestD2 = d2; best = s; }
+      }
+      return { site: best, distKm: Math.sqrt(bestD2) };
+    }
+
+    function placeLabel(site) {
+      if (!site) return '—';
+      const rec = site.rec || {};
+      const city = rec.city ? esc(rec.city) : '';
+      const state = rec.state ? esc(rec.state) : '';
+      const where = city && state ? ` · ${city}, ${state}` : (city ? ` · ${city}` : (state ? ` · ${state}` : ''));
+      return esc(rec.station || 'Unknown station') + where;
+    }
+
     // Fill the coarse canvas: colour comes from the field, alpha from how far
     // the nearest station is, so unsupported areas fade away.
     function paintAnalysis(grid, nearest2, mask, cols, rows, lo, hi, logSpan) {
@@ -549,7 +573,7 @@
       document.getElementById('legend-max').textContent = fmt(max);
     }
 
-    // Update the surface and station markers
+    // Update the surface from the selected pollutant
     let dataPromise = null;
     let probeMarker = null;
     let probePopup = null;
@@ -584,25 +608,7 @@
       const { min, max } = domainOf(stations);
       updateReadout(pollutantId, stations.length, min, max);
 
-      stations.forEach(site => {
-        const marker = L.circleMarker([site.lat, site.lon], {
-          radius: 3.2,
-          weight: 0.8,
-          color: 'rgba(15,23,42,0.55)',
-          opacity: 0.75,
-          fillColor: cssColor(site.val, min, max),
-          fillOpacity: 0.95,
-          bubblingMouseEvents: true
-        });
-
-        marker.bindTooltip(
-          `${esc(site.rec.pollutant_id)} · station ${fmtVal(site.val)} µg/m³`,
-          { direction: 'top', offset: [0, -6], opacity: 0.95 }
-        );
-
-        stationLayer.addLayer(marker);
-      });
-
+      // Station dots are not drawn; the surface is sampled by clicking any point.
       renderSurface(stations);
     }
 
@@ -626,6 +632,7 @@
       const at = Math.max(min, Math.min(max, hit.val));
       const t = max - min > 1e-9 ? (at - min) / (max - min) : 0.5;
       const li = Math.max(0, Math.min(255, Math.round(t * 255))) * 3;
+      const near = nearestStation(ll.lat, ll.lng);
 
       probeMarker = L.circleMarker(ll, {
         radius: 6,
@@ -639,10 +646,14 @@
       probePopup = L.popup()
         .setLatLng(ll)
         .setContent(
-          `<b>${esc(currentPollutant)}</b> · analysed value<br>` +
+          `<b>${esc(currentPollutant)}</b><br>` +
           `<span style="font-size:15px;font-weight:700">${fmtVal(hit.val)} µg/m³</span><br>` +
-          `${ll.lat.toFixed(3)}°N, ${ll.lng.toFixed(3)}°E<br>` +
-          `<span style="color:#475569">nearest station ${Math.round(hit.nearestKm)} km</span>`
+          `Lon: ${ll.lng.toFixed(5)}<br>` +
+          `Lat: ${ll.lat.toFixed(5)}<br>` +
+          (near
+            ? `Name: ${placeLabel(near.site)}<br>` +
+              `<span style="color:#475569">Nearest station: ${esc((near.site.rec && near.site.rec.station) || '—')} · ${Math.round(near.distKm)} km</span>`
+            : `<span style="color:#475569">Nearest station: —</span>`)
         )
         .openOn(map);
     });
