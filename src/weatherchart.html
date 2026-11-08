@@ -365,11 +365,22 @@
         }
 
         // ========== NEW VARIABLE FETCHERS ==========
+        // Relative local paths; local data now ships as
+        // `<name>_manifest.json` + parts, deployed data as `<name>.json`.
+        // Try the split layout first, fall back to the single file.
+        async function fetchLocalDataset(name) {
+            try {
+                return await loadDataset(name);
+            } catch (e) {
+                const res = await fetch(name + '.json');
+                if (!res.ok) throw new Error('HTTP ' + res.status + ' ' + name + '.json');
+                return await res.json();
+            }
+        }
+
         async function getDewPointData(lat, lon) {
             try {
-                const res = await fetch('../srcc/D2M.json');
-                if (!res.ok) throw new Error('D2M data not found');
-                const data = await res.json();
+                const data = await fetchLocalDataset('../srcc/D2M');
                 const latArr = data.coords?.latitude?.data || data.coords?.lat?.data;
                 const lonArr = data.coords?.longitude?.data || data.coords?.lon?.data;
                 if (!latArr || !lonArr) throw new Error('Invalid D2M coordinates');
@@ -386,9 +397,7 @@
 
         async function getPM10Data(lat, lon) {
             try {
-                const res = await fetch('../srcc/PM10.json');
-                if (!res.ok) throw new Error('PM10 data not found');
-                const data = await res.json();
+                const data = await fetchLocalDataset('../srcc/PM10');
                 const latArr = data.coords?.latitude?.data || data.coords?.lat?.data;
                 const lonArr = data.coords?.longitude?.data || data.coords?.lon?.data;
                 if (!latArr || !lonArr) throw new Error('Invalid PM10 coordinates');
@@ -405,9 +414,7 @@
 
         async function getPM25Data(lat, lon) {
             try {
-                const res = await fetch('../srcc/PM25.json');
-                if (!res.ok) throw new Error('PM2.5 data not found');
-                const data = await res.json();
+                const data = await fetchLocalDataset('../srcc/PM25');
                 const latArr = data.coords?.latitude?.data || data.coords?.lat?.data;
                 const lonArr = data.coords?.longitude?.data || data.coords?.lon?.data;
                 if (!latArr || !lonArr) throw new Error('Invalid PM2.5 coordinates');
@@ -433,7 +440,13 @@
             const cut = Math.max(base.lastIndexOf('/'), base.lastIndexOf('\\'));
             const dir = cut >= 0 ? base.slice(0, cut + 1) : '';
             const mres = await fetch(base + '_manifest.json');
-            if (!mres.ok) throw new Error('HTTP ' + mres.status + ' ' + base + '_manifest.json');
+            if (!mres.ok) {
+                // Deployed site still ships single-file `<name>.json`
+                // next to this page (e.g. `./2m_temp.json`).
+                const single = await fetch(base + '.json');
+                if (!single.ok) throw new Error('HTTP ' + mres.status + ' ' + base + '_manifest.json');
+                return await single.json();
+            }
             const manifest = await mres.json();
             const names = Array.isArray(manifest.parts) ? manifest.parts : [];
             if (!names.length) throw new Error('no parts in ' + base + '_manifest.json');
@@ -528,6 +541,42 @@
             return { msl: msl.map(v => parseFloat((v / 100).toFixed(1))) };
         }
 
+        // ========== GFS FETCHERS (relative local path: ../GFS/) ==========
+        // GFS tmp_surf is already degC, prmsl is already hPa,
+        // apcp is already mm; `time` is forecast hour 0..72.
+        async function getTemperatureDataGFS(lat, lon) {
+            const data = await loadDataset('../GFS/tmp_surf');
+            const latArr = coordArr(data.coords.latitude);
+            const lonArr = coordArr(data.coords.longitude);
+            const latIdx = findNearestIndex(lat, latArr);
+            const lonIdx = findNearestIndex(lon, lonArr);
+            if (latIdx === null || lonIdx === null) throw new Error('Lat/Lon out of GFS bounds');
+            const temps = data.data.map(row => parseFloat(row[latIdx][lonIdx].toFixed(1)));
+            return { labels: coordArr(data.coords.time).map(t => 'T+' + t + 'h'), temperatures: temps };
+        }
+
+        async function getrfDataGFS(lat, lon) {
+            const data = await loadDataset('../GFS/apcp');
+            const latArr = coordArr(data.coords.latitude);
+            const lonArr = coordArr(data.coords.longitude);
+            const latIdx = findNearestIndex(lat, latArr);
+            const lonIdx = findNearestIndex(lon, lonArr);
+            if (latIdx === null || lonIdx === null) throw new Error('Lat/Lon out of GFS bounds');
+            const rain = data.data.map(row => parseFloat(row[latIdx][lonIdx].toFixed(1)));
+            return { rf: rain };
+        }
+
+        async function getmslDataGFS(lat, lon) {
+            const data = await loadDataset('../GFS/prmsl');
+            const latArr = coordArr(data.coords.latitude);
+            const lonArr = coordArr(data.coords.longitude);
+            const latIdx = findNearestIndex(lat, latArr);
+            const lonIdx = findNearestIndex(lon, lonArr);
+            if (latIdx === null || lonIdx === null) throw new Error('Lat/Lon out of GFS bounds');
+            const msl = data.data.map(row => row[latIdx][lonIdx]);
+            return { msl: msl.map(v => parseFloat(v.toFixed(1))) };
+        }
+
         // ========== ENHANCED CHART WITH NEW VARIABLES ==========
         async function renderWeatherChart(lat, lon, containerId, model) {
             let tempP, rainP, mslP, d2mP, pm10P, pm25P;
@@ -536,6 +585,10 @@
                 tempP = getTemperatureDataUKMO(lat, lon);
                 rainP = getrfDataUKMO(lat, lon);
                 mslP = getmslDataUKMO(lat, lon);
+            } else if (model === 'GFS') {
+                tempP = getTemperatureDataGFS(lat, lon);
+                rainP = getrfDataGFS(lat, lon);
+                mslP = getmslDataGFS(lat, lon);
             } else {
                 tempP = getTemperatureDataECMWF(lat, lon);
                 rainP = getrfDataECMWF(lat, lon);
@@ -557,7 +610,9 @@
                 const pm10 = pm10Result?.pm10 || [];
                 const pm25 = pm25Result?.pm25 || [];
 
-                const istLabels = rawTimes.map(t => {
+                const istLabels = model === 'GFS'
+                    ? rawTimes.map(t => String(t).startsWith('T+') ? t : 'T+' + t + 'h')
+                    : rawTimes.map(t => {
                     const date = new Date(t);
                     date.setHours(date.getHours() + 5, date.getMinutes() + 30);
                     const day = date.getDate().toString().padStart(2,'0');
@@ -664,7 +719,8 @@
                 });
             } catch (err) {
                 console.error(`${model} chart error:`, err);
-                document.getElementById(containerId).innerHTML = `<div style="display:flex; align-items:center; justify-content:center; height:100%; background:#fef2f2; border-radius:20px; color:#b91c1c; padding:20px;">⚠️ Forecast data unavailable for selected coordinates</div>`;
+                const el = document.getElementById(containerId);
+                if (el) el.innerHTML = `<div style="display:flex; align-items:center; justify-content:center; height:100%; background:#fef2f2; border-radius:20px; color:#b91c1c; padding:20px; text-align:center;">⚠️ ${model} data unavailable at (${lat.toFixed(2)}, ${lon.toFixed(2)})<br><small>${err.message || ''}</small><br><small>GFS/ECMWF need lon 60–100 &amp; lat 0–40; UKMO lon 40–100. Serve over http:// (not file://) and click inside India.</small></div>`;
             }
         }
 
@@ -675,6 +731,7 @@
 
             const uniqueEcmwf = `ecm_${Date.now()}_${Math.floor(Math.random()*1000)}`;
             const uniqueUkmo = `ukmo_${Date.now()}_${Math.floor(Math.random()*1000)}`;
+            const uniqueGfs = `gfs_${Date.now()}_${Math.floor(Math.random()*1000)}`;
 
             const isMobile = window.innerWidth <= 768;
             const popupStyle = isMobile
@@ -693,9 +750,11 @@
                     <div class="popup-tabs">
                         <button class="tablink active" data-tab="${uniqueEcmwf}"><i class="fas fa-chart-simple"></i> ECMWF HRES + AQI</button>
                         <button class="tablink" data-tab="${uniqueUkmo}"><i class="fas fa-chart-line"></i> UKMO + AQI</button>
+                        <button class="tablink" data-tab="${uniqueGfs}"><i class="fas fa-cloud-sun"></i> GFS + AQI</button>
                     </div>
                     <div id="${uniqueEcmwf}" class="tabcontent active" style="height: ${chartH}px; width: 100%;"></div>
                     <div id="${uniqueUkmo}" class="tabcontent" style="height: ${chartH}px; width: 100%;"></div>
+                    <div id="${uniqueGfs}" class="tabcontent" style="height: ${chartH}px; width: 100%;"></div>
                     <div class="legend-note">
                         <i class="fas fa-chart-area"></i> PM2.5 & PM10 from available AQI datasets | Dew point (D2M) | Rainfall in mm
                     </div>
@@ -717,9 +776,11 @@
             setTimeout(() => {
                 const ecmDiv = document.getElementById(uniqueEcmwf);
                 const ukmoDiv = document.getElementById(uniqueUkmo);
-                if (ecmDiv && ukmoDiv) {
+                const gfsDiv = document.getElementById(uniqueGfs);
+                if (ecmDiv && ukmoDiv && gfsDiv) {
                     renderWeatherChart(lat, lng, uniqueEcmwf, 'ECMWF');
                     renderWeatherChart(lat, lng, uniqueUkmo, 'UKMO');
+                    renderWeatherChart(lat, lng, uniqueGfs, 'GFS');
                 }
             }, 200);
         });

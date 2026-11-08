@@ -992,7 +992,9 @@
             }
 
             async function loadUKMODataset(baseName) {
-                const base = `UKMO/${baseName}`;
+                // Relative local path (no leading slash) so it works
+                // from any subpath on GitHub Pages / local server.
+                const base = `./UKMO/${baseName}`;
                 const key = baseName.toLowerCase();
                 if (DATA_CACHE.has(key)) {
                     console.log(`Cache hit: ${key}`);
