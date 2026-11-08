@@ -1,0 +1,9 @@
+{
+    "fm": "2m_temp",
+    "count": 2,
+    "max_mb": 15.0,
+    "parts": [
+        "2m_temp_part01of02.json",
+        "2m_temp_part02of02.json"
+    ]
+}

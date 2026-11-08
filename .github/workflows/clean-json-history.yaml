@@ -1,0 +1,72 @@
+name: Clean JSON History After Data Workflows
+
+on:
+  workflow_run:
+    workflows:
+      - "cac_00.yaml"
+      - "cac_06.yaml"
+      - "ads_oo.yaml"
+      - "ads_for.yaml"
+    types:
+      - completed
+
+permissions:
+  contents: write
+
+jobs:
+  clean-history:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout main with full history
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Identify JSON directory
+        id: target
+        env:
+          SOURCE_PATH: ${{ github.event.workflow_run.path }}
+        shell: bash
+        run: |
+          case "$(basename "$SOURCE_PATH")" in
+            cac_00.yaml|cac_06.yaml) echo "folder=src" >> "$GITHUB_OUTPUT";;
+            ads_oo.yaml|ads_for.yaml) echo "folder=srcc" >> "$GITHUB_OUTPUT";;
+            *) echo "Unsupported workflow: $SOURCE_PATH"; exit 1;;
+          esac
+
+      - name: Back up current JSON files
+        env:
+          FOLDER: ${{ steps.target.outputs.folder }}
+        shell: bash
+        run: |
+          find "$FOLDER" -maxdepth 1 -type f -name '*.json' ! -name 'IND.json' -print0 | tar --null --files-from=- --create --file=/tmp/json-backup.tar
+
+      - name: Install git-filter-repo
+        run: pip install git-filter-repo
+
+      - name: Remove selected JSON history
+        env:
+          FOLDER: ${{ steps.target.outputs.folder }}
+        shell: bash
+        run: |
+          git filter-repo --path-regex "^${FOLDER}/(?!IND\\.json$)[^/]+\\.json$" --invert-paths --force
+
+      - name: Restore current JSON files
+        env:
+          FOLDER: ${{ steps.target.outputs.folder }}
+        shell: bash
+        run: |
+          tar --extract --file=/tmp/json-backup.tar --directory="$GITHUB_WORKSPACE"
+          git add -A -- "$FOLDER"
+          if ! git diff --cached --quiet; then
+            git -c user.name="github-actions[bot]" -c user.email="41898282+github-actions[bot]@users.noreply.github.com" commit -m "Restore latest $FOLDER JSON files after history cleanup"
+          fi
+
+      - name: Push rewritten history
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          git remote add origin "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
+          git push origin HEAD:main --force

@@ -1,0 +1,8 @@
+{
+  "parts": [
+    "temperature_at_screen_level_part01of04.json",
+    "temperature_at_screen_level_part02of04.json",
+    "temperature_at_screen_level_part03of04.json",
+    "temperature_at_screen_level_part04of04.json"
+  ]
+}

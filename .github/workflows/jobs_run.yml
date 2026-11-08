@@ -1,0 +1,46 @@
+name: Jobs feed snapshot
+
+on:
+  schedule:
+    # MET-JOBS is a busy list; refresh the snapshot every 6 hours
+    - cron: '17 */6 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: jobs-run
+  cancel-in-progress: false
+
+jobs:
+  snapshot:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+
+      - name: Download and parse MET-JOBS feed
+        run: python jobs_fetch.py
+
+      - name: Commit and push snapshot
+        run: |
+          set -euo pipefail
+          git config --global --add safe.directory "$GITHUB_WORKSPACE"
+          git config --global user.name "subhrajitjubu"
+          git config --global user.email "66462700+subhrajitjubu@users.noreply.github.com"
+          git pull --no-rebase origin main
+          git add -A jobs_data.json
+          if [ -z "$(git diff --cached --name-only)" ]; then
+            echo "No changes to commit."
+            exit 0
+          fi
+          git commit -m "Update MET-JOBS snapshot"
+          git push origin main

@@ -1,0 +1,9 @@
+{
+  "parts": [
+    "pressure_at_mean_sea_level_part01of05.json",
+    "pressure_at_mean_sea_level_part02of05.json",
+    "pressure_at_mean_sea_level_part03of05.json",
+    "pressure_at_mean_sea_level_part04of05.json",
+    "pressure_at_mean_sea_level_part05of05.json"
+  ]
+}

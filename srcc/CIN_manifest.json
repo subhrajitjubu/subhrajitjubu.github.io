@@ -1,0 +1,8 @@
+{
+ "fm": "CIN",
+ "count": 1,
+ "max_mb": 15,
+ "parts": [
+  "CIN_part01of01.json"
+ ]
+}

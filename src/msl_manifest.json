@@ -1,0 +1,10 @@
+{
+    "fm": "msl",
+    "count": 3,
+    "max_mb": 15.0,
+    "parts": [
+        "msl_part01of03.json",
+        "msl_part02of03.json",
+        "msl_part03of03.json"
+    ]
+}

@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Air Quality Heatmap - interactive AQI heatmap of India built from data.gov.in monitoring-station data.">
+    <title>Air Quality Heatmap | India</title>
+    <link rel="icon" type="image/jpg" href="subhrajit.JPEG">
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <style>
+        /* AQI page layout — reference design system (index.html) */
+        .aqi-wrap { max-width: 80rem; margin: 0 auto; padding: 2.5rem 1rem 3rem; }
+        @media (min-width: 640px) { .aqi-wrap { padding-left: 1.5rem; padding-right: 1.5rem; } }
+        .aqi-hero { max-width: 48rem; margin-bottom: 2rem; }
+        .aqi-hero h1 { font-size: clamp(2rem, 5vw, 3rem); font-weight: 800; letter-spacing: -0.02em; color: var(--ds-heading); margin: 0.75rem 0 0.5rem; }
+        .aqi-hero p { color: var(--ds-muted); margin: 0; font-size: 1.0625rem; line-height: 1.6; }
+        .aqi-layout { display: grid; grid-template-columns: 1fr; gap: 1rem; align-items: start; }
+        @media (min-width: 900px) { .aqi-layout { grid-template-columns: 21rem 1fr; } }
+        .aqi-panel { display: flex; flex-direction: column; gap: 1rem; }
+        .aqi-field label { display: block; font-weight: 600; color: var(--ds-heading); margin-bottom: 0.375rem; }
+        .aqi-field select { width: 100%; }
+        .aqi-note { font-size: 0.8125rem; color: var(--ds-muted); line-height: 1.5; }
+        .legend-bar { height: 10px; border-radius: 6px; border: 1px solid var(--ds-border); background: linear-gradient(90deg, #0000FF, #00FFFF 25%, #00FF00 50%, #FFFF00 75%, #FF0000); }
+        .legend-ends { display: flex; justify-content: space-between; font: 10px var(--ds-mono); color: var(--ds-muted); margin-top: 4px; }
+        .map-shell { position: relative; border-radius: var(--ds-radius); overflow: hidden; border: 1px solid var(--ds-border); box-shadow: var(--ds-shadow-sm); background: #eef2f7; height: 62vh; min-height: 420px; }
+        #map { height: 100%; width: 100%; }
+        #loading {
+            position: absolute; inset: 0; z-index: 1002;
+            display: none; align-items: center; justify-content: center;
+            background: rgba(248, 250, 252, .78); backdrop-filter: blur(2px);
+            color: var(--ds-text); font-weight: 600; gap: 0.625rem;
+        }
+        .aqi-foot { text-align: center; color: var(--ds-muted); font-size: 0.8125rem; padding: 1.5rem 1rem 2rem; }
+        .marker-tip { font: 12px var(--ds-font); }
+    </style>
+    <!-- design system (reference: index.html) -->
+    <link href="https://fontsource.org/inter/index.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="stylesheet" href="design-system.css">
+    <link rel="stylesheet" href="themes.css">
+    <script src="theme-engine.js"></script>
+</head>
+<body class="ds-base">
+    <a class="skip-link" href="#main">Skip to content</a>
+    <h1 class="sr-only">Air Quality Heatmap — India AQI from data.gov.in</h1>
+
+<nav class="ds-nav" aria-label="Primary">        <div class="ds-nav-inner">            <a class="ds-brand" href="index.html" aria-label="Subhrajit Rath — home"><span class="gradient-text">S.</span><span>Rath</span></a>            <button type="button" class="ds-nav-toggle" aria-expanded="false" aria-controls="ds-mobile-menu" aria-label="Toggle navigation menu">                <svg class="h-6 w-6" width="24" height="24" stroke="currentColor" fill="none" viewBox="0 0 24 24" aria-hidden="true">                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />                </svg>            </button>            <div class="ds-nav-links"><a href="index.html">Home</a><a href="education.html">Education</a><a href="experience.html">Skills</a><a href="publications.html">Publications</a><div class="ds-dropdown"><button type="button" class="ds-dropbtn" aria-haspopup="true" aria-expanded="false">Weather forecast <i class="fas fa-chevron-down" aria-hidden="true"></i></button><div class="ds-dropdown-panel"><a href="AQI.html" class="active" aria-current="page"><i class="fas fa-wind" aria-hidden="true"></i>AQI Heatmap</a><a href="srcc/geomap_multiple.html" class=""><i class="fas fa-map" aria-hidden="true"></i>GeoHEATMap</a><a href="meteogram.html" class=""><i class="fas fa-chart-area" aria-hidden="true"></i>Meteogram</a><a href="nwp_imd.html" class=""><i class="fas fa-cloud-moon" aria-hidden="true"></i>NWP_IMD</a><a href="sw.html" class=""><i class="fas fa-cloud-sun" aria-hidden="true"></i>Weather Card</a><a href="src/weatherchart.html" class=""><i class="fas fa-chart-line" aria-hidden="true"></i>Weather Chart</a></div></div><div class="ds-dropdown"><button type="button" class="ds-dropbtn" aria-haspopup="true" aria-expanded="false">Satellite view <i class="fas fa-chevron-down" aria-hidden="true"></i></button><div class="ds-dropdown-panel"><a href="gibs.html" class=""><i class="fas fa-globe" aria-hidden="true"></i>GIBS / NASA</a><a href="mosdac_live.html" class=""><i class="fas fa-satellite" aria-hidden="true"></i>Mosdac / ISRO</a></div></div><div class="ds-dropdown"><button type="button" class="ds-dropbtn" aria-haspopup="true" aria-expanded="false">Climatic info <i class="fas fa-chevron-down" aria-hidden="true"></i></button><div class="ds-dropdown-panel"><a href="climate/monavg/chloro.html" class=""><i class="fas fa-cloud-rain" aria-hidden="true"></i>Monthly Statistics</a></div></div><div class="ds-dropdown"><button type="button" class="ds-dropbtn" aria-haspopup="true" aria-expanded="false">Jobs <i class="fas fa-chevron-down" aria-hidden="true"></i></button><div class="ds-dropdown-panel"><a href="https://www.21centuryweather.org.au/about-us/positions-vacant/" target="_blank" rel="noopener" class=""><i class="fas fa-briefcase" aria-hidden="true"></i>21st Cent AUS MET Jobs</a><a href="https://careercenter.ametsoc.org/" target="_blank" rel="noopener" class=""><i class="fas fa-cloud" aria-hidden="true"></i>AMS Careers</a><a href="https://www.earthworks-jobs.com/" target="_blank" rel="noopener" class=""><i class="fas fa-globe" aria-hidden="true"></i>Earth-Works</a><a href="https://www.egu.eu/jobs/" target="_blank" rel="noopener" class=""><i class="fas fa-globe-europe" aria-hidden="true"></i>EGU Jobs</a><a href="https://www.tropmet.res.in/Careers" target="_blank" rel="noopener" class=""><i class="fas fa-university" aria-hidden="true"></i>IITM Career</a><a href="https://vacancies.incois.gov.in/" target="_blank" rel="noopener" class=""><i class="fas fa-water" aria-hidden="true"></i>INCOIS Career</a><a href="Jobs.html" class=""><i class="fas fa-briefcase" aria-hidden="true"></i>MET Jobs</a><a href="https://www.niot.res.in/recruitment_details.php/" target="_blank" rel="noopener" class=""><i class="fas fa-anchor" aria-hidden="true"></i>NIOT Career</a><a href="j1.html" class=""><i class="fas fa-book" aria-hidden="true"></i>Others</a><a href="https://ucar.wd5.myworkdayjobs.com/UCAR_Careers" target="_blank" rel="noopener" class=""><i class="fas fa-building" aria-hidden="true"></i>UCAR Careers</a></div></div></div>        </div>        <div class="ds-mobile-menu" id="ds-mobile-menu"><a href="index.html">Home</a><a href="education.html">Education</a><a href="experience.html">Skills</a><a href="publications.html">Publications</a><div class="ds-mobile-group"><button type="button" class="ds-mobile-head" aria-expanded="false">Weather forecast <i class="fas fa-chevron-down" aria-hidden="true"></i></button><div class="ds-mobile-items"><a href="AQI.html"><i class="fas fa-wind mr-2" aria-hidden="true"></i>AQI Heatmap</a><a href="srcc/geomap_multiple.html"><i class="fas fa-map mr-2" aria-hidden="true"></i>GeoHEATMap</a><a href="meteogram.html"><i class="fas fa-chart-area mr-2" aria-hidden="true"></i>Meteogram</a><a href="nwp_imd.html"><i class="fas fa-cloud-moon mr-2" aria-hidden="true"></i>NWP_IMD</a><a href="sw.html"><i class="fas fa-cloud-sun mr-2" aria-hidden="true"></i>Weather Card</a><a href="src/weatherchart.html"><i class="fas fa-chart-line mr-2" aria-hidden="true"></i>Weather Chart</a></div></div><div class="ds-mobile-group"><button type="button" class="ds-mobile-head" aria-expanded="false">Satellite view <i class="fas fa-chevron-down" aria-hidden="true"></i></button><div class="ds-mobile-items"><a href="gibs.html"><i class="fas fa-globe mr-2" aria-hidden="true"></i>GIBS / NASA</a><a href="mosdac_live.html"><i class="fas fa-satellite mr-2" aria-hidden="true"></i>Mosdac / ISRO</a></div></div><div class="ds-mobile-group"><button type="button" class="ds-mobile-head" aria-expanded="false">Climatic info <i class="fas fa-chevron-down" aria-hidden="true"></i></button><div class="ds-mobile-items"><a href="climate/monavg/chloro.html"><i class="fas fa-cloud-rain mr-2" aria-hidden="true"></i>Monthly Statistics</a></div></div><div class="ds-mobile-group"><button type="button" class="ds-mobile-head" aria-expanded="false">Jobs <i class="fas fa-chevron-down" aria-hidden="true"></i></button><div class="ds-mobile-items"><a href="https://www.21centuryweather.org.au/about-us/positions-vacant/" target="_blank" rel="noopener"><i class="fas fa-briefcase mr-2" aria-hidden="true"></i>21st Cent AUS MET Jobs</a><a href="https://careercenter.ametsoc.org/" target="_blank" rel="noopener"><i class="fas fa-cloud mr-2" aria-hidden="true"></i>AMS Careers</a><a href="https://www.earthworks-jobs.com/" target="_blank" rel="noopener"><i class="fas fa-globe mr-2" aria-hidden="true"></i>Earth-Works</a><a href="https://www.egu.eu/jobs/" target="_blank" rel="noopener"><i class="fas fa-globe-europe mr-2" aria-hidden="true"></i>EGU Jobs</a><a href="https://www.tropmet.res.in/Careers" target="_blank" rel="noopener"><i class="fas fa-university mr-2" aria-hidden="true"></i>IITM Career</a><a href="https://vacancies.incois.gov.in/" target="_blank" rel="noopener"><i class="fas fa-water mr-2" aria-hidden="true"></i>INCOIS Career</a><a href="Jobs.html"><i class="fas fa-briefcase mr-2" aria-hidden="true"></i>MET Jobs</a><a href="https://www.niot.res.in/recruitment_details.php/" target="_blank" rel="noopener"><i class="fas fa-anchor mr-2" aria-hidden="true"></i>NIOT Career</a><a href="j1.html"><i class="fas fa-book mr-2" aria-hidden="true"></i>Others</a><a href="https://ucar.wd5.myworkdayjobs.com/UCAR_Careers" target="_blank" rel="noopener"><i class="fas fa-building mr-2" aria-hidden="true"></i>UCAR Careers</a></div></div></div>    </nav>    <script>(function () {    var nav = document.querySelector('.ds-nav'); if (!nav) return;    var t = nav.querySelector('.ds-nav-toggle'), m = nav.querySelector('.ds-mobile-menu');    if (t && m) t.addEventListener('click', function () {        m.classList.toggle('open');        t.setAttribute('aria-expanded', m.classList.contains('open') ? 'true' : 'false');    });    nav.querySelectorAll('.ds-dropbtn').forEach(function (b) {        b.addEventListener('click', function (e) {            e.stopPropagation();            var dd = b.parentElement;            nav.querySelectorAll('.ds-dropdown.open').forEach(function (o) {                if (o !== dd) { o.classList.remove('open'); var ob = o.querySelector('.ds-dropbtn'); if (ob) ob.setAttribute('aria-expanded', 'false'); }            });            dd.classList.toggle('open');            b.setAttribute('aria-expanded', dd.classList.contains('open') ? 'true' : 'false');        });    });    if (m) m.querySelectorAll('.ds-mobile-head').forEach(function (h) {        h.addEventListener('click', function () {            var g = h.parentElement;            g.classList.toggle('open');            h.setAttribute('aria-expanded', g.classList.contains('open') ? 'true' : 'false');        });    });    document.addEventListener('click', function (e) {        if (!nav.contains(e.target)) nav.querySelectorAll('.ds-dropdown.open').forEach(function (d) {            d.classList.remove('open');            var b = d.querySelector('.ds-dropbtn'); if (b) b.setAttribute('aria-expanded', 'false');        });    });    document.addEventListener('keydown', function (e) {        if (e.key === 'Escape') nav.querySelectorAll('.ds-dropdown.open').forEach(function (d) { d.classList.remove('open'); });    });})();</script>
+
+    <div class="aqi-wrap">
+        <section class="aqi-hero">
+            <span class="badge badge-accent"><i class="fas fa-wind" aria-hidden="true"></i>Air Quality</span>
+            <h1>Air Quality Heatmap — <span class="gradient-text">India</span></h1>
+            <p>A live heat surface of pollutant concentrations from data.gov.in monitoring stations. Pick a pollutant, pan the map, and click any station for its latest reading.</p>
+        </section>
+
+        <div class="aqi-layout" id="main" role="main">
+            <aside class="aqi-panel">
+                <div class="card">
+                    <div class="aqi-field">
+                        <label for="pollutant"><i class="fas fa-sliders mr-2" aria-hidden="true"></i>Select Pollutant</label>
+                        <select id="pollutant" aria-label="Select a pollutant to display on the heatmap">
+                            <option value="SO2">SO2</option>
+                            <option value="OZONE">OZONE</option>
+                            <option value="PM2.5">PM2.5</option>
+                            <option value="NH3">NH3</option>
+                            <option value="PM10">PM10</option>
+                        </select>
+                    </div>
+                    <p class="aqi-note"><i class="fas fa-database mr-1" aria-hidden="true"></i>Data: data.gov.in monitoring stations. Results are cached for 24 hours.</p>
+                </div>
+
+                <div class="card">
+                    <div class="kicker">Concentration scale</div>
+                    <div class="legend-bar" aria-hidden="true"></div>
+                    <div class="legend-ends"><span>LOW</span><span>MEDIUM</span><span>HIGH</span></div>
+                    <p class="aqi-note">Dots mark individual stations; the heat glow shows where concentrations cluster. Hover a dot for the station reading, or click it for full details.</p>
+                </div>
+            </aside>
+
+            <section class="map-shell" aria-label="Air quality map of India">
+                <div id="map"></div>
+                <div id="loading"><i class="fas fa-circle-notch fa-spin mr-2" aria-hidden="true"></i>Loading station data…</div>
+            </section>
+        </div>
+    </div>
+
+    <footer>© 2025 Air Quality Heatmap · Data: data.gov.in · Map tiles: © OpenStreetMap</footer>
+
+  <!-- Leaflet JS -->
+  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+  <!-- Leaflet.heat Plugin (pinned UMD build — newer CDN versions are ESM-only) -->
+  <script src="https://unpkg.com/leaflet.heat@0.2.0/dist/leaflet-heat.js"></script>
+  <script>
+    // Function to parse and format the date
+    function parseDate(dateString) {
+      const [datePart, timePart] = dateString.split(' ');
+      const [day, month, year] = datePart.split('-');
+      const [hours, minutes, seconds] = timePart.split(':');
+      const date = new Date(year, month - 1, day, hours, minutes, seconds);
+      return date.toLocaleString('en-US', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit'
+      });
+    }
+
+    // Initialize the map
+    const map = L.map('map').setView([20.5937, 78.9629], 5); // Centered on India
+
+    // Add OpenStreetMap tiles
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      maxZoom: 18,
+      attribution: '© OpenStreetMap contributors'
+    }).addTo(map);
+
+    // Fetch and cache data
+    async function fetchAllData() {
+      const cacheKey = 'airQualityData';
+      const cacheExpiry = 24 * 60 * 60 * 1000; // 24 hours
+      const loadingIndicator = document.getElementById('loading');
+
+      try {
+        loadingIndicator.style.display = 'flex';
+
+        const cachedData = localStorage.getItem(cacheKey);
+        if (cachedData) {
+          const { data, timestamp } = JSON.parse(cachedData);
+          if (Date.now() - timestamp < cacheExpiry) {
+            console.log('Using cached data');
+            return data;
+          }
+        }
+
+        console.log('Fetching fresh data from API');
+        const limit = 1000;
+        let offset = 0;
+        let allRecords = [];
+
+        while (true) {
+          const response = await fetch(
+            `https://api.data.gov.in/resource/3b01bcb8-0b14-4abf-b6f2-c1bfd384ba69?api-key=579b464db66ec23bdd000001e5098ed4e61241df55effc4dbeab7289&format=json&limit=${limit}&offset=${offset}`
+          );
+
+          if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
+          const data = await response.json();
+          const records = data.records;
+
+          if (records.length === 0) break;
+          allRecords = allRecords.concat(records);
+          offset += limit;
+        }
+
+        localStorage.setItem(cacheKey, JSON.stringify({ data: allRecords, timestamp: Date.now() }));
+        return allRecords;
+      } catch (error) {
+        console.error('Error fetching data:', error);
+        alert('Unable to fetch air quality data. Please try again later.');
+        return [];
+      } finally {
+        loadingIndicator.style.display = 'none';
+      }
+    }
+
+    // Marker color function
+    function getMarkerColor(avgValue, minValue, maxValue) {
+      const normalizedValue = (avgValue - minValue) / (maxValue - minValue);
+      if (normalizedValue <= 0.2) return '#0000FF'; // Blue
+      if (normalizedValue <= 0.4) return '#00FFFF'; // Cyan
+      if (normalizedValue <= 0.6) return '#00FF00'; // Green
+      if (normalizedValue <= 0.8) return '#FFFF00'; // Yellow
+      return '#FF0000'; // Red
+    }
+
+    // Update heatmap and markers
+    async function updateHeatmapAndMarkers(pollutantId) {
+      const jsonData = await fetchAllData();
+      if (!jsonData.length) return;
+
+      map.eachLayer(layer => {
+        if (layer instanceof L.HeatLayer || layer instanceof L.Marker) map.removeLayer(layer);
+      });
+
+      const filteredRecords = jsonData.filter(record => record.pollutant_id === pollutantId);
+      const values = filteredRecords.map(r => parseFloat(r.avg_value));
+      const minValue = Math.min(...values);
+      const maxValue = Math.max(...values);
+
+      const heatData = filteredRecords.map(record => [
+        parseFloat(record.latitude),
+        parseFloat(record.longitude),
+        parseFloat(record.avg_value)
+      ]);
+
+      if (heatData.length > 0) {
+        L.heatLayer(heatData, {
+          radius: 25,
+          blur: 15,
+          maxZoom: 18,
+          max: maxValue,
+          minOpacity: 0.1,
+          gradient: {
+            0.0: '#0000FF',
+            0.25: '#00FFFF',
+            0.5: '#00FF00',
+            0.75: '#FFFF00',
+            1.0: '#FF0000'
+          }
+        }).addTo(map);
+      } else {
+        alert(`No data available for ${pollutantId}`);
+      }
+
+      const esc = (v) => String(v ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+
+      filteredRecords.forEach(record => {
+        const lat = parseFloat(record.latitude);
+        const lng = parseFloat(record.longitude);
+        const avgValue = parseFloat(record.avg_value);
+        const formattedDate = parseDate(record.last_update);
+
+        const marker = L.marker([lat, lng], {
+          icon: L.divIcon({
+            className: 'custom-icon',
+            html: `<div style="background-color: ${getMarkerColor(avgValue, minValue, maxValue)}; width: 12px; height: 12px; border-radius: 50%;"></div>`,
+            iconSize: [25, 25]
+          })
+        }).addTo(map);
+
+        marker.bindPopup(`
+          <b>Station:</b> ${esc(record.station)}<br>
+          <b>Pollutant:</b> ${esc(record.pollutant_id)}<br>
+          <b>Avg Value:</b> ${esc(avgValue)}<br>
+          <b>Max Value:</b> ${esc(record.max_value)}<br>
+          <b>Min Value:</b> ${esc(record.min_value)}<br>
+          <b>Last Updated:</b> ${esc(formattedDate)}
+        `).bindTooltip(`${esc(record.pollutant_id)}: ${esc(avgValue)}`);
+      });
+    }
+
+    // Debounce function
+    function debounce(func, wait) {
+      let timeout;
+      return function (...args) {
+        clearTimeout(timeout);
+        timeout = setTimeout(() => func.apply(this, args), wait);
+      };
+    }
+
+    // Event listener for pollutant selection
+    document.getElementById('pollutant').addEventListener('change', debounce((event) => {
+      updateHeatmapAndMarkers(event.target.value);
+    }, 300));
+
+    // Load GeoJSON
+    async function loadGeoJSON(filePath) {
+      try {
+        const response = await fetch(filePath);
+        if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
+        const geojsonData = await response.json();
+
+        const geojsonLayer = L.geoJSON(geojsonData, {
+          style: () => ({
+            color: '#187dee',
+            weight: 3,
+            fillColor: '#FFA500',
+            fillOpacity: 0
+          }),
+          onEachFeature: (feature, layer) => {
+            if (feature.properties && feature.properties.name) {
+              layer.bindPopup(`<b>Region:</b> ${esc(feature.properties.name)}`);
+            }
+          }
+        }).addTo(map);
+
+        map.fitBounds(geojsonLayer.getBounds());
+      } catch (error) {
+        console.error('Error loading GeoJSON:', error);
+        alert('Failed to load GeoJSON file.');
+      }
+    }
+
+    // Initialize
+    updateHeatmapAndMarkers('SO2');
+    loadGeoJSON('srcc/IND.json');
+
+  </script>
+</body>
+</html>

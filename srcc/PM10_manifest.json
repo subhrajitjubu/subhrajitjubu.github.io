@@ -1,0 +1,8 @@
+{
+ "fm": "PM10",
+ "count": 1,
+ "max_mb": 15,
+ "parts": [
+  "PM10_part01of01.json"
+ ]
+}
