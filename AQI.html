@@ -306,6 +306,22 @@
       return 'India';
     }
 
+    // Reverse geocode for the clicked point's city/state address.
+    async function reversePlace(lat, lon) {
+      try {
+        const url = `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat.toFixed(5)}&lon=${lon.toFixed(5)}&zoom=12&addressdetails=1`;
+        const res = await fetch(url);
+        if (!res.ok) return null;
+        const data = await res.json();
+        const a = data.address || {};
+        const city = a.city || a.town || a.village || a.suburb || a.county || a.state_district || '';
+        const location = [city, a.state].filter(Boolean).join(', ') || data.display_name || null;
+        return { location, address: data.display_name || null };
+      } catch (err) {
+        return null;
+      }
+    }
+
     function ensureRenderSize() {
       if (!indiaBounds) return;
       const nw = indiaBounds.getNorthWest();
@@ -674,19 +690,27 @@
         fillOpacity: 1
       }).addTo(map);
 
+      const buildContent = (location, address) =>
+        `<b>${esc(currentPollutant)}</b><br>` +
+        `<span style="font-size:15px;font-weight:700">${fmtVal(hit.val)} µg/m³</span><br>` +
+        `Lon: ${ll.lng.toFixed(5)}<br>` +
+        `Lat: ${ll.lat.toFixed(5)}<br>` +
+        `Location: ${esc(location)}<br>` +
+        (address ? `<span style="color:#475569">Address: ${esc(address)}</span><br>` : '') +
+        (near
+          ? `<span style="color:#475569">Nearest station: ${esc((near.site.rec && near.site.rec.station) || '—')} · ${Math.round(near.distKm)} km</span>`
+          : `<span style="color:#475569">Nearest station: —</span>`);
+
       probePopup = L.popup()
         .setLatLng(ll)
-        .setContent(
-          `<b>${esc(currentPollutant)}</b><br>` +
-          `<span style="font-size:15px;font-weight:700">${fmtVal(hit.val)} µg/m³</span><br>` +
-          `Lon: ${ll.lng.toFixed(5)}<br>` +
-          `Lat: ${ll.lat.toFixed(5)}<br>` +
-          `Location: ${esc(region)}<br>` +
-          (near
-            ? `<span style="color:#475569">Nearest station: ${esc((near.site.rec && near.site.rec.station) || '—')} · ${Math.round(near.distKm)} km</span>`
-            : `<span style="color:#475569">Nearest station: —</span>`)
-        )
+        .setContent(buildContent(region, null))
         .openOn(map);
+
+      const thisPopup = probePopup;
+      reversePlace(ll.lat, ll.lng).then(place => {
+        if (!place || probePopup !== thisPopup) return;
+        thisPopup.setContent(buildContent(place.location || region, place.address));
+      });
     });
 
     // Debounce function
