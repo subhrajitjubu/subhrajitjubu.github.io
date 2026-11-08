@@ -212,6 +212,7 @@
     let lastStations = [];
     let indiaBounds = null;
     let indiaRings = [];
+    let indiaFeatures = [];
     let indiaMask = null;
     let renderSize = { w: 0, h: 0 };
 
@@ -265,6 +266,44 @@
         }
       }
       return rings;
+    }
+
+    // Ray-casting test for one GeoJSON ring (coords are [lon, lat]).
+    function pointInRing(lat, lon, ring) {
+      let inside = false;
+      for (let i = 0, j = ring.length - 1; i < ring.length; j = i++) {
+        const xi = ring[i][0], yi = ring[i][1];
+        const xj = ring[j][0], yj = ring[j][1];
+        if (((yi > lat) !== (yj > lat)) && (lon < (xj - xi) * (lat - yi) / (yj - yi) + xi)) {
+          inside = !inside;
+        }
+      }
+      return inside;
+    }
+
+    function regionAt(lat, lon) {
+      for (const feature of indiaFeatures) {
+        const g = feature.geometry;
+        if (!g) continue;
+        const polys = g.type === 'Polygon' ? [g.coordinates]
+          : g.type === 'MultiPolygon' ? g.coordinates
+          : (g.type === 'GeometryCollection'
+            ? (g.geometries || []).flatMap(sub => sub.type === 'Polygon' ? [sub.coordinates] : sub.type === 'MultiPolygon' ? sub.coordinates : [])
+            : []);
+        for (const poly of polys) {
+          if (!poly || !poly.length) continue;
+          if (!pointInRing(lat, lon, poly[0])) continue;
+          let inHole = false;
+          for (let k = 1; k < poly.length; k++) {
+            if (pointInRing(lat, lon, poly[k])) { inHole = true; break; }
+          }
+          if (!inHole) {
+            const props = feature.properties || {};
+            return props.NAME_1 || props.name || props.NAME_0 || 'India';
+          }
+        }
+      }
+      return 'India';
     }
 
     function ensureRenderSize() {
@@ -437,15 +476,6 @@
         if (d2 < bestD2) { bestD2 = d2; best = s; }
       }
       return { site: best, distKm: Math.sqrt(bestD2) };
-    }
-
-    function placeLabel(site) {
-      if (!site) return '—';
-      const rec = site.rec || {};
-      const city = rec.city ? esc(rec.city) : '';
-      const state = rec.state ? esc(rec.state) : '';
-      const where = city && state ? ` · ${city}, ${state}` : (city ? ` · ${city}` : (state ? ` · ${state}` : ''));
-      return esc(rec.station || 'Unknown station') + where;
     }
 
     // Fill the coarse canvas: colour comes from the field, alpha from how far
@@ -633,6 +663,7 @@
       const t = max - min > 1e-9 ? (at - min) / (max - min) : 0.5;
       const li = Math.max(0, Math.min(255, Math.round(t * 255))) * 3;
       const near = nearestStation(ll.lat, ll.lng);
+      const region = regionAt(ll.lat, ll.lng);
 
       probeMarker = L.circleMarker(ll, {
         radius: 6,
@@ -650,9 +681,9 @@
           `<span style="font-size:15px;font-weight:700">${fmtVal(hit.val)} µg/m³</span><br>` +
           `Lon: ${ll.lng.toFixed(5)}<br>` +
           `Lat: ${ll.lat.toFixed(5)}<br>` +
+          `Location: ${esc(region)}<br>` +
           (near
-            ? `Name: ${placeLabel(near.site)}<br>` +
-              `<span style="color:#475569">Nearest station: ${esc((near.site.rec && near.site.rec.station) || '—')} · ${Math.round(near.distKm)} km</span>`
+            ? `<span style="color:#475569">Nearest station: ${esc((near.site.rec && near.site.rec.station) || '—')} · ${Math.round(near.distKm)} km</span>`
             : `<span style="color:#475569">Nearest station: —</span>`)
         )
         .openOn(map);
@@ -680,6 +711,7 @@
         const geojsonData = await response.json();
 
         indiaRings = ringsOf(geojsonData);
+        indiaFeatures = geojsonData.features || [];
 
         const geojsonLayer = L.geoJSON(geojsonData, {
           interactive: false,
