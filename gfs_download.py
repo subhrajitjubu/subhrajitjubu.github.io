@@ -1,22 +1,20 @@
 """
 gfs_download.py - NOAA GFS 0.25 deg pipeline, UKMO-style.
 
-Download (fast, per project script): download_gfs_curl.sh loops variable-wise
-and pulls NOMADS GRIB2 parts with curl - one file per variable per forecast
-hour, region 60-100E / 0-40N.
-Processing (Python only, from then on): cfgrib/xarray reads each variable's
-GRIBs, stacks its hourly steps, unit-converts, and writes JSON via
+Download: download_gfs_curl.sh pulls NOMADS GRIB2 parts with curl (one file
+per forecast hour, all variables, region 60-100E / 0-40N).
+Processing (Python, variable-wise): cfgrib/xarray reads each GRIB and emits
+one JSON per variable+level (time-stacked), unit-converted, via
 save_json.save_da_json (same layout as UKMO/: <fm>_partNNofNN.json when
-large, else <fm>.json, always + <fm>_manifest.json) - one output per
-variable, never merged across variables.
+large, else <fm>.json, always + <fm>_manifest.json).
 
   python gfs_download.py --date 20261108 --cycle 00 --max-lead 72
-  python gfs_download.py --skip-download   # GRIBs already in place
+  python gfs_download.py --skip-download --keep-grib   # GRIBs already in place
 
-Output stems (GeoHEATMap ../GFS/<stem>): tmp_surf, pressfc, cld_amt_surf.
+Downloaded GRIBs are deleted after conversion (pass --keep-grib to retain).
+Output stems are what GeoHEATMap loads as ../GFS/<stem>.
 """
 import argparse
-import glob
 import os
 import subprocess
 import sys
@@ -29,19 +27,65 @@ import xarray as xr
 
 from save_json import save_da_json
 
-BUILD = "2026-11-08-gfs-curl-1"
+BUILD = "2026-11-08-gfs-curl-2"
 CYCLES = ("00", "06", "12", "18")
 
-# output stem -> (cfgrib filter_by_keys, data var, unit scale/offset, units)
+# Output stem -> cfgrib filter, cfgrib data var, unit conversion, units.
+# Converted to human units to match UKMO/GeoHEATMap conventions.
+def _surf(filt, var, s, o, u):
+    return dict(filter=filt, var=var, scale=s, offset=o, units=u)
+
 VARIABLES = {
-    "tmp_surf": dict(filter={"typeOfLevel": "heightAboveGround",
-                             "stepType": "instant", "level": 2},
-                     var="t2m", scale=1.0, offset=-273.15, units="degC"),
-    "pressfc": dict(filter={"typeOfLevel": "meanSea", "stepType": "instant"},
-                    var="prmsl", scale=0.01, offset=0.0, units="hPa"),
-    "cld_amt_surf": dict(filter={"typeOfLevel": "atmosphere", "stepType": "instant"},
-                         var="tcc", scale=1.0, offset=0.0, units="%"),
+    # --- surface / single level -------------------------------------------
+    "tmp_surf": _surf({"typeOfLevel": "heightAboveGround", "stepType": "instant", "level": 2},
+                      "t2m", 1.0, -273.15, "degC"),
+    "dpt_surf": _surf({"typeOfLevel": "heightAboveGround", "stepType": "instant", "level": 2},
+                      "d2m", 1.0, -273.15, "degC"),
+    "rh_surf": _surf({"typeOfLevel": "heightAboveGround", "stepType": "instant", "level": 2},
+                     "r2", 1.0, 0.0, "%"),
+    "spfh_surf": _surf({"typeOfLevel": "heightAboveGround", "stepType": "instant", "level": 2},
+                       "sh2", 1000.0, 0.0, "g/kg"),
+    "u10": _surf({"typeOfLevel": "heightAboveGround", "stepType": "instant", "level": 10},
+                 "u10", 1.0, 0.0, "m s-1"),
+    "v10": _surf({"typeOfLevel": "heightAboveGround", "stepType": "instant", "level": 10},
+                 "v10", 1.0, 0.0, "m s-1"),
+    "prmsl": _surf({"typeOfLevel": "meanSea", "stepType": "instant"},
+                   "prmsl", 0.01, 0.0, "hPa"),
+    "pres_sfc": _surf({"typeOfLevel": "surface", "stepType": "instant"},
+                      "sp", 0.01, 0.0, "hPa"),
+    "gust_sfc": _surf({"typeOfLevel": "surface", "stepType": "instant"},
+                      "gust", 1.0, 0.0, "m s-1"),
+    "tmax_surf": _surf({"typeOfLevel": "heightAboveGround", "stepType": "avg", "level": 2},
+                       "tmax", 1.0, -273.15, "degC"),
+    "tmin_surf": _surf({"typeOfLevel": "heightAboveGround", "stepType": "avg", "level": 2},
+                       "tmin", 1.0, -273.15, "degC"),
+    "apcp": _surf({"typeOfLevel": "surface", "stepType": "accum"},
+                  "acpcp", 1000.0, 0.0, "mm"),
+    "prate": _surf({"typeOfLevel": "surface", "stepType": "avg"},
+                   "prate", 3.6e6, 0.0, "mm h-1"),
+    "cprat": _surf({"typeOfLevel": "surface", "stepType": "avg"},
+                   "cpr", 3.6e6, 0.0, "mm h-1"),
+    "crain": _surf({"typeOfLevel": "surface", "stepType": "avg"},
+                   "crain", 1000.0, 0.0, "mm"),
+    "refc": _surf({"typeOfLevel": "atmosphere", "stepType": "instant"},
+                  "refc", 1.0, 0.0, "dBZ"),
+    "tcdc": _surf({"typeOfLevel": "atmosphere", "stepType": "instant"},
+                  "tcc", 1.0, 0.0, "%"),
 }
+
+# --- pressure levels (isobaricInhPa) ---------------------------------------
+for _lev in (850, 500, 200):
+    for _base, _var, _s, _o, _u in (
+        ("tmp", "t", 1.0, -273.15, "degC"),
+        ("rh", "r", 1.0, 0.0, "%"),
+        ("u", "u", 1.0, 0.0, "m s-1"),
+        ("v", "v", 1.0, 0.0, "m s-1"),
+        ("gh", "gh", 1.0, 0.0, "m"),
+    ):
+        VARIABLES[f"{_base}_p{_lev}"] = _surf(
+            {"typeOfLevel": "isobaricInhPa", "stepType": "instant", "level": _lev},
+            _var, _s, _o, _u)
+
 DEFAULT_VARS = list(VARIABLES)
 
 
@@ -67,6 +111,19 @@ def read_grib(path, meta):
         ds.close()
 
 
+def cleanup_gribs(out):
+    import glob as _glob
+    n = 0
+    for pat in ("*.grib2", "*.grib", "*.idx"):
+        for path in _glob.glob(os.path.join(out, pat)):
+            try:
+                os.remove(path)
+                n += 1
+            except OSError:
+                pass
+    print(f"cleanup: removed {n} GRIB/index file(s) from {out}", flush=True)
+
+
 def main():
     print(f"gfs_download.py {BUILD}", flush=True)
     ap = argparse.ArgumentParser()
@@ -81,6 +138,8 @@ def main():
     ap.add_argument("--max-json-mb", type=float, default=15.0)
     ap.add_argument("--skip-download", action="store_true",
                     help="skip the curl downloader, process GRIBs already in --out")
+    ap.add_argument("--keep-grib", action="store_true",
+                    help="keep downloaded GRIBs (default: delete after conversion)")
     a = ap.parse_args()
 
     stems = [s.strip() for s in a.vars.split(",")] if a.vars else list(DEFAULT_VARS)
@@ -94,14 +153,15 @@ def main():
         run_downloader(a.date, a.cycle, 0, a.max_lead, a.out)
 
     leads = list(range(0, a.max_lead + 1, a.lead_every))
-    print(f"GFS {a.date} cycle {a.cycle}  leads {leads}  out {a.out}")
+    print(f"GFS {a.date} cycle {a.cycle}  leads {len(leads)} hourly steps  out {a.out}")
 
+    # process variable-wise: one output per variable(+level), never merged
     for stem in stems:
         meta = VARIABLES[stem]
         print(f"=== variable {stem} ===", flush=True)
         frames, time_vals = [], []
         for fh in leads:
-            path = os.path.join(a.out, f"gfs_60-100E_0-40N_f{fh:03d}_{stem}.grib2")
+            path = os.path.join(a.out, f"gfs_60-100E_0-40N_f{fh:03d}.grib2")
             if not os.path.isfile(path):
                 print(f"    f{fh:03d} absent, skipped", flush=True)
                 continue
@@ -129,6 +189,9 @@ def main():
             paths = [paths]
         sizes = ", ".join(f"{os.path.getsize(p) / 1e6:.1f} MB" for p in paths)
         print(f"    -> {len(paths)} part(s): {sizes}", flush=True)
+
+    if not a.keep_grib:
+        cleanup_gribs(a.out)
 
     print(f"done. JSON in {a.out}/")
 

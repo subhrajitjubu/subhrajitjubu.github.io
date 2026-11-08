@@ -600,25 +600,236 @@ const VARIABLE_META = {
 
     // ─── NOAA GFS variables (unit-converted by gfs_download.py) ───
     'tmp_surf': {
-        label: 'Surface Temperature', unit: 'degC',
+        label: '2 m Temperature', unit: 'degC',
         scale: [
             [0.00, '#2b0fff'], [0.15, '#1e90ff'], [0.30, '#00cfff'],
             [0.42, '#00e876'], [0.50, '#a8ff00'], [0.60, '#ffe600'],
             [0.72, '#ff8c00'], [0.85, '#ff2200'], [1.00, '#a80000'],
         ],
     },
-    'pressfc': {
+    'dpt_surf': {
+        label: '2 m Dew Point', unit: 'degC',
+        scale: [
+            [0.00, '#2b0fff'], [0.15, '#1e90ff'], [0.30, '#00cfff'],
+            [0.42, '#00e876'], [0.50, '#a8ff00'], [0.60, '#ffe600'],
+            [0.72, '#ff8c00'], [0.85, '#ff2200'], [1.00, '#a80000'],
+        ],
+    },
+    'rh_surf': {
+        label: '2 m Relative Humidity', unit: '%',
+        scale: [
+            [0.00, '#f7fbff'], [0.25, '#c6dbef'], [0.50, '#6baed6'],
+            [0.75, '#2171b5'], [1.00, '#08306b'],
+        ],
+    },
+    'spfh_surf': {
+        label: '2 m Specific Humidity', unit: 'g/kg',
+        scale: [
+            [0.00, '#fff7ec'], [0.25, '#fee6ce'], [0.50, '#fdd0a2'],
+            [0.75, '#fdbb84'], [1.00, '#e34a33'],
+        ],
+    },
+    'u10': {
+        label: '10 m U Wind', unit: 'm s-1',
+        scale: [
+            [0.00, '#eff6ff'], [0.20, '#93c5fd'], [0.38, '#38bdf8'],
+            [0.52, '#22c55e'], [0.66, '#f59e0b'], [0.80, '#f97316'], [1.00, '#dc2626'],
+        ],
+    },
+    'v10': {
+        label: '10 m V Wind', unit: 'm s-1',
+        scale: [
+            [0.00, '#eff6ff'], [0.20, '#93c5fd'], [0.38, '#38bdf8'],
+            [0.52, '#22c55e'], [0.66, '#f59e0b'], [0.80, '#f97316'], [1.00, '#dc2626'],
+        ],
+    },
+    'prmsl': {
+        label: 'Mean Sea Level Pressure', unit: 'hPa',
+        scale: [
+            [0.00, '#4575b4'], [0.20, '#74add1'], [0.40, '#e0f3f8'],
+            [0.50, '#ffffbf'], [0.60, '#fee090'], [0.80, '#f46d43'], [1.00, '#d73027'],
+        ],
+    },
+    'pres_sfc': {
         label: 'Surface Pressure', unit: 'hPa',
         scale: [
             [0.00, '#4575b4'], [0.20, '#74add1'], [0.40, '#e0f3f8'],
             [0.50, '#ffffbf'], [0.60, '#fee090'], [0.80, '#f46d43'], [1.00, '#d73027'],
         ],
     },
-    'cld_amt_surf': {
-        label: 'Cloud Amount (lowest layer)', unit: '%',
+    'gust_sfc': {
+        label: 'Surface Gust', unit: 'm s-1',
+        scale: [
+            [0.00, '#eff6ff'], [0.20, '#93c5fd'], [0.38, '#38bdf8'],
+            [0.52, '#22c55e'], [0.66, '#f59e0b'], [0.80, '#f97316'], [1.00, '#dc2626'],
+        ],
+    },
+    'tmax_surf': {
+        label: '2 m Max Temp', unit: 'degC',
+        scale: [
+            [0.00, '#2b0fff'], [0.15, '#1e90ff'], [0.30, '#00cfff'],
+            [0.42, '#00e876'], [0.50, '#a8ff00'], [0.60, '#ffe600'],
+            [0.72, '#ff8c00'], [0.85, '#ff2200'], [1.00, '#a80000'],
+        ],
+    },
+    'tmin_surf': {
+        label: '2 m Min Temp', unit: 'degC',
+        scale: [
+            [0.00, '#2b0fff'], [0.15, '#1e90ff'], [0.30, '#00cfff'],
+            [0.42, '#00e876'], [0.50, '#a8ff00'], [0.60, '#ffe600'],
+            [0.72, '#ff8c00'], [0.85, '#ff2200'], [1.00, '#a80000'],
+        ],
+    },
+    'apcp': {
+        label: 'Accumulated Precipitation', unit: 'mm',
+        scale: [
+            [0.00, '#ffffff'], [0.10, '#c6e9f7'], [0.25, '#74c8f0'],
+            [0.40, '#1e9fd4'], [0.55, '#0b5ea8'], [0.70, '#083680'],
+            [0.85, '#4b0082'], [1.00, '#8b0000'],
+        ],
+    },
+    'prate': {
+        label: 'Precipitation Rate', unit: 'mm h-1',
+        scale: [
+            [0.00, '#ffffff'], [0.10, '#c6e9f7'], [0.25, '#74c8f0'],
+            [0.40, '#1e9fd4'], [0.55, '#0b5ea8'], [0.70, '#083680'],
+            [0.85, '#4b0082'], [1.00, '#8b0000'],
+        ],
+    },
+    'cprat': {
+        label: 'Convective Precip Rate', unit: 'mm h-1',
+        scale: [
+            [0.00, '#ffffff'], [0.15, '#b3e5fc'], [0.30, '#4db6e8'],
+            [0.50, '#0288d1'], [0.70, '#01579b'], [0.85, '#6a1b9a'], [1.00, '#880e4f'],
+        ],
+    },
+    'crain': {
+        label: 'Convective Rain', unit: 'mm',
+        scale: [
+            [0.00, '#ffffff'], [0.15, '#b3e5fc'], [0.30, '#4db6e8'],
+            [0.50, '#0288d1'], [0.70, '#01579b'], [0.85, '#6a1b9a'], [1.00, '#880e4f'],
+        ],
+    },
+    'tcdc': {
+        label: 'Total Cloud Cover', unit: '%',
         scale: [
             [0.00, '#fafafa'], [0.25, '#d4e8f5'], [0.50, '#88c4e8'],
             [0.75, '#3a90c8'], [1.00, '#0a4a7c'],
+        ],
+    },
+    'refc': {
+        label: 'Reflectivity', unit: 'dBZ',
+        scale: [
+            [0.00, '#f5f5f5'], [0.20, '#a1d99b'], [0.40, '#31a354'],
+            [0.60, '#3182bd'], [0.80, '#756bb1'], [1.00, '#54278f'],
+        ],
+    },
+    'tmp_p850': {
+        label: '850 hPa Temperature', unit: 'degC',
+        scale: [
+            [0.00, '#2b0fff'], [0.15, '#1e90ff'], [0.30, '#00cfff'],
+            [0.42, '#00e876'], [0.50, '#a8ff00'], [0.60, '#ffe600'],
+            [0.72, '#ff8c00'], [0.85, '#ff2200'], [1.00, '#a80000'],
+        ],
+    },
+    'rh_p850': {
+        label: '850 hPa Relative Humidity', unit: '%',
+        scale: [
+            [0.00, '#f7fbff'], [0.25, '#c6dbef'], [0.50, '#6baed6'],
+            [0.75, '#2171b5'], [1.00, '#08306b'],
+        ],
+    },
+    'u_p850': {
+        label: '850 hPa U Wind', unit: 'm s-1',
+        scale: [
+            [0.00, '#eff6ff'], [0.20, '#93c5fd'], [0.38, '#38bdf8'],
+            [0.52, '#22c55e'], [0.66, '#f59e0b'], [0.80, '#f97316'], [1.00, '#dc2626'],
+        ],
+    },
+    'v_p850': {
+        label: '850 hPa V Wind', unit: 'm s-1',
+        scale: [
+            [0.00, '#eff6ff'], [0.20, '#93c5fd'], [0.38, '#38bdf8'],
+            [0.52, '#22c55e'], [0.66, '#f59e0b'], [0.80, '#f97316'], [1.00, '#dc2626'],
+        ],
+    },
+    'gh_p850': {
+        label: '850 hPa Geopotential Height', unit: 'm',
+        scale: [
+            [0.00, '#4575b4'], [0.25, '#91bfdb'], [0.50, '#e0f3f8'],
+            [0.75, '#fdae61'], [1.00, '#d73027'],
+        ],
+    },
+    'tmp_p500': {
+        label: '500 hPa Temperature', unit: 'degC',
+        scale: [
+            [0.00, '#2b0fff'], [0.15, '#1e90ff'], [0.30, '#00cfff'],
+            [0.42, '#00e876'], [0.50, '#a8ff00'], [0.60, '#ffe600'],
+            [0.72, '#ff8c00'], [0.85, '#ff2200'], [1.00, '#a80000'],
+        ],
+    },
+    'rh_p500': {
+        label: '500 hPa Relative Humidity', unit: '%',
+        scale: [
+            [0.00, '#f7fbff'], [0.25, '#c6dbef'], [0.50, '#6baed6'],
+            [0.75, '#2171b5'], [1.00, '#08306b'],
+        ],
+    },
+    'u_p500': {
+        label: '500 hPa U Wind', unit: 'm s-1',
+        scale: [
+            [0.00, '#eff6ff'], [0.20, '#93c5fd'], [0.38, '#38bdf8'],
+            [0.52, '#22c55e'], [0.66, '#f59e0b'], [0.80, '#f97316'], [1.00, '#dc2626'],
+        ],
+    },
+    'v_p500': {
+        label: '500 hPa V Wind', unit: 'm s-1',
+        scale: [
+            [0.00, '#eff6ff'], [0.20, '#93c5fd'], [0.38, '#38bdf8'],
+            [0.52, '#22c55e'], [0.66, '#f59e0b'], [0.80, '#f97316'], [1.00, '#dc2626'],
+        ],
+    },
+    'gh_p500': {
+        label: '500 hPa Geopotential Height', unit: 'm',
+        scale: [
+            [0.00, '#4575b4'], [0.25, '#91bfdb'], [0.50, '#e0f3f8'],
+            [0.75, '#fdae61'], [1.00, '#d73027'],
+        ],
+    },
+    'tmp_p200': {
+        label: '200 hPa Temperature', unit: 'degC',
+        scale: [
+            [0.00, '#2b0fff'], [0.15, '#1e90ff'], [0.30, '#00cfff'],
+            [0.42, '#00e876'], [0.50, '#a8ff00'], [0.60, '#ffe600'],
+            [0.72, '#ff8c00'], [0.85, '#ff2200'], [1.00, '#a80000'],
+        ],
+    },
+    'rh_p200': {
+        label: '200 hPa Relative Humidity', unit: '%',
+        scale: [
+            [0.00, '#f7fbff'], [0.25, '#c6dbef'], [0.50, '#6baed6'],
+            [0.75, '#2171b5'], [1.00, '#08306b'],
+        ],
+    },
+    'u_p200': {
+        label: '200 hPa U Wind', unit: 'm s-1',
+        scale: [
+            [0.00, '#eff6ff'], [0.20, '#93c5fd'], [0.38, '#38bdf8'],
+            [0.52, '#22c55e'], [0.66, '#f59e0b'], [0.80, '#f97316'], [1.00, '#dc2626'],
+        ],
+    },
+    'v_p200': {
+        label: '200 hPa V Wind', unit: 'm s-1',
+        scale: [
+            [0.00, '#eff6ff'], [0.20, '#93c5fd'], [0.38, '#38bdf8'],
+            [0.52, '#22c55e'], [0.66, '#f59e0b'], [0.80, '#f97316'], [1.00, '#dc2626'],
+        ],
+    },
+    'gh_p200': {
+        label: '200 hPa Geopotential Height', unit: 'm',
+        scale: [
+            [0.00, '#4575b4'], [0.25, '#91bfdb'], [0.50, '#e0f3f8'],
+            [0.75, '#fdae61'], [1.00, '#d73027'],
         ],
     },
 };
