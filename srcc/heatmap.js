@@ -622,13 +622,6 @@ const VARIABLE_META = {
             [0.75, '#2171b5'], [1.00, '#08306b'],
         ],
     },
-    'spfh_surf': {
-        label: '2 m Specific Humidity', unit: 'g/kg',
-        scale: [
-            [0.00, '#fff7ec'], [0.25, '#fee6ce'], [0.50, '#fdd0a2'],
-            [0.75, '#fdbb84'], [1.00, '#e34a33'],
-        ],
-    },
     'u10': {
         label: '10 m U Wind', unit: 'm s-1',
         scale: [
@@ -648,20 +641,6 @@ const VARIABLE_META = {
         scale: [
             [0.00, '#4575b4'], [0.20, '#74add1'], [0.40, '#e0f3f8'],
             [0.50, '#ffffbf'], [0.60, '#fee090'], [0.80, '#f46d43'], [1.00, '#d73027'],
-        ],
-    },
-    'pres_sfc': {
-        label: 'Surface Pressure', unit: 'hPa',
-        scale: [
-            [0.00, '#4575b4'], [0.20, '#74add1'], [0.40, '#e0f3f8'],
-            [0.50, '#ffffbf'], [0.60, '#fee090'], [0.80, '#f46d43'], [1.00, '#d73027'],
-        ],
-    },
-    'gust_sfc': {
-        label: 'Surface Gust', unit: 'm s-1',
-        scale: [
-            [0.00, '#eff6ff'], [0.20, '#93c5fd'], [0.38, '#38bdf8'],
-            [0.52, '#22c55e'], [0.66, '#f59e0b'], [0.80, '#f97316'], [1.00, '#dc2626'],
         ],
     },
     'tmax_surf': {
@@ -703,33 +682,11 @@ const VARIABLE_META = {
             [0.50, '#0288d1'], [0.70, '#01579b'], [0.85, '#6a1b9a'], [1.00, '#880e4f'],
         ],
     },
-    'crain': {
-        label: 'Convective Rain', unit: 'mm',
-        scale: [
-            [0.00, '#ffffff'], [0.15, '#b3e5fc'], [0.30, '#4db6e8'],
-            [0.50, '#0288d1'], [0.70, '#01579b'], [0.85, '#6a1b9a'], [1.00, '#880e4f'],
-        ],
-    },
     'tcdc': {
         label: 'Total Cloud Cover', unit: '%',
         scale: [
             [0.00, '#fafafa'], [0.25, '#d4e8f5'], [0.50, '#88c4e8'],
             [0.75, '#3a90c8'], [1.00, '#0a4a7c'],
-        ],
-    },
-    'refc': {
-        label: 'Reflectivity', unit: 'dBZ',
-        scale: [
-            [0.00, '#f5f5f5'], [0.20, '#a1d99b'], [0.40, '#31a354'],
-            [0.60, '#3182bd'], [0.80, '#756bb1'], [1.00, '#54278f'],
-        ],
-    },
-    'tmp_p850': {
-        label: '850 hPa Temperature', unit: 'degC',
-        scale: [
-            [0.00, '#2b0fff'], [0.15, '#1e90ff'], [0.30, '#00cfff'],
-            [0.42, '#00e876'], [0.50, '#a8ff00'], [0.60, '#ffe600'],
-            [0.72, '#ff8c00'], [0.85, '#ff2200'], [1.00, '#a80000'],
         ],
     },
     'rh_p850': {
@@ -760,14 +717,6 @@ const VARIABLE_META = {
             [0.75, '#fdae61'], [1.00, '#d73027'],
         ],
     },
-    'tmp_p500': {
-        label: '500 hPa Temperature', unit: 'degC',
-        scale: [
-            [0.00, '#2b0fff'], [0.15, '#1e90ff'], [0.30, '#00cfff'],
-            [0.42, '#00e876'], [0.50, '#a8ff00'], [0.60, '#ffe600'],
-            [0.72, '#ff8c00'], [0.85, '#ff2200'], [1.00, '#a80000'],
-        ],
-    },
     'rh_p500': {
         label: '500 hPa Relative Humidity', unit: '%',
         scale: [
@@ -794,14 +743,6 @@ const VARIABLE_META = {
         scale: [
             [0.00, '#4575b4'], [0.25, '#91bfdb'], [0.50, '#e0f3f8'],
             [0.75, '#fdae61'], [1.00, '#d73027'],
-        ],
-    },
-    'tmp_p200': {
-        label: '200 hPa Temperature', unit: 'degC',
-        scale: [
-            [0.00, '#2b0fff'], [0.15, '#1e90ff'], [0.30, '#00cfff'],
-            [0.42, '#00e876'], [0.50, '#a8ff00'], [0.60, '#ffe600'],
-            [0.72, '#ff8c00'], [0.85, '#ff2200'], [1.00, '#a80000'],
         ],
     },
     'rh_p200': {

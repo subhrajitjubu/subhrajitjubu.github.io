@@ -19,11 +19,11 @@ env:
   PYTHONFAULTHANDLER: "1"
   # output stems produced by gfs_download.VARIABLES
   VARS: >-
-    tmp_surf,dpt_surf,rh_surf,spfh_surf,u10,v10,prmsl,pres_sfc,gust_sfc,
-    tmax_surf,tmin_surf,apcp,prate,cprat,crain,refc,tcdc,
-    tmp_p850,rh_p850,u_p850,v_p850,gh_p850,
-    tmp_p500,rh_p500,u_p500,v_p500,gh_p500,
-    tmp_p200,rh_p200,u_p200,v_p200,gh_p200
+    tmp_surf,dpt_surf,rh_surf,u10,v10,prmsl,
+    tmax_surf,tmin_surf,apcp,prate,cprat,tcdc,
+    rh_p850,u_p850,v_p850,gh_p850,
+    rh_p500,u_p500,v_p500,gh_p500,
+    rh_p200,u_p200,v_p200,gh_p200
 
 jobs:
   run-preprocess:

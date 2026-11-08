@@ -43,18 +43,12 @@ VARIABLES = {
                       "d2m", 1.0, -273.15, "degC"),
     "rh_surf": _surf({"typeOfLevel": "heightAboveGround", "stepType": "instant", "level": 2},
                      "r2", 1.0, 0.0, "%"),
-    "spfh_surf": _surf({"typeOfLevel": "heightAboveGround", "stepType": "instant", "level": 2},
-                       "sh2", 1000.0, 0.0, "g/kg"),
     "u10": _surf({"typeOfLevel": "heightAboveGround", "stepType": "instant", "level": 10},
                  "u10", 1.0, 0.0, "m s-1"),
     "v10": _surf({"typeOfLevel": "heightAboveGround", "stepType": "instant", "level": 10},
                  "v10", 1.0, 0.0, "m s-1"),
     "prmsl": _surf({"typeOfLevel": "meanSea", "stepType": "instant"},
                    "prmsl", 0.01, 0.0, "hPa"),
-    "pres_sfc": _surf({"typeOfLevel": "surface", "stepType": "instant"},
-                      "sp", 0.01, 0.0, "hPa"),
-    "gust_sfc": _surf({"typeOfLevel": "surface", "stepType": "instant"},
-                      "gust", 1.0, 0.0, "m s-1"),
     "tmax_surf": _surf({"typeOfLevel": "heightAboveGround", "stepType": "max", "level": 2},
                        "tmax", 1.0, -273.15, "degC"),
     "tmin_surf": _surf({"typeOfLevel": "heightAboveGround", "stepType": "min", "level": 2},
@@ -65,10 +59,6 @@ VARIABLES = {
                    "prate", 3.6e6, 0.0, "mm h-1"),
     "cprat": _surf({"typeOfLevel": "surface", "stepType": "avg"},
                    "cpr", 3.6e6, 0.0, "mm h-1"),
-    "crain": _surf({"typeOfLevel": "surface", "stepType": "avg"},
-                   "crain", 1000.0, 0.0, "mm"),
-    "refc": _surf({"typeOfLevel": "atmosphere", "stepType": "instant"},
-                  "refc", 1.0, 0.0, "dBZ"),
     "tcdc": _surf({"typeOfLevel": "atmosphere", "stepType": "instant"},
                   "tcc", 1.0, 0.0, "%"),
 }
@@ -76,7 +66,6 @@ VARIABLES = {
 # --- pressure levels (isobaricInhPa) ---------------------------------------
 for _lev in (850, 500, 200):
     for _base, _var, _s, _o, _u in (
-        ("tmp", "t", 1.0, -273.15, "degC"),
         ("rh", "r", 1.0, 0.0, "%"),
         ("u", "u", 1.0, 0.0, "m s-1"),
         ("v", "v", 1.0, 0.0, "m s-1"),
