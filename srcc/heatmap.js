@@ -597,6 +597,38 @@ const VARIABLE_META = {
             [0.50, '#facc15'], [0.66, '#22c55e'], [0.83, '#06b6d4'], [1.00, '#3b82f6'],
         ],
     },
+
+    // ─── NOAA GFS variables (unit-converted by gfs_download.py) ───
+    'tmpsfc': {
+        label: 'Surface Temperature', unit: 'degC',
+        scale: [
+            [0.00, '#2b0fff'], [0.15, '#1e90ff'], [0.30, '#00cfff'],
+            [0.42, '#00e876'], [0.50, '#a8ff00'], [0.60, '#ffe600'],
+            [0.72, '#ff8c00'], [0.85, '#ff2200'], [1.00, '#a80000'],
+        ],
+    },
+    'pressfc': {
+        label: 'Surface Pressure', unit: 'hPa',
+        scale: [
+            [0.00, '#4575b4'], [0.20, '#74add1'], [0.40, '#e0f3f8'],
+            [0.50, '#ffffbf'], [0.60, '#fee090'], [0.80, '#f46d43'], [1.00, '#d73027'],
+        ],
+    },
+    'apcpsfc': {
+        label: 'Accumulated Precipitation', unit: 'mm',
+        scale: [
+            [0.00, '#ffffff'], [0.10, '#c6e9f7'], [0.25, '#74c8f0'],
+            [0.40, '#1e9fd4'], [0.55, '#0b5ea8'], [0.70, '#083680'],
+            [0.85, '#4b0082'], [1.00, '#8b0000'],
+        ],
+    },
+    'tcdcaveclm': {
+        label: 'Total Cloud Cover', unit: '%',
+        scale: [
+            [0.00, '#fafafa'], [0.25, '#d4e8f5'], [0.50, '#88c4e8'],
+            [0.75, '#3a90c8'], [1.00, '#0a4a7c'],
+        ],
+    },
 };
 
 // ─── Helpers ─────────────────────────────────────────────────────────────

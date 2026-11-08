@@ -550,6 +550,7 @@
                 <select id="model-selector">
                     <option value="ecmwf" selected>ECMWF IFS</option>
                     <option value="ukmo">UKMO (Global 10km)</option>
+                    <option value="gfs">NOAA GFS (0.25°)</option>
                 </select>
             </div>
 
@@ -610,7 +611,7 @@
     <footer>
         <div class="footer-left">© 2024 SUBHRAJIT RATH</div>
         <div class="footer-right">
-            Data: ECMWF IFS · UKMO Global 10km &nbsp;·&nbsp;
+            Data: ECMWF IFS · UKMO Global 10km · NOAA GFS &nbsp;·&nbsp;
             <span>Vis: Canvas + GeoJSON (no chart library)</span>
         </div>
     </footer>
@@ -768,6 +769,18 @@
                     ['../UKMO/cloud_amount_of_medium_cloud', 'Mid Cloud Cover'],
                     ['../UKMO/cloud_amount_of_high_cloud', 'High Cloud Cover'],
                     ['../UKMO/cloud_amount_of_total_cloud', 'Total Cloud Cover'],
+                ]},
+            ],
+        },
+        gfs: {
+            label: 'NOAA GFS (0.25°)',
+            defaultValue: '../GFS/tmpsfc',
+            groups: [
+                { label: 'Surface', items: [
+                    ['../GFS/tmpsfc', 'Surface Temperature'],
+                    ['../GFS/pressfc', 'Surface Pressure'],
+                    ['../GFS/apcpsfc', 'Accumulated Precipitation'],
+                    ['../GFS/tcdcaveclm', 'Total Cloud Cover'],
                 ]},
             ],
         },

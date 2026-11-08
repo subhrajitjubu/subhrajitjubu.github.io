@@ -1,0 +1,140 @@
+name: GFS run
+
+on:
+  schedule:
+    # every 6 hours. NOMADS publishes the 00/06/12/18 cycles with a few
+    # hours of lag, so each tick picks up the newest cycle available
+    - cron: '0 */6 * * *'
+  workflow_dispatch:  # Allows manual triggering
+
+permissions:
+  contents: write   # needed to push the generated JSON back to the repo
+
+concurrency:
+  # never let a scheduled run and a manual one fight over the same branch
+  group: gfs-run
+  cancel-in-progress: false
+
+env:
+  PYTHONFAULTHANDLER: "1"
+  # output stems produced by gfs_vars.VARIABLES
+  VARS: >-
+    apcpsfc,
+    tmpsfc,
+    pressfc,
+    tcdcaveclm
+
+jobs:
+  run-preprocess:
+    runs-on: ubuntu-latest
+    timeout-minutes: 360
+
+    steps:
+      - name: Check runner resources
+        run: |
+          echo "CPU cores:"
+          nproc
+          echo "Memory:"
+          free -h
+          echo "Disk:"
+          df -h /
+
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          # purge_history.sh rewrites history, so it needs the real history and
+          # not a depth-1 shallow clone
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+
+      - name: Cache Python packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Resolve the cycle
+        run: |
+          # newest GFS cycle in the last few days that NOMADS can serve
+          CYCLE=00
+          for delta in 0 1 2; do
+            YMD=$(date -u -d "$delta days ago" +%Y%m%d)
+            for hh in 18 12 06 00; do
+              if curl -sL --max-time 15 "http://nomads.ncep.noaa.gov:80/dods/gfs_0p25_1hr/gfs${YMD}/gfs_0p25_1hr_${hh}z.das" -o /dev/null -w "%{http_code}" | grep -q 200; then
+                CYCLE=$hh
+                echo "YMD=$YMD" >> "$GITHUB_ENV"
+                echo "CYCLE=$CYCLE" >> "$GITHUB_ENV"
+                break 2
+              fi
+            done
+          done
+          echo "cycle: $YMD ${CYCLE}z"
+
+      - name: Download, crop and convert to JSON
+        run: |
+          set -euo pipefail
+
+          # start from a clean slate: a different number of parts would
+          # otherwise leave stale *_part03of03.json files behind
+          mkdir -p GFS
+          find GFS -maxdepth 1 -type f -name '*.json' -delete
+
+          python -X faulthandler gfs_download.py \
+            --date "$YMD" --cycle "$CYCLE" \
+            --lat 0 40 --lon 40 100 \
+            --max-lead 60 --lead-every 3 \
+            --vars "$VARS" \
+            --out GFS --max-json-mb 15
+
+          n=$(find GFS -maxdepth 1 -type f -name '*.json' | wc -l)
+          if [ "$n" -eq 0 ]; then
+            echo "no JSON was produced - failing instead of committing nothing"
+            exit 1
+          fi
+          echo "$n JSON file(s) in GFS/"
+          du -sh GFS/
+
+          # GitHub's web uploader refuses files over 25 MB. --max-json-mb 15
+          # keeps every part below that; warn if that ever breaks.
+          big=$(find GFS -maxdepth 1 -type f -name '*.json' -size +25M)
+          if [ -n "$big" ]; then
+            echo "::warning::JSON files larger than 25 MB:"
+            echo "$big"
+          fi
+
+      - name: Commit and push changes
+        run: |
+          set -euo pipefail
+          git config --global --add safe.directory "$GITHUB_WORKSPACE"
+          git config --global user.name "subhrajitjubu"
+          git config --global user.email "66462700+subhrajitjubu@users.noreply.github.com"
+          git pull --no-rebase origin main
+
+          # -A so files deleted at the start of the run are staged too;
+          # `git add GFS/*.json` only ever matches files that still exist
+          git add -A GFS/
+
+          if [ -z "$(git diff --cached --name-only)" ]; then
+            echo "No changes to commit."
+            exit 0
+          fi
+
+          git commit -m "Update GFS JSON ($YMD ${CYCLE}z)"
+
+          # every earlier version of GFS/*.json is stripped out of history and
+          # garbage-collected, so .git stays the size of one run's data instead
+          # of growing by ~0.5 GB per run. This rewrites history - hence --force.
+          bash purge_history.sh GFS
+
+          git push --force origin main
