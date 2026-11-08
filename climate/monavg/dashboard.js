@@ -113,6 +113,11 @@
    
 
     function renderLineChart(time1,data1, district) {
+    if (typeof Highcharts === 'undefined') {
+        document.getElementById('chart-container').innerHTML =
+            '<p style="color:#b91c1c">Chart library failed to load. Please check your connection and reload.</p>';
+        return;
+    }
     // Check if values is an array and contains data
     const values = Object.values(data1);
     const time = Object.values(time1);
