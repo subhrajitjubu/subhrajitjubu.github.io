@@ -671,16 +671,13 @@
         indiaRings = ringsOf(geojsonData);
 
         const geojsonLayer = L.geoJSON(geojsonData, {
+          interactive: false,
           style: () => ({
             color: '#187dee',
             weight: 3,
             fillColor: '#FFA500',
             fillOpacity: 0
-          }),
-          onEachFeature: (feature, layer) => {
-            const name = feature.properties && (feature.properties.NAME_1 || feature.properties.name);
-            if (name) layer.bindPopup(`<b>Region:</b> ${esc(name)}`);
-          }
+          })
         }).addTo(map);
 
         const bounds = geojsonLayer.getBounds();
