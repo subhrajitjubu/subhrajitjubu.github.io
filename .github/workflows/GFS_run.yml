@@ -89,13 +89,14 @@ jobs:
           mkdir -p GFS
           find GFS -maxdepth 1 -type f -name '*.json' -delete
 
-          # download via the project's curl script, then process in Python
-          bash download_gfs_curl.sh "$YMD" "$CYCLE" 0 12
+          # download via the project's curl script (variable-wise, hourly),
+          # then process in Python (one output per variable)
+          bash download_gfs_curl.sh "$YMD" "$CYCLE" 0 72
 
           python -X faulthandler gfs_download.py \
             --skip-download \
             --date "$YMD" --cycle "$CYCLE" \
-            --max-lead 12 --lead-every 3 \
+            --max-lead 72 --lead-every 1 \
             --vars "$VARS" \
             --out GFS --max-json-mb 15
 

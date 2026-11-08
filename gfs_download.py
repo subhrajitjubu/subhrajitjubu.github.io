@@ -1,14 +1,16 @@
 """
 gfs_download.py - NOAA GFS 0.25 deg pipeline, UKMO-style.
 
-Download (fast, per project script): download_gfs_curl.sh pulls NOMADS
-GRIB2 parts with curl - each forecast hour ~1.6 MB, region 60-100E / 0-40N.
-Processing (Python only, from then on): cfgrib/xarray reads the GRIBs,
-stacks the 3-hourly steps, unit-converts, and writes JSON via
+Download (fast, per project script): download_gfs_curl.sh loops variable-wise
+and pulls NOMADS GRIB2 parts with curl - one file per variable per forecast
+hour, region 60-100E / 0-40N.
+Processing (Python only, from then on): cfgrib/xarray reads each variable's
+GRIBs, stacks its hourly steps, unit-converts, and writes JSON via
 save_json.save_da_json (same layout as UKMO/: <fm>_partNNofNN.json when
-large, else <fm>.json, always + <fm>_manifest.json).
+large, else <fm>.json, always + <fm>_manifest.json) - one output per
+variable, never merged across variables.
 
-  python gfs_download.py --date 20261108 --cycle 00 --max-lead 12
+  python gfs_download.py --date 20261108 --cycle 00 --max-lead 72
   python gfs_download.py --skip-download   # GRIBs already in place
 
 Output stems (GeoHEATMap ../GFS/<stem>): tmp_surf, pressfc, cld_amt_surf.
@@ -72,10 +74,10 @@ def main():
     ap.add_argument("--cycle", default="00", choices=CYCLES)
     ap.add_argument("--out", default="GFS")
     ap.add_argument("--vars", default=None)
-    ap.add_argument("--max-lead", type=int, default=12,
-                    help="forecast hours to keep (curl script default 0-72)")
-    ap.add_argument("--lead-every", type=int, default=3,
-                    help="keep every Nth hourly step (3 = 3-hourly)")
+    ap.add_argument("--max-lead", type=int, default=72,
+                    help="forecast hours to keep (hourly to 72 h = 3 days)")
+    ap.add_argument("--lead-every", type=int, default=1,
+                    help="keep every Nth hourly step (1 = hourly)")
     ap.add_argument("--max-json-mb", type=float, default=15.0)
     ap.add_argument("--skip-download", action="store_true",
                     help="skip the curl downloader, process GRIBs already in --out")
@@ -96,10 +98,10 @@ def main():
 
     for stem in stems:
         meta = VARIABLES[stem]
-        print(f"  {stem} ...", flush=True)
+        print(f"=== variable {stem} ===", flush=True)
         frames, time_vals = [], []
         for fh in leads:
-            path = os.path.join(a.out, f"gfs_60-100E_0-40N_f{fh:03d}.grib2")
+            path = os.path.join(a.out, f"gfs_60-100E_0-40N_f{fh:03d}_{stem}.grib2")
             if not os.path.isfile(path):
                 print(f"    f{fh:03d} absent, skipped", flush=True)
                 continue
