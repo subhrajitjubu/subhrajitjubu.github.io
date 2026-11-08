@@ -11,21 +11,23 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v2
-
-      - name: Set up Python
-        uses: actions/setup-python@v2
-        with:
-          python-version: '3.8'  # Specify the Python version you need
-
-      - name: Cache Python packages
         uses: actions/checkout@v4
         with:
-          cache: 'pip'
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+
+      - name: Cache Python packages
+        uses: actions/cache@v4
+        with:
           path: ~/.cache/pip
           key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
           restore-keys: |
             ${{ runner.os }}-pip-
+
       - name: Create virtual environment
         run: |
           python -m venv venv
@@ -38,31 +40,27 @@ jobs:
           git config --global user.name "subhrajitjubu"
           git config --global user.email "66462700+subhrajitjubu@users.noreply.github.com"
           git pull origin main
-          
+           
       - name: Run Jupyter Notebook
         env:
           CDSAPI_KEY: ${{ secrets.CDSAPI_KEY }}
         run: |
           source venv/bin/activate
-          rm srcc/*.json
+          find srcc -type f -name '*.json' ! -name 'IND.json' -exec rm {} +
           ipython -c "%run srcc/plott_00.ipynb"
-          
-      
-          
+       
       - name: Commit and push changes
         run: |
           git config --global user.name "subhrajitjubu"
           git config --global user.email "66462700+subhrajitjubu@users.noreply.github.com"
           git pull origin main
-          # git rm --cached *.zip *.nc
-          git add .gitignore
-          
-
           mv *.json srcc/
-          git add srcc/*.json
+          git add -A srcc/
           if [ -n "$(git status --porcelain)" ]; then
-            git commit -m "Update files created by Jupyter Notebook"
-            git push origin main
+            git commit -m "Update ECMWF JSON"
+            # keep history at one run's data (same discipline as UKMO/GFS)
+            bash purge_history.sh srcc
+            git push --force origin main
           else
             echo "No changes to commit."
           fi
