@@ -55,9 +55,9 @@ VARIABLES = {
                       "sp", 0.01, 0.0, "hPa"),
     "gust_sfc": _surf({"typeOfLevel": "surface", "stepType": "instant"},
                       "gust", 1.0, 0.0, "m s-1"),
-    "tmax_surf": _surf({"typeOfLevel": "heightAboveGround", "stepType": "avg", "level": 2},
+    "tmax_surf": _surf({"typeOfLevel": "heightAboveGround", "stepType": "max", "level": 2},
                        "tmax", 1.0, -273.15, "degC"),
-    "tmin_surf": _surf({"typeOfLevel": "heightAboveGround", "stepType": "avg", "level": 2},
+    "tmin_surf": _surf({"typeOfLevel": "heightAboveGround", "stepType": "min", "level": 2},
                        "tmin", 1.0, -273.15, "degC"),
     "apcp": _surf({"typeOfLevel": "surface", "stepType": "accum"},
                   "acpcp", 1000.0, 0.0, "mm"),
@@ -100,8 +100,14 @@ def run_downloader(date, cycle, f_start, f_end, out):
 
 
 def read_grib(path, meta):
-    ds = xr.open_dataset(path, engine="cfgrib", filter_by_keys=meta["filter"])
     try:
+        ds = xr.open_dataset(path, engine="cfgrib", filter_by_keys=meta["filter"])
+    except Exception:
+        return None, None, None
+    try:
+        if meta["var"] not in ds.data_vars:
+            ds.close()
+            return None, None, None
         da = ds[meta["var"]].load()
         lats = np.asarray(da["latitude"].values, dtype="float64")
         lons = np.asarray(da["longitude"].values, dtype="float64")
@@ -166,6 +172,9 @@ def main():
                 print(f"    f{fh:03d} absent, skipped", flush=True)
                 continue
             arr, lats, lons = read_grib(path, meta)
+            if arr is None:
+                print(f"    f{fh:03d} missing field, skipped", flush=True)
+                continue
             frames.append(arr)
             time_vals.append(fh)
             print(f"    f{fh:03d} done", flush=True)
