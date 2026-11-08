@@ -695,8 +695,7 @@
         `<span style="font-size:15px;font-weight:700">${fmtVal(hit.val)} µg/m³</span><br>` +
         `Lon: ${ll.lng.toFixed(5)}<br>` +
         `Lat: ${ll.lat.toFixed(5)}<br>` +
-        `Location: ${esc(location)}<br>` +
-        (address ? `<span style="color:#475569">Address: ${esc(address)}</span><br>` : '') +
+        (address ? `Address: ${esc(address)}<br>` : '') +
         (near
           ? `<span style="color:#475569">Nearest station: ${esc((near.site.rec && near.site.rec.station) || '—')} · ${Math.round(near.distKm)} km</span>`
           : `<span style="color:#475569">Nearest station: —</span>`);
