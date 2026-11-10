@@ -1,0 +1,674 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+        <link rel="icon" type="image/jpg" href="subhrajit.JPEG">
+<meta name="description" content="Professional experience of Subhrajit Rath - atmospheric radiation, HITRAN data curation and NWP modeling.">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Experience - Subhrajit Rath</title>
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Fontsource Inter -->
+    <link href="https://fontsource.org/inter/index.css" rel="stylesheet">
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            scroll-behavior: smooth;
+        }
+
+        .hero-bg {
+            background-image: url('assets/hero.png');
+            background-size: cover;
+            background-position: center;
+        }
+
+        .gradient-text {
+            background: linear-gradient(135deg, #3b82f6, #06b6d4);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .glass-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .reveal {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.8s ease-out;
+        }
+        .reveal.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .nav-link {
+            position: relative;
+        }
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: -4px;
+            left: 50%;
+            background: #3b82f6;
+            transition: all 0.3s ease;
+            transform: translateX(-50%);
+        }
+        .nav-link:hover::after {
+            width: 70%;
+        }
+
+        .experience-card {
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .experience-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 25px 50px -12px rgba(59, 130, 246, 0.25);
+        }
+
+        .skill-badge {
+            transition: all 0.3s ease;
+        }
+        .skill-badge:hover {
+            transform: scale(1.05);
+        }
+    
+/* === UX-MAX baseline (focus + reduced motion) === */
+:focus-visible { outline: 2px solid var(--accent, #38bdf8); outline-offset: 2px; }
+@media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; scroll-behavior: auto !important; }
+}
+
+.skip-link { position: absolute; left: -9999px; top: 0; z-index: 10000; padding: 10px 18px; background: var(--accent, #38bdf8); color: #081018; font-weight: 700; border-radius: 0 0 8px 0; text-decoration: none; }
+.skip-link:focus { left: 0; }
+</style>
+
+    <!-- design system (reference: index.html) -->
+    <link rel="stylesheet" href="design-system.css">
+    <link rel="stylesheet" href="themes.css">
+    <script src="theme-engine.js"></script>
+</head>
+<body class="bg-slate-50 text-slate-800 antialiased ds-base">
+    <a class="skip-link" href="#main">Skip to content</a>
+
+    <!-- Navigation -->
+    <nav class="ds-nav" aria-label="Primary">
+        <div class="ds-nav-inner">
+            <a class="ds-brand" href="index.html" aria-label="Subhrajit Rath — home"><span class="gradient-text">S.</span><span>Rath</span></a>
+            <button type="button" class="ds-nav-toggle" aria-expanded="false" aria-controls="ds-mobile-menu" aria-label="Toggle navigation menu">
+                <svg class="h-6 w-6" width="24" height="24" stroke="currentColor" fill="none" viewBox="0 0 24 24" aria-hidden="true">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                </svg>
+            </button>
+            <div class="ds-nav-links"><a href="index.html">Home</a><a href="education.html">Education</a><a href="experience.html" class="active" aria-current="page">Skills</a><a href="publications.html">Publications</a><div class="ds-dropdown"><button type="button" class="ds-dropbtn" aria-haspopup="true" aria-expanded="false">Weather forecast <i class="fas fa-chevron-down" aria-hidden="true"></i></button><div class="ds-dropdown-panel"><a href="AQI.html" class=""><i class="fas fa-wind" aria-hidden="true"></i>AQI Heatmap</a><a href="srcc/geomap_multiple.html" class=""><i class="fas fa-map" aria-hidden="true"></i>GeoHEATMap</a><a href="meteogram.html" class=""><i class="fas fa-chart-area" aria-hidden="true"></i>Meteogram</a><a href="nwp_imd.html" class=""><i class="fas fa-cloud-moon" aria-hidden="true"></i>NWP_IMD</a><a href="sw.html" class=""><i class="fas fa-cloud-sun" aria-hidden="true"></i>Weather Card</a><a href="src/weatherchart.html" class=""><i class="fas fa-chart-line" aria-hidden="true"></i>Weather Chart</a></div></div><div class="ds-dropdown"><button type="button" class="ds-dropbtn" aria-haspopup="true" aria-expanded="false">Satellite view <i class="fas fa-chevron-down" aria-hidden="true"></i></button><div class="ds-dropdown-panel"><a href="gibs.html" class=""><i class="fas fa-globe" aria-hidden="true"></i>GIBS / NASA</a><a href="mosdac_live.html" class=""><i class="fas fa-satellite" aria-hidden="true"></i>Mosdac / ISRO</a></div></div><div class="ds-dropdown"><button type="button" class="ds-dropbtn" aria-haspopup="true" aria-expanded="false">Climatic info <i class="fas fa-chevron-down" aria-hidden="true"></i></button><div class="ds-dropdown-panel"><a href="climate/monavg/chloro.html" class=""><i class="fas fa-cloud-rain" aria-hidden="true"></i>Monthly Statistics</a></div></div><div class="ds-dropdown"><button type="button" class="ds-dropbtn" aria-haspopup="true" aria-expanded="false">Jobs <i class="fas fa-chevron-down" aria-hidden="true"></i></button><div class="ds-dropdown-panel"><a href="https://www.21centuryweather.org.au/about-us/positions-vacant/" target="_blank" rel="noopener" class=""><i class="fas fa-briefcase" aria-hidden="true"></i>21st Cent AUS MET Jobs</a><a href="https://careercenter.ametsoc.org/" target="_blank" rel="noopener" class=""><i class="fas fa-cloud" aria-hidden="true"></i>AMS Careers</a><a href="https://www.earthworks-jobs.com/" target="_blank" rel="noopener" class=""><i class="fas fa-globe" aria-hidden="true"></i>Earth-Works</a><a href="https://www.egu.eu/jobs/" target="_blank" rel="noopener" class=""><i class="fas fa-globe-europe" aria-hidden="true"></i>EGU Jobs</a><a href="https://www.tropmet.res.in/Careers" target="_blank" rel="noopener" class=""><i class="fas fa-university" aria-hidden="true"></i>IITM Career</a><a href="https://vacancies.incois.gov.in/" target="_blank" rel="noopener" class=""><i class="fas fa-water" aria-hidden="true"></i>INCOIS Career</a><a href="Jobs.html" class=""><i class="fas fa-briefcase" aria-hidden="true"></i>MET Jobs</a><a href="https://www.niot.res.in/recruitment_details.php/" target="_blank" rel="noopener" class=""><i class="fas fa-anchor" aria-hidden="true"></i>NIOT Career</a><a href="j1.html" class=""><i class="fas fa-book" aria-hidden="true"></i>Others</a><a href="https://ucar.wd5.myworkdayjobs.com/UCAR_Careers" target="_blank" rel="noopener" class=""><i class="fas fa-building" aria-hidden="true"></i>UCAR Careers</a></div></div></div>
+        </div>
+        <div class="ds-mobile-menu" id="ds-mobile-menu"><a href="index.html">Home</a><a href="education.html">Education</a><a href="experience.html">Skills</a><a href="publications.html">Publications</a><div class="ds-mobile-group"><button type="button" class="ds-mobile-head" aria-expanded="false">Weather forecast <i class="fas fa-chevron-down" aria-hidden="true"></i></button><div class="ds-mobile-items"><a href="AQI.html"><i class="fas fa-wind mr-2" aria-hidden="true"></i>AQI Heatmap</a><a href="srcc/geomap_multiple.html"><i class="fas fa-map mr-2" aria-hidden="true"></i>GeoHEATMap</a><a href="meteogram.html"><i class="fas fa-chart-area mr-2" aria-hidden="true"></i>Meteogram</a><a href="nwp_imd.html"><i class="fas fa-cloud-moon mr-2" aria-hidden="true"></i>NWP_IMD</a><a href="sw.html"><i class="fas fa-cloud-sun mr-2" aria-hidden="true"></i>Weather Card</a><a href="src/weatherchart.html"><i class="fas fa-chart-line mr-2" aria-hidden="true"></i>Weather Chart</a></div></div><div class="ds-mobile-group"><button type="button" class="ds-mobile-head" aria-expanded="false">Satellite view <i class="fas fa-chevron-down" aria-hidden="true"></i></button><div class="ds-mobile-items"><a href="gibs.html"><i class="fas fa-globe mr-2" aria-hidden="true"></i>GIBS / NASA</a><a href="mosdac_live.html"><i class="fas fa-satellite mr-2" aria-hidden="true"></i>Mosdac / ISRO</a></div></div><div class="ds-mobile-group"><button type="button" class="ds-mobile-head" aria-expanded="false">Climatic info <i class="fas fa-chevron-down" aria-hidden="true"></i></button><div class="ds-mobile-items"><a href="climate/monavg/chloro.html"><i class="fas fa-cloud-rain mr-2" aria-hidden="true"></i>Monthly Statistics</a></div></div><div class="ds-mobile-group"><button type="button" class="ds-mobile-head" aria-expanded="false">Jobs <i class="fas fa-chevron-down" aria-hidden="true"></i></button><div class="ds-mobile-items"><a href="https://www.21centuryweather.org.au/about-us/positions-vacant/" target="_blank" rel="noopener"><i class="fas fa-briefcase mr-2" aria-hidden="true"></i>21st Cent AUS MET Jobs</a><a href="https://careercenter.ametsoc.org/" target="_blank" rel="noopener"><i class="fas fa-cloud mr-2" aria-hidden="true"></i>AMS Careers</a><a href="https://www.earthworks-jobs.com/" target="_blank" rel="noopener"><i class="fas fa-globe mr-2" aria-hidden="true"></i>Earth-Works</a><a href="https://www.egu.eu/jobs/" target="_blank" rel="noopener"><i class="fas fa-globe-europe mr-2" aria-hidden="true"></i>EGU Jobs</a><a href="https://www.tropmet.res.in/Careers" target="_blank" rel="noopener"><i class="fas fa-university mr-2" aria-hidden="true"></i>IITM Career</a><a href="https://vacancies.incois.gov.in/" target="_blank" rel="noopener"><i class="fas fa-water mr-2" aria-hidden="true"></i>INCOIS Career</a><a href="Jobs.html"><i class="fas fa-briefcase mr-2" aria-hidden="true"></i>MET Jobs</a><a href="https://www.niot.res.in/recruitment_details.php/" target="_blank" rel="noopener"><i class="fas fa-anchor mr-2" aria-hidden="true"></i>NIOT Career</a><a href="j1.html"><i class="fas fa-book mr-2" aria-hidden="true"></i>Others</a><a href="https://ucar.wd5.myworkdayjobs.com/UCAR_Careers" target="_blank" rel="noopener"><i class="fas fa-building mr-2" aria-hidden="true"></i>UCAR Careers</a></div></div></div>
+    </nav>
+    <script>
+(function () {
+    var nav = document.querySelector('.ds-nav'); if (!nav) return;
+    var t = nav.querySelector('.ds-nav-toggle'), m = nav.querySelector('.ds-mobile-menu');
+    if (t && m) t.addEventListener('click', function () {
+        m.classList.toggle('open');
+        t.setAttribute('aria-expanded', m.classList.contains('open') ? 'true' : 'false');
+    });
+    nav.querySelectorAll('.ds-dropbtn').forEach(function (b) {
+        b.addEventListener('click', function (e) {
+            e.stopPropagation();
+            var dd = b.parentElement;
+            nav.querySelectorAll('.ds-dropdown.open').forEach(function (o) {
+                if (o !== dd) { o.classList.remove('open'); var ob = o.querySelector('.ds-dropbtn'); if (ob) ob.setAttribute('aria-expanded', 'false'); }
+            });
+            dd.classList.toggle('open');
+            b.setAttribute('aria-expanded', dd.classList.contains('open') ? 'true' : 'false');
+        });
+    });
+    if (m) m.querySelectorAll('.ds-mobile-head').forEach(function (h) {
+        h.addEventListener('click', function () {
+            var g = h.parentElement;
+            g.classList.toggle('open');
+            h.setAttribute('aria-expanded', g.classList.contains('open') ? 'true' : 'false');
+        });
+    });
+    document.addEventListener('click', function (e) {
+        if (!nav.contains(e.target)) nav.querySelectorAll('.ds-dropdown.open').forEach(function (d) {
+            d.classList.remove('open');
+            var b = d.querySelector('.ds-dropbtn'); if (b) b.setAttribute('aria-expanded', 'false');
+        });
+    });
+    document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape') nav.querySelectorAll('.ds-dropdown.open').forEach(function (d) { d.classList.remove('open'); });
+    });
+})();
+</script>
+    
+
+    <!-- Hero Section -->
+    <section class="relative pt-32 pb-20 flex items-center justify-center hero-bg" role="main" id="main">
+        <div class="absolute inset-0 bg-gradient-to-b from-slate-900/70 via-slate-900/60 to-slate-900/80"></div>
+        <div class="relative z-10 text-center px-4 max-w-4xl mx-auto reveal active">
+            <div class="mb-6 inline-block">
+                <span class="bg-blue-500/20 text-blue-100 border border-blue-400/30 px-5 py-2 rounded-full text-sm font-semibold tracking-wide uppercase backdrop-blur-sm">
+                    <i class="fas fa-briefcase mr-2"></i>Professional Journey
+                </span>
+            </div>
+            <h1 class="text-5xl md:text-6xl font-extrabold text-white mb-6 tracking-tight leading-tight">
+                Work <span class="gradient-text">Experience</span>
+            </h1>
+            <p class="text-xl text-slate-200 max-w-2xl mx-auto font-light">
+                A track record of research excellence in atmospheric science, from project scientist roles to senior research fellowships at premier institutions.
+            </p>
+        </div>
+    </section>
+
+    <!-- Experience Cards Section -->
+    <section class="py-20 bg-gradient-to-br from-slate-50 via-blue-50 to-cyan-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+
+            <!-- Stats Overview -->
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-6 mb-16 reveal">
+                <div class="bg-white rounded-2xl p-6 text-center shadow-lg border border-blue-100">
+                    <div class="w-14 h-14 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-xl flex items-center justify-center mx-auto mb-3">
+                        <i class="fas fa-clock text-white text-2xl"></i>
+                    </div>
+                    <div class="text-3xl font-bold gradient-text mb-1">6+</div>
+                    <div class="text-sm text-slate-600">Years Experience</div>
+                </div>
+                <div class="bg-white rounded-2xl p-6 text-center shadow-lg border border-purple-100">
+                    <div class="w-14 h-14 bg-gradient-to-br from-purple-500 to-blue-500 rounded-xl flex items-center justify-center mx-auto mb-3">
+                        <i class="fas fa-briefcase text-white text-2xl"></i>
+                    </div>
+                    <div class="text-3xl font-bold gradient-text mb-1">4</div>
+                    <div class="text-sm text-slate-600">Research Roles</div>
+                </div>
+                <div class="bg-white rounded-2xl p-6 text-center shadow-lg border border-green-100">
+                    <div class="w-14 h-14 bg-gradient-to-br from-green-500 to-teal-500 rounded-xl flex items-center justify-center mx-auto mb-3">
+                        <i class="fas fa-rocket text-white text-2xl"></i>
+                    </div>
+                    <div class="text-3xl font-bold gradient-text mb-1">ISRO</div>
+                    <div class="text-sm text-slate-600">NARL Associate</div>
+                </div>
+                <div class="bg-white rounded-2xl p-6 text-center shadow-lg border border-orange-100">
+                    <div class="w-14 h-14 bg-gradient-to-br from-orange-500 to-yellow-500 rounded-xl flex items-center justify-center mx-auto mb-3">
+                        <i class="fas fa-award text-white text-2xl"></i>
+                    </div>
+                    <div class="text-3xl font-bold gradient-text mb-1">IITM</div>
+                    <div class="text-sm text-slate-600">Project Scientist</div>
+                </div>
+            </div>
+
+            <!-- Experience Cards Grid -->
+            <div class="space-y-8">
+
+                <!-- Card 1: Project Scientist -->
+                <div class="experience-card bg-white rounded-3xl shadow-xl overflow-hidden border border-slate-100 reveal">
+                    <div class="grid grid-cols-1 lg:grid-cols-3">
+                        <!-- Left: Header -->
+                        <div class="bg-gradient-to-br from-blue-600 to-cyan-500 p-8 text-white lg:col-span-1">
+                            <div class="inline-block mb-4">
+                                <span class="bg-white/20 backdrop-blur-sm text-white px-4 py-1.5 rounded-full text-xs font-semibold uppercase tracking-wide">
+                                    <i class="fas fa-circle text-xs mr-2"></i>Current
+                                </span>
+                            </div>
+                            <div class="w-16 h-16 bg-white/20 backdrop-blur-sm rounded-2xl flex items-center justify-center mb-6">
+                                <i class="fas fa-user-tie text-3xl"></i>
+                            </div>
+                            <h2 class="text-2xl font-bold mb-2">Project Scientist</h2>
+                            <p class="text-blue-100 mb-6">Indian Institute of Tropical Meteorology</p>
+                            <div class="space-y-3 text-sm">
+                                <div class="flex items-center gap-3">
+                                    <i class="fas fa-calendar text-blue-200"></i>
+                                    <span>Mar 2024 - Present</span>
+                                </div>
+                                <div class="flex items-center gap-3">
+                                    <i class="fas fa-map-marker-alt text-blue-200"></i>
+                                    <span>Pune, MH, India</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Right: Content -->
+                        <div class="p-8 lg:col-span-2">
+                            <h3 class="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2">
+                                <i class="fas fa-bullseye text-blue-500"></i> Objective
+                            </h3>
+                            <p class="text-slate-600 mb-6 leading-relaxed">
+                                Cloud fraction forecasting using machine learning techniques integrated into global models.
+                            </p>
+
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div>
+                                    <h3 class="text-sm font-bold text-slate-700 mb-3 flex items-center gap-2">
+                                        <i class="fas fa-database text-blue-500"></i> Data Collection
+                                    </h3>
+                                    <ul class="space-y-2 text-sm text-slate-600">
+                                        <li class="flex items-start gap-2">
+                                            <i class="fas fa-check text-blue-400 mt-1 flex-shrink-0"></i>
+                                            <span>Atmospheric variables (temperature, divergence, geopotential)</span>
+                                        </li>
+                                        <li class="flex items-start gap-2">
+                                            <i class="fas fa-check text-blue-400 mt-1 flex-shrink-0"></i>
+                                            <span>Cloud parameters (cloud cover, liquid water content)</span>
+                                        </li>
+                                        <li class="flex items-start gap-2">
+                                            <i class="fas fa-check text-blue-400 mt-1 flex-shrink-0"></i>
+                                            <span>Historical Cloud fraction data</span>
+                                        </li>
+                                    </ul>
+                                </div>
+
+                                <div>
+                                    <h3 class="text-sm font-bold text-slate-700 mb-3 flex items-center gap-2">
+                                        <i class="fas fa-brain text-blue-500"></i> ML Workflow
+                                    </h3>
+                                    <ul class="space-y-2 text-sm text-slate-600">
+                                        <li class="flex items-start gap-2">
+                                            <i class="fas fa-check text-blue-400 mt-1 flex-shrink-0"></i>
+                                            <span>Model: Convolutional Neural Network (CNN)</span>
+                                        </li>
+                                        <li class="flex items-start gap-2">
+                                            <i class="fas fa-check text-blue-400 mt-1 flex-shrink-0"></i>
+                                            <span>Output: Rainfall intensity (mm/h)</span>
+                                        </li>
+                                        <li class="flex items-start gap-2">
+                                            <i class="fas fa-check text-blue-400 mt-1 flex-shrink-0"></i>
+                                            <span>Hyperparameters: RESNET, SPC Search</span>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+
+                            <!-- Skills Tags -->
+                            <div class="mt-6 pt-6 border-t border-slate-100">
+                                <div class="flex flex-wrap gap-2">
+                                    <span class="skill-badge px-3 py-1.5 bg-blue-100 text-blue-700 rounded-full text-xs font-semibold">Machine Learning</span>
+                                    <span class="skill-badge px-3 py-1.5 bg-cyan-100 text-cyan-700 rounded-full text-xs font-semibold">CNN</span>
+                                    <span class="skill-badge px-3 py-1.5 bg-purple-100 text-purple-700 rounded-full text-xs font-semibold">Python</span>
+                                    <span class="skill-badge px-3 py-1.5 bg-green-100 text-green-700 rounded-full text-xs font-semibold">Cloud Forecasting</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Card 2: NCAP Project -->
+                <div class="experience-card bg-white rounded-3xl shadow-xl overflow-hidden border border-slate-100 reveal">
+                    <div class="grid grid-cols-1 lg:grid-cols-3">
+                        <!-- Left: Header -->
+                        <div class="bg-gradient-to-br from-purple-600 to-blue-500 p-8 text-white lg:col-span-1">
+                            <div class="inline-block mb-4">
+                                <span class="bg-white/20 backdrop-blur-sm text-white px-4 py-1.5 rounded-full text-xs font-semibold uppercase tracking-wide">
+                                    <i class="fas fa-circle text-xs mr-2"></i>Completed
+                                </span>
+                            </div>
+                            <div class="w-16 h-16 bg-white/20 backdrop-blur-sm rounded-2xl flex items-center justify-center mb-6">
+                                <i class="fas fa-project-diagram text-3xl"></i>
+                            </div>
+                            <h2 class="text-xl font-bold mb-2">NCAP Project</h2>
+                            <p class="text-purple-100 mb-6">National Atmospheric Research Laboratory, ISRO</p>
+                            <div class="space-y-3 text-sm">
+                                <div class="flex items-center gap-3">
+                                    <i class="fas fa-calendar text-purple-200"></i>
+                                    <span>July 2023 - Feb 2024</span>
+                                </div>
+                                <div class="flex items-center gap-3">
+                                    <i class="fas fa-map-marker-alt text-purple-200"></i>
+                                    <span>Tirupati, AP, India</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Right: Content -->
+                        <div class="p-8 lg:col-span-2">
+                            <h3 class="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2">
+                                <i class="fas fa-star text-purple-500"></i> Key Contributions
+                            </h3>
+
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div>
+                                    <h4 class="text-sm font-bold text-slate-700 mb-3 flex items-center gap-2">
+                                        <i class="fas fa-car text-purple-500"></i> Emission Study
+                                    </h4>
+                                    <ul class="space-y-2 text-sm text-slate-600">
+                                        <li class="flex items-start gap-2">
+                                            <i class="fas fa-circle text-purple-400 text-xs mt-1.5 flex-shrink-0"></i>
+                                            <span>Vehicular Count & Typology</span>
+                                        </li>
+                                        <li class="flex items-start gap-2">
+                                            <i class="fas fa-circle text-purple-400 text-xs mt-1.5 flex-shrink-0"></i>
+                                            <span>Emission Intensity Assessment</span>
+                                        </li>
+                                    </ul>
+                                </div>
+
+                                <div>
+                                    <h4 class="text-sm font-bold text-slate-700 mb-3 flex items-center gap-2">
+                                        <i class="fas fa-chart-bar text-purple-500"></i> Data Science
+                                    </h4>
+                                    <ul class="space-y-2 text-sm text-slate-600">
+                                        <li class="flex items-start gap-2">
+                                            <i class="fas fa-circle text-purple-400 text-xs mt-1.5 flex-shrink-0"></i>
+                                            <span>Data Curation & Processing</span>
+                                        </li>
+                                        <li class="flex items-start gap-2">
+                                            <i class="fas fa-circle text-purple-400 text-xs mt-1.5 flex-shrink-0"></i>
+                                            <span>Python Analysis & Visualization</span>
+                                        </li>
+                                    </ul>
+                                </div>
+
+                                <div>
+                                    <h4 class="text-sm font-bold text-slate-700 mb-3 flex items-center gap-2">
+                                        <i class="fas fa-cloud-sun text-purple-500"></i> Met Analysis
+                                    </h4>
+                                    <ul class="space-y-2 text-sm text-slate-600">
+                                        <li class="flex items-start gap-2">
+                                            <i class="fas fa-circle text-purple-400 text-xs mt-1.5 flex-shrink-0"></i>
+                                            <span>Location-Specific Analysis (4 districts)</span>
+                                        </li>
+                                        <li class="flex items-start gap-2">
+                                            <i class="fas fa-circle text-purple-400 text-xs mt-1.5 flex-shrink-0"></i>
+                                            <span>Weather & Emission Correlation</span>
+                                        </li>
+                                    </ul>
+                                </div>
+
+                                <div>
+                                    <h4 class="text-sm font-bold text-slate-700 mb-3 flex items-center gap-2">
+                                        <i class="fas fa-tasks text-purple-500"></i> Management
+                                    </h4>
+                                    <ul class="space-y-2 text-sm text-slate-600">
+                                        <li class="flex items-start gap-2">
+                                            <i class="fas fa-circle text-purple-400 text-xs mt-1.5 flex-shrink-0"></i>
+                                            <span>Workflow Supervision</span>
+                                        </li>
+                                        <li class="flex items-start gap-2">
+                                            <i class="fas fa-circle text-purple-400 text-xs mt-1.5 flex-shrink-0"></i>
+                                            <span>Quality Deliverables</span>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+
+                            <!-- Skills Tags -->
+                            <div class="mt-6 pt-6 border-t border-slate-100">
+                                <div class="flex flex-wrap gap-2">
+                                    <span class="skill-badge px-3 py-1.5 bg-purple-100 text-purple-700 rounded-full text-xs font-semibold">Python</span>
+                                    <span class="skill-badge px-3 py-1.5 bg-blue-100 text-blue-700 rounded-full text-xs font-semibold">Data Analysis</span>
+                                    <span class="skill-badge px-3 py-1.5 bg-green-100 text-green-700 rounded-full text-xs font-semibold">Air Quality</span>
+                                    <span class="skill-badge px-3 py-1.5 bg-orange-100 text-orange-700 rounded-full text-xs font-semibold">Project Management</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Card 3: Senior Research Fellow -->
+                <div class="experience-card bg-white rounded-3xl shadow-xl overflow-hidden border border-slate-100 reveal">
+                    <div class="grid grid-cols-1 lg:grid-cols-3">
+                        <!-- Left: Header -->
+                        <div class="bg-gradient-to-br from-green-600 to-teal-500 p-8 text-white lg:col-span-1">
+                            <div class="inline-block mb-4">
+                                <span class="bg-white/20 backdrop-blur-sm text-white px-4 py-1.5 rounded-full text-xs font-semibold uppercase tracking-wide">
+                                    <i class="fas fa-circle text-xs mr-2"></i>Completed
+                                </span>
+                            </div>
+                            <div class="w-16 h-16 bg-white/20 backdrop-blur-sm rounded-2xl flex items-center justify-center mb-6">
+                                <i class="fas fa-microscope text-3xl"></i>
+                            </div>
+                            <h2 class="text-xl font-bold mb-2">Senior Research Fellow</h2>
+                            <p class="text-green-100 mb-6">National Atmospheric Research Laboratory, ISRO</p>
+                            <div class="space-y-3 text-sm">
+                                <div class="flex items-center gap-3">
+                                    <i class="fas fa-calendar text-green-200"></i>
+                                    <span>July 2020 - July 2023</span>
+                                </div>
+                                <div class="flex items-center gap-3">
+                                    <i class="fas fa-map-marker-alt text-green-200"></i>
+                                    <span>Tirupati, AP, India</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Right: Content -->
+                        <div class="p-8 lg:col-span-2">
+                            <h3 class="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2">
+                                <i class="fas fa-star text-green-500"></i> Key Contributions
+                            </h3>
+
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div class="flex items-start gap-4 p-4 bg-green-50 rounded-xl">
+                                    <div class="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                                        <i class="fas fa-satellite text-green-600"></i>
+                                    </div>
+                                    <div>
+                                        <h4 class="font-semibold text-slate-800 mb-1">Satellite Data</h4>
+                                        <p class="text-sm text-slate-600">Extracted 3D/4D gridded data sets from satellite, weather stations, and re-analysis sources</p>
+                                    </div>
+                                </div>
+
+                                <div class="flex items-start gap-4 p-4 bg-green-50 rounded-xl">
+                                    <div class="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                                        <i class="fas fa-cloud text-green-600"></i>
+                                    </div>
+                                    <div>
+                                        <h4 class="font-semibold text-slate-800 mb-1">Cloud Microphysics</h4>
+                                        <p class="text-sm text-slate-600">Model developments for Weather Parameter Analysis for Cloud Microphysics</p>
+                                    </div>
+                                </div>
+
+                                <div class="flex items-start gap-4 p-4 bg-green-50 rounded-xl">
+                                    <div class="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                                        <i class="fas fa-dna text-green-600"></i>
+                                    </div>
+                                    <div>
+                                        <h4 class="font-semibold text-slate-800 mb-1">HITRAN Data</h4>
+                                        <p class="text-sm text-slate-600">Curated HITRAN Molecular Data for radiation models</p>
+                                    </div>
+                                </div>
+
+                                <div class="flex items-start gap-4 p-4 bg-green-50 rounded-xl">
+                                    <div class="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                                        <i class="fas fa-wave-square text-green-600"></i>
+                                    </div>
+                                    <div>
+                                        <h4 class="font-semibold text-slate-800 mb-1">Radiative Transfer</h4>
+                                        <p class="text-sm text-slate-600">Implemented Radiative Transfer Modeling and Advective Diffusion Solutions</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Skills Tags -->
+                            <div class="mt-6 pt-6 border-t border-slate-100">
+                                <div class="flex flex-wrap gap-2">
+                                    <span class="skill-badge px-3 py-1.5 bg-green-100 text-green-700 rounded-full text-xs font-semibold">Fortran</span>
+                                    <span class="skill-badge px-3 py-1.5 bg-blue-100 text-blue-700 rounded-full text-xs font-semibold">MODTRAN</span>
+                                    <span class="skill-badge px-3 py-1.5 bg-cyan-100 text-cyan-700 rounded-full text-xs font-semibold">ARTS</span>
+                                    <span class="skill-badge px-3 py-1.5 bg-purple-100 text-purple-700 rounded-full text-xs font-semibold">HITRAN</span>
+                                    <span class="skill-badge px-3 py-1.5 bg-orange-100 text-orange-700 rounded-full text-xs font-semibold">Radiative Transfer</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Card 4: Junior Research Fellow -->
+                <div class="experience-card bg-white rounded-3xl shadow-xl overflow-hidden border border-slate-100 reveal">
+                    <div class="grid grid-cols-1 lg:grid-cols-3">
+                        <!-- Left: Header -->
+                        <div class="bg-gradient-to-br from-orange-600 to-yellow-500 p-8 text-white lg:col-span-1">
+                            <div class="inline-block mb-4">
+                                <span class="bg-white/20 backdrop-blur-sm text-white px-4 py-1.5 rounded-full text-xs font-semibold uppercase tracking-wide">
+                                    <i class="fas fa-circle text-xs mr-2"></i>Completed
+                                </span>
+                            </div>
+                            <div class="w-16 h-16 bg-white/20 backdrop-blur-sm rounded-2xl flex items-center justify-center mb-6">
+                                <i class="fas fa-user-graduate text-3xl"></i>
+                            </div>
+                            <h2 class="text-xl font-bold mb-2">Junior Research Fellow</h2>
+                            <p class="text-orange-100 mb-6">National Atmospheric Research Laboratory, ISRO</p>
+                            <div class="space-y-3 text-sm">
+                                <div class="flex items-center gap-3">
+                                    <i class="fas fa-calendar text-orange-200"></i>
+                                    <span>July 2018 - July 2020</span>
+                                </div>
+                                <div class="flex items-center gap-3">
+                                    <i class="fas fa-map-marker-alt text-orange-200"></i>
+                                    <span>Tirupati, AP, India</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Right: Content -->
+                        <div class="p-8 lg:col-span-2">
+                            <h3 class="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2">
+                                <i class="fas fa-star text-orange-500"></i> Key Contributions
+                            </h3>
+
+                            <div class="space-y-4">
+                                <div class="flex items-start gap-4 p-4 bg-orange-50 rounded-xl">
+                                    <div class="w-10 h-10 bg-orange-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                                        <i class="fas fa-sun text-orange-600"></i>
+                                    </div>
+                                    <div class="flex-1">
+                                        <h4 class="font-semibold text-slate-800 mb-1">Radiational & Microphysics Schemes</h4>
+                                        <p class="text-sm text-slate-600">Analyzed RRTMG, Morrison and other radiational and microphysics schemes for weather models</p>
+                                    </div>
+                                </div>
+
+                                <div class="flex items-start gap-4 p-4 bg-orange-50 rounded-xl">
+                                    <div class="w-10 h-10 bg-orange-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                                        <i class="fas fa-clipboard-list text-orange-600"></i>
+                                    </div>
+                                    <div class="flex-1">
+                                        <h4 class="font-semibold text-slate-800 mb-1">Methodology Development</h4>
+                                        <p class="text-sm text-slate-600">Formulated methodology for evaluating radiational impact on microphysical processes</p>
+                                    </div>
+                                </div>
+
+                                <div class="flex items-start gap-4 p-4 bg-orange-50 rounded-xl">
+                                    <div class="w-10 h-10 bg-orange-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                                        <i class="fas fa-calculator text-orange-600"></i>
+                                    </div>
+                                    <div class="flex-1">
+                                        <h4 class="font-semibold text-slate-800 mb-1">Numerical Techniques</h4>
+                                        <p class="text-sm text-slate-600">Developed numerical techniques for solving radiative transfer and microphysics equations</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Skills Tags -->
+                            <div class="mt-6 pt-6 border-t border-slate-100">
+                                <div class="flex flex-wrap gap-2">
+                                    <span class="skill-badge px-3 py-1.5 bg-orange-100 text-orange-700 rounded-full text-xs font-semibold">RRTMG</span>
+                                    <span class="skill-badge px-3 py-1.5 bg-red-100 text-red-700 rounded-full text-xs font-semibold">Morrison</span>
+                                    <span class="skill-badge px-3 py-1.5 bg-blue-100 text-blue-700 rounded-full text-xs font-semibold">Numerical Methods</span>
+                                    <span class="skill-badge px-3 py-1.5 bg-purple-100 text-purple-700 rounded-full text-xs font-semibold">Research</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Skills Summary Section -->
+            <div class="mt-20 bg-white rounded-3xl p-8 md:p-12 shadow-xl border border-slate-100 reveal">
+                <h2 class="text-3xl font-bold text-slate-900 text-center mb-4">Technical Skills & Expertise</h2>
+                <p class="text-slate-600 text-center mb-10 max-w-2xl mx-auto">A comprehensive toolkit spanning programming, modeling, and data analysis for atmospheric research</p>
+
+                <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-4">
+                    <div class="skill-badge bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl p-4 text-center border border-blue-200">
+                        <i class="fab fa-python text-3xl text-blue-500 mb-2"></i>
+                        <p class="font-semibold text-slate-700 text-sm">Python</p>
+                    </div>
+                    <div class="skill-badge bg-gradient-to-br from-purple-50 to-purple-100 rounded-xl p-4 text-center border border-purple-200">
+                        <i class="fas fa-brain text-3xl text-purple-500 mb-2"></i>
+                        <p class="font-semibold text-slate-700 text-sm">Machine Learning</p>
+                    </div>
+                    <div class="skill-badge bg-gradient-to-br from-cyan-50 to-cyan-100 rounded-xl p-4 text-center border border-cyan-200">
+                        <i class="fas fa-cloud text-3xl text-cyan-500 mb-2"></i>
+                        <p class="font-semibold text-slate-700 text-sm">Cloud Physics</p>
+                    </div>
+                    <div class="skill-badge bg-gradient-to-br from-green-50 to-green-100 rounded-xl p-4 text-center border border-green-200">
+                        <i class="fas fa-satellite text-3xl text-green-500 mb-2"></i>
+                        <p class="font-semibold text-slate-700 text-sm">Satellite Data</p>
+                    </div>
+                    <div class="skill-badge bg-gradient-to-br from-orange-50 to-orange-100 rounded-xl p-4 text-center border border-orange-200">
+                        <i class="fas fa-wave-square text-3xl text-orange-500 mb-2"></i>
+                        <p class="font-semibold text-slate-700 text-sm">Radiative Transfer</p>
+                    </div>
+                    <div class="skill-badge bg-gradient-to-br from-red-50 to-red-100 rounded-xl p-4 text-center border border-red-200">
+                        <i class="fas fa-database text-3xl text-red-500 mb-2"></i>
+                        <p class="font-semibold text-slate-700 text-sm">HITRAN</p>
+                    </div>
+                    <div class="skill-badge bg-gradient-to-br from-indigo-50 to-indigo-100 rounded-xl p-4 text-center border border-indigo-200">
+                        <i class="fas fa-chart-line text-3xl text-indigo-500 mb-2"></i>
+                        <p class="font-semibold text-slate-700 text-sm">Data Analysis</p>
+                    </div>
+                    <div class="skill-badge bg-gradient-to-br from-teal-50 to-teal-100 rounded-xl p-4 text-center border border-teal-200">
+                        <i class="fas fa-globe text-3xl text-teal-500 mb-2"></i>
+                        <p class="font-semibold text-slate-700 text-sm">NWP Models</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-slate-900 py-12 border-t border-slate-800">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <h3 class="text-2xl font-bold gradient-text mb-4">S.<span class="text-white">Rath</span></h3>
+            <p class="text-slate-400 mb-8">Personal & Research Portfolio</p>
+            <div class="flex justify-center space-x-6 mb-8">
+                <a href="index.html" class="text-slate-400 hover:text-white transition-colors">Home</a>
+                <a href="contact.html" class="text-slate-400 hover:text-white transition-colors">Contact</a>
+                <a href="publications.html" class="text-slate-400 hover:text-white transition-colors">Publications</a>
+            </div>
+            <p class="text-slate-600 text-sm">
+                &copy; <script>document.write(new Date().getFullYear());</script> Subhrajit Rath. All rights reserved.
+            </p>
+        </div>
+    </footer>
+
+    <script>
+        // Scroll Reveal Animation
+        function reveal() {
+            var reveals = document.querySelectorAll(".reveal");
+            for (var i = 0; i < reveals.length; i++) {
+                var windowHeight = window.innerHeight;
+                var elementTop = reveals[i].getBoundingClientRect().top;
+                var elementVisible = 100;
+                if (elementTop < windowHeight - elementVisible) {
+                    reveals[i].classList.add("active");
+                }
+            }
+        }
+        window.addEventListener("scroll", reveal);
+        reveal();
+
+        // Navbar blur effect on scroll
+        const navbar = document.getElementById('navbar');
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 20) {
+                navbar.classList.add('shadow-md');
+            } else {
+                navbar.classList.remove('shadow-md');
+            }
+        });
+    </script>
+<script src="devtools-guard.js"></script></body>
+</html>
+

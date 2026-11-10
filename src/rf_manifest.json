@@ -1,0 +1,9 @@
+{
+    "fm": "rf",
+    "count": 2,
+    "max_mb": 15.0,
+    "parts": [
+        "rf_part01of02.json",
+        "rf_part02of02.json"
+    ]
+}

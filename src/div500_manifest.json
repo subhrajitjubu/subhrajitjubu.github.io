@@ -1,0 +1,10 @@
+{
+    "fm": "div500",
+    "count": 3,
+    "max_mb": 15.0,
+    "parts": [
+        "div500_part01of03.json",
+        "div500_part02of03.json",
+        "div500_part03of03.json"
+    ]
+}

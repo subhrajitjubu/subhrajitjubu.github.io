@@ -1,0 +1,777 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Air quality surface - Cressman analysis of data.gov.in monitoring stations over India.">
+    <title>Air Quality Surface | India</title>
+    <link rel="icon" type="image/jpg" href="subhrajit.JPEG">
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <style>
+        /* AQI page layout — reference design system (index.html) */
+        .aqi-wrap { max-width: 80rem; margin: 0 auto; padding: 2.5rem 1rem 3rem; }
+        @media (min-width: 640px) { .aqi-wrap { padding-left: 1.5rem; padding-right: 1.5rem; } }
+        .aqi-hero { max-width: 48rem; margin-bottom: 2rem; }
+        .aqi-hero h1 { font-size: clamp(2rem, 5vw, 3rem); font-weight: 800; letter-spacing: -0.02em; color: var(--ds-heading); margin: 0.75rem 0 0.5rem; }
+        .aqi-hero p { color: var(--ds-muted); margin: 0; font-size: 1.0625rem; line-height: 1.6; }
+        .aqi-layout { display: grid; grid-template-columns: 1fr; gap: 1rem; align-items: start; }
+        @media (min-width: 900px) { .aqi-layout { grid-template-columns: 21rem 1fr; } }
+        .aqi-panel { display: flex; flex-direction: column; gap: 1rem; }
+        .aqi-field label { display: block; font-weight: 600; color: var(--ds-heading); margin-bottom: 0.375rem; }
+        .aqi-field select { width: 100%; }
+        .aqi-note { font-size: 0.8125rem; color: var(--ds-muted); line-height: 1.5; }
+        .legend-bar { height: 10px; border-radius: 6px; border: 1px solid var(--ds-border); background: linear-gradient(90deg, #0000FF, #00FFFF 25%, #00FF00 50%, #FFFF00 75%, #FF0000); }
+        .legend-ends { display: flex; justify-content: space-between; font: 10px var(--ds-mono); color: var(--ds-muted); margin-top: 4px; }
+        .aqi-meta { font: 600 0.75rem/1.4 var(--ds-mono); letter-spacing: .02em; color: var(--ds-muted); margin-bottom: .5rem; }
+        .map-shell { position: relative; border-radius: var(--ds-radius); overflow: hidden; border: 1px solid var(--ds-border); box-shadow: var(--ds-shadow-sm); background: #eef2f7; height: 62vh; min-height: 420px; }
+        #map { height: 100%; width: 100%; }
+        #loading {
+            position: absolute; inset: 0; z-index: 1002;
+            display: none; align-items: center; justify-content: center;
+            background: rgba(248, 250, 252, .78); backdrop-filter: blur(2px);
+            color: var(--ds-text); font-weight: 600; gap: 0.625rem;
+        }
+        .aqi-foot { text-align: center; color: var(--ds-muted); font-size: 0.8125rem; padding: 1.5rem 1rem 2rem; }
+        .marker-tip { font: 12px var(--ds-font); }
+    </style>
+    <!-- design system (reference: index.html) -->
+    <link href="https://fontsource.org/inter/index.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="stylesheet" href="design-system.css">
+    <link rel="stylesheet" href="themes.css">
+    <script src="theme-engine.js"></script>
+</head>
+<body class="ds-base">
+    <a class="skip-link" href="#main">Skip to content</a>
+    <h1 class="sr-only">Air Quality Surface — India AQI from data.gov.in</h1>
+
+<nav class="ds-nav" aria-label="Primary">        <div class="ds-nav-inner">            <a class="ds-brand" href="index.html" aria-label="Subhrajit Rath — home"><span class="gradient-text">S.</span><span>Rath</span></a>            <button type="button" class="ds-nav-toggle" aria-expanded="false" aria-controls="ds-mobile-menu" aria-label="Toggle navigation menu">                <svg class="h-6 w-6" width="24" height="24" stroke="currentColor" fill="none" viewBox="0 0 24 24" aria-hidden="true">                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />                </svg>            </button>            <div class="ds-nav-links"><a href="index.html">Home</a><a href="education.html">Education</a><a href="experience.html">Skills</a><a href="publications.html">Publications</a><div class="ds-dropdown"><button type="button" class="ds-dropbtn" aria-haspopup="true" aria-expanded="false">Weather forecast <i class="fas fa-chevron-down" aria-hidden="true"></i></button><div class="ds-dropdown-panel"><a href="AQI.html" class="active" aria-current="page"><i class="fas fa-wind" aria-hidden="true"></i>AQI Heatmap</a><a href="srcc/geomap_multiple.html" class=""><i class="fas fa-map" aria-hidden="true"></i>GeoHEATMap</a><a href="meteogram.html" class=""><i class="fas fa-chart-area" aria-hidden="true"></i>Meteogram</a><a href="nwp_imd.html" class=""><i class="fas fa-cloud-moon" aria-hidden="true"></i>NWP_IMD</a><a href="sw.html" class=""><i class="fas fa-cloud-sun" aria-hidden="true"></i>Weather Card</a><a href="src/weatherchart.html" class=""><i class="fas fa-chart-line" aria-hidden="true"></i>Weather Chart</a></div></div><div class="ds-dropdown"><button type="button" class="ds-dropbtn" aria-haspopup="true" aria-expanded="false">Satellite view <i class="fas fa-chevron-down" aria-hidden="true"></i></button><div class="ds-dropdown-panel"><a href="gibs.html" class=""><i class="fas fa-globe" aria-hidden="true"></i>GIBS / NASA</a><a href="mosdac_live.html" class=""><i class="fas fa-satellite" aria-hidden="true"></i>Mosdac / ISRO</a></div></div><div class="ds-dropdown"><button type="button" class="ds-dropbtn" aria-haspopup="true" aria-expanded="false">Climatic info <i class="fas fa-chevron-down" aria-hidden="true"></i></button><div class="ds-dropdown-panel"><a href="climate/monavg/chloro.html" class=""><i class="fas fa-cloud-rain" aria-hidden="true"></i>Monthly Statistics</a></div></div><div class="ds-dropdown"><button type="button" class="ds-dropbtn" aria-haspopup="true" aria-expanded="false">Jobs <i class="fas fa-chevron-down" aria-hidden="true"></i></button><div class="ds-dropdown-panel"><a href="https://www.21centuryweather.org.au/about-us/positions-vacant/" target="_blank" rel="noopener" class=""><i class="fas fa-briefcase" aria-hidden="true"></i>21st Cent AUS MET Jobs</a><a href="https://careercenter.ametsoc.org/" target="_blank" rel="noopener" class=""><i class="fas fa-cloud" aria-hidden="true"></i>AMS Careers</a><a href="https://www.earthworks-jobs.com/" target="_blank" rel="noopener" class=""><i class="fas fa-globe" aria-hidden="true"></i>Earth-Works</a><a href="https://www.egu.eu/jobs/" target="_blank" rel="noopener" class=""><i class="fas fa-globe-europe" aria-hidden="true"></i>EGU Jobs</a><a href="https://www.tropmet.res.in/Careers" target="_blank" rel="noopener" class=""><i class="fas fa-university" aria-hidden="true"></i>IITM Career</a><a href="https://vacancies.incois.gov.in/" target="_blank" rel="noopener" class=""><i class="fas fa-water" aria-hidden="true"></i>INCOIS Career</a><a href="Jobs.html" class=""><i class="fas fa-briefcase" aria-hidden="true"></i>MET Jobs</a><a href="https://www.niot.res.in/recruitment_details.php/" target="_blank" rel="noopener" class=""><i class="fas fa-anchor" aria-hidden="true"></i>NIOT Career</a><a href="j1.html" class=""><i class="fas fa-book" aria-hidden="true"></i>Others</a><a href="https://ucar.wd5.myworkdayjobs.com/UCAR_Careers" target="_blank" rel="noopener" class=""><i class="fas fa-building" aria-hidden="true"></i>UCAR Careers</a></div></div></div>        </div>        <div class="ds-mobile-menu" id="ds-mobile-menu"><a href="index.html">Home</a><a href="education.html">Education</a><a href="experience.html">Skills</a><a href="publications.html">Publications</a><div class="ds-mobile-group"><button type="button" class="ds-mobile-head" aria-expanded="false">Weather forecast <i class="fas fa-chevron-down" aria-hidden="true"></i></button><div class="ds-mobile-items"><a href="AQI.html"><i class="fas fa-wind mr-2" aria-hidden="true"></i>AQI Heatmap</a><a href="srcc/geomap_multiple.html"><i class="fas fa-map mr-2" aria-hidden="true"></i>GeoHEATMap</a><a href="meteogram.html"><i class="fas fa-chart-area mr-2" aria-hidden="true"></i>Meteogram</a><a href="nwp_imd.html"><i class="fas fa-cloud-moon mr-2" aria-hidden="true"></i>NWP_IMD</a><a href="sw.html"><i class="fas fa-cloud-sun mr-2" aria-hidden="true"></i>Weather Card</a><a href="src/weatherchart.html"><i class="fas fa-chart-line mr-2" aria-hidden="true"></i>Weather Chart</a></div></div><div class="ds-mobile-group"><button type="button" class="ds-mobile-head" aria-expanded="false">Satellite view <i class="fas fa-chevron-down" aria-hidden="true"></i></button><div class="ds-mobile-items"><a href="gibs.html"><i class="fas fa-globe mr-2" aria-hidden="true"></i>GIBS / NASA</a><a href="mosdac_live.html"><i class="fas fa-satellite mr-2" aria-hidden="true"></i>Mosdac / ISRO</a></div></div><div class="ds-mobile-group"><button type="button" class="ds-mobile-head" aria-expanded="false">Climatic info <i class="fas fa-chevron-down" aria-hidden="true"></i></button><div class="ds-mobile-items"><a href="climate/monavg/chloro.html"><i class="fas fa-cloud-rain mr-2" aria-hidden="true"></i>Monthly Statistics</a></div></div><div class="ds-mobile-group"><button type="button" class="ds-mobile-head" aria-expanded="false">Jobs <i class="fas fa-chevron-down" aria-hidden="true"></i></button><div class="ds-mobile-items"><a href="https://www.21centuryweather.org.au/about-us/positions-vacant/" target="_blank" rel="noopener"><i class="fas fa-briefcase mr-2" aria-hidden="true"></i>21st Cent AUS MET Jobs</a><a href="https://careercenter.ametsoc.org/" target="_blank" rel="noopener"><i class="fas fa-cloud mr-2" aria-hidden="true"></i>AMS Careers</a><a href="https://www.earthworks-jobs.com/" target="_blank" rel="noopener"><i class="fas fa-globe mr-2" aria-hidden="true"></i>Earth-Works</a><a href="https://www.egu.eu/jobs/" target="_blank" rel="noopener"><i class="fas fa-globe-europe mr-2" aria-hidden="true"></i>EGU Jobs</a><a href="https://www.tropmet.res.in/Careers" target="_blank" rel="noopener"><i class="fas fa-university mr-2" aria-hidden="true"></i>IITM Career</a><a href="https://vacancies.incois.gov.in/" target="_blank" rel="noopener"><i class="fas fa-water mr-2" aria-hidden="true"></i>INCOIS Career</a><a href="Jobs.html"><i class="fas fa-briefcase mr-2" aria-hidden="true"></i>MET Jobs</a><a href="https://www.niot.res.in/recruitment_details.php/" target="_blank" rel="noopener"><i class="fas fa-anchor mr-2" aria-hidden="true"></i>NIOT Career</a><a href="j1.html"><i class="fas fa-book mr-2" aria-hidden="true"></i>Others</a><a href="https://ucar.wd5.myworkdayjobs.com/UCAR_Careers" target="_blank" rel="noopener"><i class="fas fa-building mr-2" aria-hidden="true"></i>UCAR Careers</a></div></div></div>    </nav>    <script>(function () {    var nav = document.querySelector('.ds-nav'); if (!nav) return;    var t = nav.querySelector('.ds-nav-toggle'), m = nav.querySelector('.ds-mobile-menu');    if (t && m) t.addEventListener('click', function () {        m.classList.toggle('open');        t.setAttribute('aria-expanded', m.classList.contains('open') ? 'true' : 'false');    });    nav.querySelectorAll('.ds-dropbtn').forEach(function (b) {        b.addEventListener('click', function (e) {            e.stopPropagation();            var dd = b.parentElement;            nav.querySelectorAll('.ds-dropdown.open').forEach(function (o) {                if (o !== dd) { o.classList.remove('open'); var ob = o.querySelector('.ds-dropbtn'); if (ob) ob.setAttribute('aria-expanded', 'false'); }            });            dd.classList.toggle('open');            b.setAttribute('aria-expanded', dd.classList.contains('open') ? 'true' : 'false');        });    });    if (m) m.querySelectorAll('.ds-mobile-head').forEach(function (h) {        h.addEventListener('click', function () {            var g = h.parentElement;            g.classList.toggle('open');            h.setAttribute('aria-expanded', g.classList.contains('open') ? 'true' : 'false');        });    });    document.addEventListener('click', function (e) {        if (!nav.contains(e.target)) nav.querySelectorAll('.ds-dropdown.open').forEach(function (d) {            d.classList.remove('open');            var b = d.querySelector('.ds-dropbtn'); if (b) b.setAttribute('aria-expanded', 'false');        });    });    document.addEventListener('keydown', function (e) {        if (e.key === 'Escape') nav.querySelectorAll('.ds-dropdown.open').forEach(function (d) { d.classList.remove('open'); });    });})();</script>
+
+    <div class="aqi-wrap">
+        <section class="aqi-hero">
+            <span class="badge badge-accent"><i class="fas fa-wind" aria-hidden="true"></i>Air Quality</span>
+            <h1>Air Quality Surface — <span class="gradient-text">India</span></h1>
+            <p>A successive-correction (Cressman) analysis of data.gov.in monitoring stations. Pick a pollutant to rebuild the field; click any point on the map for the value there.</p>
+        </section>
+
+        <div class="aqi-layout" id="main" role="main">
+            <aside class="aqi-panel">
+                <div class="card">
+                    <div class="aqi-field">
+                        <label for="pollutant"><i class="fas fa-sliders mr-2" aria-hidden="true"></i>Select Pollutant</label>
+                        <select id="pollutant" aria-label="Select a pollutant to display on the surface">
+                            <option value="SO2">SO2</option>
+                            <option value="OZONE">OZONE</option>
+                            <option value="PM2.5">PM2.5</option>
+                            <option value="NH3">NH3</option>
+                            <option value="PM10">PM10</option>
+                        </select>
+                    </div>
+                    <p class="aqi-note"><i class="fas fa-database mr-1" aria-hidden="true"></i>Data: data.gov.in monitoring stations. Results are cached for 24 hours.</p>
+                </div>
+
+                <div class="card">
+                    <div class="kicker">Concentration scale</div>
+                    <div class="aqi-meta" id="surface-meta">Loading station surface…</div>
+                    <div class="legend-bar" aria-hidden="true"></div>
+                    <div class="legend-ends"><span id="legend-min">—</span><span>µg/m³ · log</span><span id="legend-max">—</span></div>
+                    <p class="aqi-note">Cressman analysis (800→250 km), clipped to India. Click any point on the map for its analysed value.</p>
+                </div>
+            </aside>
+
+            <section class="map-shell" aria-label="Air quality map of India">
+                <div id="map"></div>
+                <div id="loading"><i class="fas fa-circle-notch fa-spin mr-2" aria-hidden="true"></i>Loading station data…</div>
+            </section>
+        </div>
+    </div>
+
+    <footer>© 2025 Air Quality Surface · Data: data.gov.in · Map tiles: © OpenStreetMap</footer>
+
+  <!-- Leaflet JS -->
+  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+  <script>
+    // Function to parse and format the date
+    function parseDate(dateString) {
+      const [datePart, timePart] = dateString.split(' ');
+      const [day, month, year] = datePart.split('-');
+      const [hours, minutes, seconds] = timePart.split(':');
+      const date = new Date(year, month - 1, day, hours, minutes, seconds);
+      return date.toLocaleString('en-US', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit'
+      });
+    }
+
+    // Initialize the map
+    const map = L.map('map').setView([20.5937, 78.9629], 5); // Centered on India
+
+    // Add OpenStreetMap tiles
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      maxZoom: 18,
+      attribution: '© OpenStreetMap contributors'
+    }).addTo(map);
+
+    // Fetch and cache data
+    async function fetchAllData() {
+      const cacheKey = 'airQualityData';
+      const cacheExpiry = 24 * 60 * 60 * 1000; // 24 hours
+      const loadingIndicator = document.getElementById('loading');
+
+      try {
+        loadingIndicator.style.display = 'flex';
+
+        const cachedData = localStorage.getItem(cacheKey);
+        if (cachedData) {
+          const { data, timestamp } = JSON.parse(cachedData);
+          if (Date.now() - timestamp < cacheExpiry) {
+            console.log('Using cached data');
+            return data;
+          }
+        }
+
+        console.log('Fetching fresh data from API');
+        const limit = 1000;
+        let offset = 0;
+        let allRecords = [];
+
+        while (true) {
+          const response = await fetch(
+            `https://api.data.gov.in/resource/3b01bcb8-0b14-4abf-b6f2-c1bfd384ba69?api-key=579b464db66ec23bdd000001e5098ed4e61241df55effc4dbeab7289&format=json&limit=${limit}&offset=${offset}`
+          );
+
+          if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
+          const data = await response.json();
+          const records = data.records;
+
+          if (records.length === 0) break;
+          allRecords = allRecords.concat(records);
+          offset += limit;
+        }
+
+        localStorage.setItem(cacheKey, JSON.stringify({ data: allRecords, timestamp: Date.now() }));
+        return allRecords;
+      } catch (error) {
+        console.error('Error fetching data:', error);
+        alert('Unable to fetch air quality data. Please try again later.');
+        return [];
+      } finally {
+        loadingIndicator.style.display = 'none';
+      }
+    }
+
+    // Escape untrusted API text before it reaches HTML.
+    const esc = (v) => String(v ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+
+    // ---- Colour ramp: blue -> cyan -> green -> yellow -> red ----
+    const RAMP = [
+      [0.00, [0, 0, 255]],
+      [0.25, [0, 255, 255]],
+      [0.50, [0, 255, 0]],
+      [0.75, [255, 255, 0]],
+      [1.00, [255, 0, 0]]
+    ];
+
+    function rampAt(t) {
+      t = Math.max(0, Math.min(1, t));
+      for (let i = 1; i < RAMP.length; i++) {
+        if (t <= RAMP[i][0]) {
+          const [t0, c0] = RAMP[i - 1];
+          const [t1, c1] = RAMP[i];
+          const k = (t - t0) / (t1 - t0);
+          return [
+            Math.round(c0[0] + (c1[0] - c0[0]) * k),
+            Math.round(c0[1] + (c1[1] - c0[1]) * k),
+            Math.round(c0[2] + (c1[2] - c0[2]) * k)
+          ];
+        }
+      }
+      return RAMP[RAMP.length - 1][1];
+    }
+
+    const LUT = new Uint8ClampedArray(256 * 3);
+    for (let i = 0; i < 256; i++) {
+      const [r, g, b] = rampAt(i / 255);
+      LUT[i * 3] = r; LUT[i * 3 + 1] = g; LUT[i * 3 + 2] = b;
+    }
+
+    function cssColor(value, min, max) {
+      const t = max - min > 1e-9 ? (value - min) / (max - min) : 0.5;
+      const i = Math.max(0, Math.min(255, Math.round(t * 255))) * 3;
+      return `rgb(${LUT[i]},${LUT[i + 1]},${LUT[i + 2]})`;
+    }
+
+    // ---- Spatial surface (IDW) + station dots ----
+    const stationLayer = L.layerGroup().addTo(map);
+    let surfaceOverlay = null;
+    let lastStations = [];
+    let indiaBounds = null;
+    let indiaRings = [];
+    let indiaFeatures = [];
+    let indiaMask = null;
+    let renderSize = { w: 0, h: 0 };
+
+    const RENDER_W = 1100;            // output raster width; the analysis is smooth, so it scales cleanly
+    const GRID_COLS = 240;            // analysis grid, bilinearly upscaled for display
+    const SCM_PASSES = [800, 600, 400, 250]; // Cressman radii (km), coarse to fine
+    const SCM_FADE_KM = 650;          // beyond this distance the field has no local support
+    const SCM_FULL_KM = 500;          // full opacity inside this distance
+    const KM_PER_DEG = 111.32;
+
+    const mercY = (lat) => Math.log(Math.tan(Math.PI / 4 + lat * Math.PI / 360));
+    const invMercY = (y) => (2 * Math.atan(Math.exp(y)) - Math.PI / 2) * 180 / Math.PI;
+
+    // One point per station location: multiple monitors at the same site are averaged.
+    function toStations(records) {
+      const bySite = new Map();
+      for (const rec of records) {
+        const lat = parseFloat(rec.latitude);
+        const lon = parseFloat(rec.longitude);
+        const val = parseFloat(rec.avg_value);
+        if (!isFinite(lat) || !isFinite(lon) || !isFinite(val)) continue;
+        const key = lat.toFixed(3) + ',' + lon.toFixed(3);
+        const site = bySite.get(key);
+        if (site) { site.sum += val; site.n += 1; }
+        else bySite.set(key, { lat, lon, sum: val, n: 1, rec });
+      }
+      return [...bySite.values()].map(s => ({ lat: s.lat, lon: s.lon, val: s.sum / s.n, rec: s.rec }));
+    }
+
+    function domainOf(stations) {
+      let min = Infinity, max = -Infinity;
+      for (const s of stations) {
+        if (s.val < min) min = s.val;
+        if (s.val > max) max = s.val;
+      }
+      if (!isFinite(min)) return { min: 0, max: 1 };
+      if (max - min < 1e-6) max = min + 1;
+      return { min, max };
+    }
+
+    function ringsOf(geojson) {
+      const rings = [];
+      for (const feature of geojson.features || []) {
+        const g = feature.geometry;
+        if (!g) continue;
+        if (g.type === 'Polygon') rings.push(...g.coordinates);
+        else if (g.type === 'MultiPolygon') for (const poly of g.coordinates) rings.push(...poly);
+        else if (g.type === 'GeometryCollection') for (const sub of g.geometries || []) {
+          if (sub.type === 'Polygon') rings.push(...sub.coordinates);
+          else if (sub.type === 'MultiPolygon') for (const poly of sub.coordinates) rings.push(...poly);
+        }
+      }
+      return rings;
+    }
+
+    // Ray-casting test for one GeoJSON ring (coords are [lon, lat]).
+    function pointInRing(lat, lon, ring) {
+      let inside = false;
+      for (let i = 0, j = ring.length - 1; i < ring.length; j = i++) {
+        const xi = ring[i][0], yi = ring[i][1];
+        const xj = ring[j][0], yj = ring[j][1];
+        if (((yi > lat) !== (yj > lat)) && (lon < (xj - xi) * (lat - yi) / (yj - yi) + xi)) {
+          inside = !inside;
+        }
+      }
+      return inside;
+    }
+
+    function regionAt(lat, lon) {
+      for (const feature of indiaFeatures) {
+        const g = feature.geometry;
+        if (!g) continue;
+        const polys = g.type === 'Polygon' ? [g.coordinates]
+          : g.type === 'MultiPolygon' ? g.coordinates
+          : (g.type === 'GeometryCollection'
+            ? (g.geometries || []).flatMap(sub => sub.type === 'Polygon' ? [sub.coordinates] : sub.type === 'MultiPolygon' ? sub.coordinates : [])
+            : []);
+        for (const poly of polys) {
+          if (!poly || !poly.length) continue;
+          if (!pointInRing(lat, lon, poly[0])) continue;
+          let inHole = false;
+          for (let k = 1; k < poly.length; k++) {
+            if (pointInRing(lat, lon, poly[k])) { inHole = true; break; }
+          }
+          if (!inHole) {
+            const props = feature.properties || {};
+            return props.NAME_1 || props.name || props.NAME_0 || 'India';
+          }
+        }
+      }
+      return 'India';
+    }
+
+    // Reverse geocode for the clicked point's city/state address.
+    async function reversePlace(lat, lon) {
+      try {
+        const url = `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat.toFixed(5)}&lon=${lon.toFixed(5)}&zoom=12&addressdetails=1`;
+        const res = await fetch(url);
+        if (!res.ok) return null;
+        const data = await res.json();
+        const a = data.address || {};
+        const city = a.city || a.town || a.village || a.suburb || a.county || a.state_district || '';
+        const location = [city, a.state].filter(Boolean).join(', ') || data.display_name || null;
+        return { location, address: data.display_name || null };
+      } catch (err) {
+        return null;
+      }
+    }
+
+    function ensureRenderSize() {
+      if (!indiaBounds) return;
+      const nw = indiaBounds.getNorthWest();
+      const se = indiaBounds.getSouthEast();
+      const yN = mercY(nw.lat), yS = mercY(se.lat);
+      const xSpan = (se.lng - nw.lng) * Math.PI / 180;
+      renderSize = {
+        w: RENDER_W,
+        h: Math.max(1, Math.round(RENDER_W * (yN - yS) / xSpan))
+      };
+    }
+
+    // Project India's rings once per size; reuse for every pollutant.
+    function buildMask() {
+      if (!indiaBounds || !renderSize.w) return null;
+      const { w, h } = renderSize;
+      const lonW = indiaBounds.getWest();
+      const lonE = indiaBounds.getEast();
+      const yN = mercY(indiaBounds.getNorth());
+      const yS = mercY(indiaBounds.getSouth());
+      const sx = w / (lonE - lonW);
+      const sy = h / (yN - yS);
+
+      const canvas = document.createElement('canvas');
+      canvas.width = w;
+      canvas.height = h;
+      const ctx = canvas.getContext('2d');
+      ctx.fillStyle = '#fff';
+      ctx.beginPath();
+      for (const ring of indiaRings) {
+        for (let i = 0; i < ring.length; i++) {
+          const x = (ring[i][0] - lonW) * sx;
+          const y = (yN - mercY(ring[i][1])) * sy;
+          if (i === 0) ctx.moveTo(x, y);
+          else ctx.lineTo(x, y);
+        }
+        ctx.closePath();
+      }
+      ctx.fill('evenodd');
+      return canvas;
+    }
+
+    let cellMask = null;
+    let cellMaskKey = '';
+
+    // Rasterise the India mask onto the analysis grid so sea cells are skipped.
+    function buildCellMask(cols, rows) {
+      const key = cols + 'x' + rows;
+      if (cellMask && cellMaskKey === key) return cellMask;
+      const canvas = document.createElement('canvas');
+      canvas.width = cols;
+      canvas.height = rows;
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(indiaMask, 0, 0, cols, rows);
+      const px = ctx.getImageData(0, 0, cols, rows).data;
+      const mask = new Uint8Array(cols * rows);
+      for (let i = 0; i < mask.length; i++) mask[i] = px[i * 4 + 3] > 127 ? 1 : 0;
+      cellMask = mask;
+      cellMaskKey = key;
+      return mask;
+    }
+
+    // Bilinear sample of the current analysis at an observation location.
+    function sampleGrid(grid, cols, rows, lonW, lonE, yN, yS, lat, lon) {
+      let fx = (lon - lonW) / (lonE - lonW) * cols - 0.5;
+      let fy = (yN - mercY(lat)) / (yN - yS) * rows - 0.5;
+      fx = Math.max(0, Math.min(cols - 1, fx));
+      fy = Math.max(0, Math.min(rows - 1, fy));
+      const x0 = Math.floor(fx), y0 = Math.floor(fy);
+      const x1 = Math.min(cols - 1, x0 + 1), y1 = Math.min(rows - 1, y0 + 1);
+      const tx = fx - x0, ty = fy - y0;
+      const a = grid[y0 * cols + x0] * (1 - tx) + grid[y0 * cols + x1] * tx;
+      const b = grid[y1 * cols + x0] * (1 - tx) + grid[y1 * cols + x1] * tx;
+      return a * (1 - ty) + b * ty;
+    }
+
+    // One Cressman (1959) scan: w(r) = (L^2 - r^2) / (L^2 + r^2) for r <= L.
+    function scmPass(grid, mask, cols, rows, stations, L, nearest2, clampMin, clampMax) {      const L2 = L * L;
+      const lonW = indiaBounds.getWest();
+      const lonE = indiaBounds.getEast();
+      const yN = mercY(indiaBounds.getNorth());
+      const yS = mercY(indiaBounds.getSouth());
+      const res = new Float64Array(stations.length);
+
+      // Observation minus the current analysis, sampled at each station.
+      for (let i = 0; i < stations.length; i++) {
+        const s = stations[i];
+        res[i] = s.val - sampleGrid(grid, cols, rows, lonW, lonE, yN, yS, s.lat, s.lon);
+      }
+
+      for (let r = 0; r < rows; r++) {
+        const y = yN - (r + 0.5) / rows * (yN - yS);
+        const lat = invMercY(y);
+        const cosLat = Math.cos(lat * Math.PI / 180);
+        for (let c = 0; c < cols; c++) {
+          const o = r * cols + c;
+          if (!mask[o]) continue;
+          const lon = lonW + (c + 0.5) / cols * (lonE - lonW);
+          let sw = 0, sr = 0, minD2 = nearest2 ? Infinity : 0;
+
+          for (let i = 0; i < stations.length; i++) {
+            const s = stations[i];
+            const dy = (s.lat - lat) * KM_PER_DEG;
+            const dx = (s.lon - lon) * KM_PER_DEG * cosLat;
+            const d2 = dx * dx + dy * dy;
+            if (nearest2 && d2 < minD2) minD2 = d2;
+            if (d2 >= L2) continue;
+            const w = (L2 - d2) / (L2 + d2);
+            sw += w;
+            sr += w * res[i];
+          }
+
+          if (sw > 0) grid[o] += sr / sw;
+          if (grid[o] < clampMin) grid[o] = clampMin;
+          else if (grid[o] > clampMax) grid[o] = clampMax;
+          if (nearest2) nearest2[o] = minD2;
+        }
+      }
+    }
+
+    // Keep the analysed field so any map point can be read back on click.
+    let analysisGrid = null;
+    let analysisGridMeta = null;
+    let currentPollutant = 'SO2';
+    let probeDomain = null;
+
+    // Value of the Cressman field at an arbitrary latitude/longitude.
+    function valueAt(lat, lon) {
+      if (!analysisGrid || !analysisGridMeta) return null;
+      const { grid, cols, rows, lonW, lonE, yN, yS, nearest, mask } = analysisGridMeta;
+      if (lat < analysisGridMeta.latS || lat > analysisGridMeta.latN ||
+          lon < analysisGridMeta.lonW || lon > analysisGridMeta.lonE) return null;
+
+      let fx = (lon - lonW) / (lonE - lonW) * cols - 0.5;
+      let fy = (yN - mercY(lat)) / (yN - yS) * rows - 0.5;
+      fx = Math.max(0, Math.min(cols - 1, fx));
+      fy = Math.max(0, Math.min(rows - 1, fy));
+      const x0 = Math.floor(fx), y0 = Math.floor(fy);
+      const x1 = Math.min(cols - 1, x0 + 1), y1 = Math.min(rows - 1, y0 + 1);
+      const tx = fx - x0, ty = fy - y0;
+      const cover = mask[y0 * cols + x0] * (1 - tx) * (1 - ty) +
+        mask[y0 * cols + x1] * tx * (1 - ty) +
+        mask[y1 * cols + x0] * (1 - tx) * ty +
+        mask[y1 * cols + x1] * tx * ty;
+      if (cover < 0.5) return null;
+
+      return {
+        val: sampleGrid(grid, cols, rows, lonW, lonE, yN, yS, lat, lon),
+        nearestKm: Math.sqrt(sampleGrid(nearest, cols, rows, lonW, lonE, yN, yS, lat, lon))
+      };
+    }
+
+    // Number format for on-map readouts.
+    function fmtVal(v) {
+      return v >= 100 ? String(Math.round(v)) : v.toFixed(1);
+    }
+
+    // Nearest monitoring station to an arbitrary point, for the click readout.
+    function nearestStation(lat, lon) {
+      if (!lastStations.length) return null;
+      const cosLat = Math.cos(lat * Math.PI / 180);
+      let best = null;
+      let bestD2 = Infinity;
+      for (const s of lastStations) {
+        const dy = (s.lat - lat) * KM_PER_DEG;
+        const dx = (s.lon - lon) * KM_PER_DEG * cosLat;
+        const d2 = dx * dx + dy * dy;
+        if (d2 < bestD2) { bestD2 = d2; best = s; }
+      }
+      return { site: best, distKm: Math.sqrt(bestD2) };
+    }
+
+    // Fill the coarse canvas: colour comes from the field, alpha from how far
+    // the nearest station is, so unsupported areas fade away.
+    function paintAnalysis(grid, nearest2, mask, cols, rows, lo, hi, logSpan) {
+      const coarse = document.createElement('canvas');
+      coarse.width = cols;
+      coarse.height = rows;
+      const cctx = coarse.getContext('2d');
+      const image = cctx.createImageData(cols, rows);
+      const data = image.data;
+
+      for (let o = 0; o < cols * rows; o++) {
+        if (!mask[o]) continue;
+        const g = grid[o] < lo ? lo : grid[o];
+        let t = logSpan > 1e-9 ? Math.log(g / lo) / logSpan : 0.5;
+        t = t < 0 ? 0 : (t > 1 ? 1 : t);
+        const li = Math.round(t * 255) * 3;
+        const q = o * 4;
+        data[q] = LUT[li];
+        data[q + 1] = LUT[li + 1];
+        data[q + 2] = LUT[li + 2];
+
+        const nearest = Math.sqrt(nearest2[o]);
+        const fade = nearest <= SCM_FULL_KM
+          ? 1
+          : Math.max(0, Math.min(1, (SCM_FADE_KM - nearest) / (SCM_FADE_KM - SCM_FULL_KM)));
+        data[q + 3] = Math.round(224 * fade);
+      }
+
+      cctx.putImageData(image, 0, 0);
+      return coarse;
+    }
+
+    function renderSurface(stations) {
+      if (!indiaBounds || !indiaMask || !stations.length) return;
+      const { w, h } = renderSize;
+      if (!w || !h) return;
+
+      const lonW = indiaBounds.getWest();
+      const lonE = indiaBounds.getEast();
+      const yN = mercY(indiaBounds.getNorth());
+      const yS = mercY(indiaBounds.getSouth());
+      const cols = GRID_COLS;
+      const rows = Math.max(60, Math.round(cols * h / w));
+      const mask = buildCellMask(cols, rows);
+      const { min, max } = domainOf(stations);
+
+      // Second build at a finer resolution, used only to answer point queries.
+      const FINE_COLS = 420;
+      const fineRows = Math.max(100, Math.round(FINE_COLS * h / w));
+      const fineMask = buildCellMask(FINE_COLS, fineRows);
+
+      let sum = 0;
+      for (const s of stations) sum += s.val;
+      const mean = sum / stations.length;
+
+      const lo = Math.max(0.1, min);
+      const hi = Math.max(max, lo * 1.001);
+      const logSpan = Math.log(hi / lo);
+
+      const grid = new Float32Array(cols * rows);
+      grid.fill(mean);
+      const nearest2 = new Float32Array(cols * rows);
+
+      const fineGrid = new Float32Array(FINE_COLS * fineRows);
+      fineGrid.fill(mean);
+      const fineNearest2 = new Float32Array(FINE_COLS * fineRows);
+
+      for (let p = 0; p < SCM_PASSES.length; p++) {
+        const L = SCM_PASSES[p];
+        const last = p === SCM_PASSES.length - 1;
+        scmPass(grid, mask, cols, rows, stations, L, last ? nearest2 : null, min, max);
+        scmPass(fineGrid, fineMask, FINE_COLS, fineRows, stations, L, last ? fineNearest2 : null, min, max);
+      }
+
+      analysisGrid = fineGrid;
+      probeDomain = { min, max };
+      analysisGridMeta = {
+        grid: fineGrid,
+        nearest: fineNearest2,
+        mask: fineMask,
+        cols: FINE_COLS,
+        rows: fineRows,
+        lonW,
+        lonE,
+        yN,
+        yS,
+        latN: indiaBounds.getNorth(),
+        latS: indiaBounds.getSouth()
+      };
+
+      const coarse = paintAnalysis(grid, nearest2, mask, cols, rows, lo, hi, logSpan);
+
+      const out = document.createElement('canvas');
+      out.width = w;
+      out.height = h;
+      const octx = out.getContext('2d');
+      octx.imageSmoothingEnabled = true;
+      octx.imageSmoothingQuality = 'high';
+      octx.drawImage(coarse, 0, 0, w, h);
+
+      octx.globalCompositeOperation = 'destination-in';
+      octx.drawImage(indiaMask, 0, 0);
+      octx.globalCompositeOperation = 'source-over';
+
+      const url = out.toDataURL('image/png');
+      if (surfaceOverlay) {
+        surfaceOverlay.setBounds(indiaBounds);
+        surfaceOverlay.setUrl(url);
+      } else {
+        surfaceOverlay = L.imageOverlay(url, indiaBounds, {
+          pane: 'aqiSurfacePane',
+          interactive: false,
+          opacity: 1
+        }).addTo(map);
+      }
+    }
+
+    function updateReadout(pollutantId, count, min, max) {
+      const fmt = v => v >= 100 ? String(Math.round(v)) : v.toFixed(1);
+      document.getElementById('surface-meta').textContent =
+        `${pollutantId} · ${count} stations · ${fmt(min)}–${fmt(max)} µg/m³`;
+      document.getElementById('legend-min').textContent = fmt(min);
+      document.getElementById('legend-max').textContent = fmt(max);
+    }
+
+    // Update the surface from the selected pollutant
+    let dataPromise = null;
+    let probeMarker = null;
+    let probePopup = null;
+
+    async function updateHeatmapAndMarkers(pollutantId) {
+      currentPollutant = pollutantId;
+      if (!dataPromise) dataPromise = fetchAllData();
+      const jsonData = await dataPromise;
+
+      stationLayer.clearLayers();
+      if (probeMarker) { map.removeLayer(probeMarker); probeMarker = null; probePopup = null; }
+      analysisGrid = null;
+      analysisGridMeta = null;
+      probeDomain = null;
+
+      if (!jsonData.length) {
+        document.getElementById('surface-meta').textContent = 'Station data unavailable';
+        return;
+      }
+
+      const records = jsonData.filter(record => record.pollutant_id === pollutantId);
+      const stations = toStations(records);
+      lastStations = stations;
+
+      if (!stations.length) {
+        if (surfaceOverlay) { map.removeLayer(surfaceOverlay); surfaceOverlay = null; }
+        document.getElementById('surface-meta').textContent = `No station data for ${pollutantId}`;
+        alert(`No data available for ${pollutantId}`);
+        return;
+      }
+
+      const { min, max } = domainOf(stations);
+      updateReadout(pollutantId, stations.length, min, max);
+
+      // Station dots are not drawn; the surface is sampled by clicking any point.
+      renderSurface(stations);
+    }
+
+    // Clicking anywhere on the map reports the analysed value at that point,
+    // not a station observation. Blank areas are outside the field's support.
+    map.on('click', (e) => {
+      const ll = e.latlng;
+      const hit = valueAt(ll.lat, ll.lng);
+
+      if (probeMarker) { map.removeLayer(probeMarker); probeMarker = null; probePopup = null; }
+
+      if (!hit) {
+        L.popup()
+          .setLatLng(ll)
+          .setContent(`<b>${esc(currentPollutant)}</b> at ${ll.lat.toFixed(3)}°N, ${ll.lng.toFixed(3)}°E — outside the analysed area.`)
+          .openOn(map);
+        return;
+      }
+
+      const { min, max } = probeDomain || { min: 0, max: 1 };
+      const at = Math.max(min, Math.min(max, hit.val));
+      const t = max - min > 1e-9 ? (at - min) / (max - min) : 0.5;
+      const li = Math.max(0, Math.min(255, Math.round(t * 255))) * 3;
+      const near = nearestStation(ll.lat, ll.lng);
+      const region = regionAt(ll.lat, ll.lng);
+
+      probeMarker = L.circleMarker(ll, {
+        radius: 6,
+        weight: 2,
+        color: '#ffffff',
+        opacity: 1,
+        fillColor: `rgb(${LUT[li]},${LUT[li + 1]},${LUT[li + 2]})`,
+        fillOpacity: 1
+      }).addTo(map);
+
+      const buildContent = (location, address) =>
+        `<b>${esc(currentPollutant)}</b><br>` +
+        `<span style="font-size:15px;font-weight:700">${fmtVal(hit.val)} µg/m³</span><br>` +
+        `Lon: ${ll.lng.toFixed(5)}<br>` +
+        `Lat: ${ll.lat.toFixed(5)}<br>` +
+        (address ? `Address: ${esc(address)}<br>` : '') +
+        (near
+          ? `<span style="color:#475569">Nearest station: ${esc((near.site.rec && near.site.rec.station) || '—')} · ${Math.round(near.distKm)} km</span>`
+          : `<span style="color:#475569">Nearest station: —</span>`);
+
+      probePopup = L.popup()
+        .setLatLng(ll)
+        .setContent(buildContent(region, null))
+        .openOn(map);
+
+      const thisPopup = probePopup;
+      reversePlace(ll.lat, ll.lng).then(place => {
+        if (!place || probePopup !== thisPopup) return;
+        thisPopup.setContent(buildContent(place.location || region, place.address));
+      });
+    });
+
+    // Debounce function
+    function debounce(func, wait) {
+      let timeout;
+      return function (...args) {
+        clearTimeout(timeout);
+        timeout = setTimeout(() => func.apply(this, args), wait);
+      };
+    }
+
+    // Event listener for pollutant selection
+    document.getElementById('pollutant').addEventListener('change', debounce((event) => {
+      updateHeatmapAndMarkers(event.target.value);
+    }, 300));
+
+    // Load GeoJSON boundary: outline, mask and map extent
+    async function loadGeoJSON(filePath) {
+      try {
+        const response = await fetch(filePath);
+        if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
+        const geojsonData = await response.json();
+
+        indiaRings = ringsOf(geojsonData);
+        indiaFeatures = geojsonData.features || [];
+
+        const geojsonLayer = L.geoJSON(geojsonData, {
+          interactive: false,
+          style: () => ({
+            color: '#187dee',
+            weight: 3,
+            fillColor: '#FFA500',
+            fillOpacity: 0
+          })
+        }).addTo(map);
+
+        const bounds = geojsonLayer.getBounds();
+        indiaBounds = L.latLngBounds(
+          [bounds.getSouth() - 0.2, bounds.getWest() - 0.2],
+          [bounds.getNorth() + 0.2, bounds.getEast() + 0.2]
+        );
+        ensureRenderSize();
+        indiaMask = buildMask();
+
+        map.fitBounds(bounds);
+
+        // Data may have rendered before the boundary arrived; redraw with the mask.
+        if (lastStations.length) renderSurface(lastStations);
+      } catch (error) {
+        console.error('Error loading GeoJSON:', error);
+      }
+    }
+
+    // Pane below the vector overlay so the India outline stays on top of the raster.
+    map.createPane('aqiSurfacePane');
+    map.getPane('aqiSurfacePane').style.zIndex = 350;
+    map.getPane('aqiSurfacePane').style.pointerEvents = 'none';
+
+    // Initialize
+    updateHeatmapAndMarkers('SO2');
+    loadGeoJSON('srcc/IND.json');
+
+  </script>
+<script src="devtools-guard.js"></script></body>
+</html>

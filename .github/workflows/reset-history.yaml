@@ -1,0 +1,27 @@
+
+name: Reset Repository History
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  reset-history:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout latest snapshot
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 1
+
+      - name: Create a new history
+        run: |
+          git config user.name "subhrajitjubu"
+          git config user.email "66462700+subhrajitjubu@users.noreply.github.com"
+          git checkout --orphan clean-main
+          git add -A
+          git commit -m "Reset history and retain current files"
+          git push origin clean-main:main --force

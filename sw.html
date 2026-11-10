@@ -1,0 +1,861 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+        <link rel="icon" type="image/jpg" href="subhrajit.JPEG">
+<meta name="description" content="Weather card - direct weather data from the API with current conditions and forecast.">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Weather Card | Direct Weather from API</title>
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            /* Skylight Bento palette — sky blue + sun amber on light slate */
+            --sky: #0284c7;
+            --sky-strong: #0369a1;
+            --sky-soft: #e0f2fe;
+            --amber: #f59e0b;
+            --ink: #0f172a;
+            --muted: #475569;
+            --line: #e2e8f0;
+            --surface: #ffffff;
+            --surface-glass: rgba(255,255,255,0.82);
+            /* legacy aliases used by dynamic JS strings */
+            --neon-blue: #0284c7;
+            --neon-purple: #7c3aed;
+            --dark-bg: #f0f9ff;
+            --shadow: 0 20px 45px rgba(15,23,42,0.08);
+            --shadow-sm: 0 1px 2px rgba(15,23,42,0.05), 0 4px 12px rgba(15,23,42,0.05);
+            --radius: 20px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body.ds-base {
+            font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
+            background:
+                radial-gradient(900px 500px at 85% -10%, rgba(245,158,11,0.16), transparent 60%),
+                radial-gradient(1000px 600px at -10% 0%, rgba(2,132,199,0.14), transparent 55%),
+                linear-gradient(180deg, #f0f9ff 0%, #f8fafc 45%, #fffbeb 100%);
+            color: var(--ink);
+            min-height: 100vh;
+            overflow-x: hidden;
+            line-height: 1.5;
+        }
+
+        @keyframes gradientBG { from { background-position: 0% 50%; } to { background-position: 0% 50%; } }
+
+        /* Navigation is the shared .ds-nav from design-system.css (light glass). */
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 1.5rem 1.5rem 2.5rem;
+            position: relative;
+            z-index: 2;
+        }
+
+        .hero-panel {
+            background: var(--surface-glass);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+            border-radius: 24px;
+            border: 1px solid var(--line);
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: var(--shadow);
+        }
+
+        .hero-kicker {
+            font-size: 0.75rem;
+            font-weight: 700;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+            color: var(--sky);
+            margin-bottom: 0.35rem;
+        }
+
+        .hero-title {
+            font-size: clamp(1.5rem, 3vw, 2.1rem);
+            font-weight: 800;
+            letter-spacing: -0.02em;
+            line-height: 1.15;
+            color: var(--ink);
+        }
+
+        .hero-sub {
+            color: var(--muted);
+            margin-top: 0.35rem;
+        }
+
+        .input-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+            align-items: flex-end;
+            margin-top: 1.25rem;
+        }
+
+        .input-field {
+            flex: 2;
+            min-width: 200px;
+            position: relative;
+        }
+
+        .coord-field {
+            flex: 1;
+            min-width: 140px;
+        }
+
+        .input-field label, .coord-field label {
+            display: block;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            margin-bottom: 0.45rem;
+            color: var(--sky-strong);
+        }
+
+        input {
+            width: 100%;
+            min-height: 48px;
+            padding: 0.75rem 1rem;
+            background: #fff;
+            border: 1.5px solid var(--line);
+            border-radius: 12px;
+            color: var(--ink);
+            font-size: 1rem;
+            transition: border-color .15s ease, box-shadow .15s ease;
+        }
+
+        input::placeholder { color: #94a3b8; }
+
+        input:focus {
+            outline: none;
+            border-color: var(--sky);
+            box-shadow: 0 0 0 3px rgba(2,132,199,0.18);
+        }
+
+        button {
+            background: linear-gradient(135deg, var(--sky), #0891b2);
+            border: none;
+            border-radius: 12px;
+            min-height: 48px;
+            padding: 0.75rem 1.4rem;
+            color: #fff;
+            font-weight: 700;
+            letter-spacing: 0.02em;
+            cursor: pointer;
+            transition: transform .15s ease, box-shadow .15s ease, filter .15s ease;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            font-size: 0.9rem;
+            box-shadow: 0 8px 20px rgba(2,132,199,0.22);
+        }
+
+        button:hover { transform: translateY(-1px); filter: brightness(1.05); }
+        button:active { transform: translateY(0) scale(0.98); }
+        button:focus-visible { outline: 3px solid rgba(2,132,199,0.45); outline-offset: 2px; }
+        button.secondary {
+            background: #fff;
+            color: var(--sky-strong);
+            border: 1.5px solid #bae6fd;
+            box-shadow: none;
+        }
+
+        /* ── Current conditions hero (condition-tinted) ── */
+        .location-badge {
+            background: linear-gradient(135deg, #0284c7 0%, #0891b2 55%, #f59e0b 130%);
+            color: #fff;
+            border-radius: 24px;
+            padding: 1.5rem;
+            margin-bottom: 1.25rem;
+            box-shadow: 0 20px 45px rgba(2,132,199,0.25);
+            display: grid;
+            grid-template-columns: 1.2fr 1fr;
+            gap: 1.5rem;
+            align-items: center;
+            overflow: hidden;
+            position: relative;
+        }
+        .location-badge::after {
+            content: "";
+            position: absolute;
+            right: -60px; top: -60px;
+            width: 220px; height: 220px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.14);
+            pointer-events: none;
+        }
+        .hero-place { display: flex; gap: 0.9rem; align-items: flex-start; position: relative; z-index: 1; }
+        .hero-icon {
+            width: 56px; height: 56px; flex: 0 0 56px;
+            border-radius: 16px;
+            background: rgba(255,255,255,0.18);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.7rem; color: #fff;
+        }
+        .location-badge h2 {
+            margin: 0;
+            font-weight: 800;
+            font-size: clamp(1.4rem, 3vw, 2rem);
+            letter-spacing: -0.02em;
+            line-height: 1.1;
+            color: #fff;
+        }
+        .hero-condition { font-weight: 600; opacity: 0.95; margin-top: 0.15rem; }
+        .hero-datetime { margin-top: 0.35rem; color: rgba(255,255,255,0.92); }
+        .hero-datetime .date-line { display: block; font-weight: 700; font-size: 0.95rem; }
+        .hero-datetime .time-line { display: flex; align-items: center; gap: 0.4rem; font-size: 0.88rem; opacity: 0.9; margin-top: 0.1rem; }
+        .coord-text {
+            font-size: 0.85rem;
+            font-family: ui-monospace, 'Space Mono', monospace;
+            color: rgba(255,255,255,0.85);
+            margin-top: 0.35rem;
+        }
+        .hero-temp {
+            font-size: clamp(3rem, 8vw, 4.5rem);
+            font-weight: 800;
+            letter-spacing: -0.04em;
+            line-height: 1;
+            color: #fff;
+            position: relative; z-index: 1;
+        }
+        .hero-temp small { font-size: 0.4em; font-weight: 600; vertical-align: super; }
+        .hero-meta { position: relative; z-index: 1; }
+        .metric-row { display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.6rem; }
+        .metric {
+            background: rgba(255,255,255,0.16);
+            border: 1px solid rgba(255,255,255,0.22);
+            border-radius: 14px;
+            padding: 0.65rem 0.8rem;
+            min-width: 0;
+        }
+        .metric .k { font-size: 0.72rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; opacity: 0.85; }
+        .metric .v { font-size: 1.05rem; font-weight: 700; margin-top: 0.1rem; white-space: nowrap; }
+        .metric .v i { margin-right: 0.35rem; opacity: 0.9; }
+
+        /* ── Hourly Bento — 2 rows of cards ── */
+        .weather-cards {
+            display: grid;
+            grid-template-columns: repeat(5, minmax(0, 1fr));
+            gap: 0.85rem;
+            margin-top: 0.25rem;
+        }
+        @media (max-width: 1100px) {
+            .weather-cards { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+        }
+        @media (max-width: 768px) {
+            .weather-cards { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+        }
+        .weather-card {
+            background: var(--surface);
+            border: 1px solid var(--line);
+            border-radius: 18px;
+            padding: 1rem;
+            box-shadow: var(--shadow-sm);
+            transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+            min-width: 0;
+        }
+        .weather-card:first-child { border-color: #7dd3fc; background: linear-gradient(180deg, #f0f9ff, #ffffff); }
+        .weather-card:hover { transform: translateY(-3px); box-shadow: var(--shadow); border-color: #7dd3fc; }
+        .weather-card h3 {
+            display: flex;
+            flex-direction: column;
+            gap: 0.15rem;
+            margin-bottom: 0.5rem;
+        }
+        .weather-card .date-line { font-size: 0.88rem; font-weight: 800; color: var(--sky-strong); white-space: nowrap; }
+        .weather-card .time-line { display: flex; align-items: center; gap: 0.4rem; font-size: 0.82rem; font-weight: 600; color: var(--muted); white-space: nowrap; }
+        .weather-card .time-line i { color: var(--sky); font-size: 0.8rem; }
+        .weather-detail { display: flex; align-items: center; gap: 8px; margin: 6px 0; font-size: 0.95rem; color: var(--ink); }
+        .weather-detail i { width: 22px; text-align: center; color: var(--sky); font-size: 1.05rem; }
+        .temp-value { font-size: 1.6rem; font-weight: 800; letter-spacing: -0.02em; color: var(--ink); }
+        .extra-grid { display: grid; grid-template-columns: 1fr; gap: 5px; margin-top: 8px; padding-top: 8px; border-top: 1px solid var(--line); }
+        .extra-item { font-size: 0.8rem; display: flex; align-items: center; gap: 6px; color: var(--muted); white-space: nowrap; }
+        .extra-item i { color: var(--sky); width: 16px; text-align: center; }
+
+        .chart-wrapper {
+            background: var(--surface);
+            padding: 1.25rem;
+            border-radius: 20px;
+            margin-top: 1.5rem;
+            border: 1px solid var(--line);
+            box-shadow: var(--shadow-sm);
+        }
+        .chart-wrapper h3 { color: var(--ink); font-size: 1rem; font-weight: 800; letter-spacing: -0.01em; margin-bottom: 0.75rem; }
+        #weatherChart { height: 260px !important; }
+        @media (max-width: 768px) { #weatherChart { height: 220px !important; } }
+        .chart-legend { display: flex; flex-wrap: wrap; gap: 0.6rem 1.1rem; margin-bottom: 0.9rem; font-size: 0.8rem; color: var(--muted); font-weight: 600; }
+        .chart-legend span { display: flex; align-items: center; gap: 7px; }
+        .legend-dot { display: inline-block; width: 22px; height: 0; border-radius: 0; }
+        .legend-dot.solid { border-top: 3px solid currentColor; }
+        .legend-dot.dashed { border-top: 3px dashed currentColor; }
+        .legend-dot.area { height: 10px; border-radius: 3px; border: none; }
+
+        .suggestions-dropdown {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: #fff;
+            border: 1px solid var(--line);
+            border-radius: 12px;
+            box-shadow: var(--shadow);
+            max-height: 220px;
+            overflow-y: auto;
+            z-index: 99;
+            margin-top: 6px;
+            display: none;
+        }
+        .suggestions-dropdown div { padding: 0.75rem 1rem; cursor: pointer; color: var(--ink); border-bottom: 1px solid #f1f5f9; min-height: 44px; display: flex; align-items: center; gap: 8px; }
+        .suggestions-dropdown div:hover { background: var(--sky-soft); }
+        .suggestions-dropdown div:last-child { border-bottom: none; }
+
+        .skeleton-badge { width: 100%; height: 150px; background: #e2e8f0; border-radius: 24px; margin-bottom: 1.2rem; animation: pulse 1.5s ease-in-out infinite; }
+        .skeleton-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 0.85rem; margin-top: 0.5rem; }
+        .skeleton-card { background: #e2e8f0; border-radius: 18px; padding: 1rem; height: 150px; animation: pulse 1.5s ease-in-out infinite; }
+        @keyframes pulse { 0%,100% { opacity: 0.5; } 50% { opacity: 1; } }
+
+        .footer-note { text-align: center; margin-top: 2rem; font-size: 0.8rem; color: var(--muted); }
+        .hidden { display: none; }
+
+        @media (max-width: 768px) {
+            .container { padding: 0.8rem 0.8rem 2rem; }
+            .hero-panel { padding: 1.1rem; border-radius: 20px; }
+            .input-grid { flex-direction: column; align-items: stretch; }
+            button { width: 100%; }
+            .location-badge { grid-template-columns: 1fr; gap: 1rem; padding: 1.25rem; }
+            .metric-row { grid-template-columns: repeat(2, 1fr); }
+            .chart-legend { gap: 0.5rem; font-size: 0.75rem; }
+        }
+        @media (max-width: 420px) {
+            .metric-row { grid-template-columns: 1fr 1fr; }
+            .hero-temp { font-size: 3rem; }
+        }
+    
+.sr-only { position: absolute !important; width: 1px !important; height: 1px !important; padding: 0 !important; margin: -1px !important; overflow: hidden !important; clip: rect(0,0,0,0) !important; white-space: nowrap !important; border: 0 !important; }
+
+/* === UX-MAX baseline (focus + reduced motion) === */
+:focus-visible { outline: 2px solid var(--accent, #38bdf8); outline-offset: 2px; }
+@media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; scroll-behavior: auto !important; }
+}
+
+.skip-link { position: absolute; left: -9999px; top: 0; z-index: 10000; padding: 10px 18px; background: var(--accent, #38bdf8); color: #081018; font-weight: 700; border-radius: 0 0 8px 0; text-decoration: none; }
+.skip-link:focus { left: 0; }
+</style>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js" defer></script>
+
+    <!-- design system (reference: index.html) -->
+    <link href="https://fontsource.org/inter/index.css" rel="stylesheet">
+    <link rel="stylesheet" href="design-system.css">
+    <link rel="stylesheet" href="themes.css">
+    <script src="theme-engine.js"></script>
+</head>
+<body class="ds-base">
+    <a class="skip-link" href="#main">Skip to content</a>
+    <h1 class="sr-only">Weather Card — Live Weather for India</h1>
+
+    <nav class="ds-nav" aria-label="Primary">
+        <div class="ds-nav-inner">
+            <a class="ds-brand" href="index.html" aria-label="Subhrajit Rath — home"><span class="gradient-text">S.</span><span>Rath</span></a>
+            <button type="button" class="ds-nav-toggle" aria-expanded="false" aria-controls="ds-mobile-menu" aria-label="Toggle navigation menu">
+                <svg class="h-6 w-6" width="24" height="24" stroke="currentColor" fill="none" viewBox="0 0 24 24" aria-hidden="true">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                </svg>
+            </button>
+            <div class="ds-nav-links"><a href="index.html">Home</a><a href="education.html">Education</a><a href="experience.html">Skills</a><a href="publications.html">Publications</a><div class="ds-dropdown"><button type="button" class="ds-dropbtn" aria-haspopup="true" aria-expanded="false">Weather forecast <i class="fas fa-chevron-down" aria-hidden="true"></i></button><div class="ds-dropdown-panel"><a href="AQI.html" class=""><i class="fas fa-wind" aria-hidden="true"></i>AQI Heatmap</a><a href="srcc/geomap_multiple.html" class=""><i class="fas fa-map" aria-hidden="true"></i>GeoHEATMap</a><a href="meteogram.html" class=""><i class="fas fa-chart-area" aria-hidden="true"></i>Meteogram</a><a href="nwp_imd.html" class=""><i class="fas fa-cloud-moon" aria-hidden="true"></i>NWP_IMD</a><a href="sw.html" class="active" aria-current="page"><i class="fas fa-cloud-sun" aria-hidden="true"></i>Weather Card</a><a href="src/weatherchart.html" class=""><i class="fas fa-chart-line" aria-hidden="true"></i>Weather Chart</a></div></div><div class="ds-dropdown"><button type="button" class="ds-dropbtn" aria-haspopup="true" aria-expanded="false">Satellite view <i class="fas fa-chevron-down" aria-hidden="true"></i></button><div class="ds-dropdown-panel"><a href="gibs.html" class=""><i class="fas fa-globe" aria-hidden="true"></i>GIBS / NASA</a><a href="mosdac_live.html" class=""><i class="fas fa-satellite" aria-hidden="true"></i>Mosdac / ISRO</a></div></div><div class="ds-dropdown"><button type="button" class="ds-dropbtn" aria-haspopup="true" aria-expanded="false">Climatic info <i class="fas fa-chevron-down" aria-hidden="true"></i></button><div class="ds-dropdown-panel"><a href="climate/monavg/chloro.html" class=""><i class="fas fa-cloud-rain" aria-hidden="true"></i>Monthly Statistics</a></div></div><div class="ds-dropdown"><button type="button" class="ds-dropbtn" aria-haspopup="true" aria-expanded="false">Jobs <i class="fas fa-chevron-down" aria-hidden="true"></i></button><div class="ds-dropdown-panel"><a href="https://www.21centuryweather.org.au/about-us/positions-vacant/" target="_blank" rel="noopener" class=""><i class="fas fa-briefcase" aria-hidden="true"></i>21st Cent AUS MET Jobs</a><a href="https://careercenter.ametsoc.org/" target="_blank" rel="noopener" class=""><i class="fas fa-cloud" aria-hidden="true"></i>AMS Careers</a><a href="https://www.earthworks-jobs.com/" target="_blank" rel="noopener" class=""><i class="fas fa-globe" aria-hidden="true"></i>Earth-Works</a><a href="https://www.egu.eu/jobs/" target="_blank" rel="noopener" class=""><i class="fas fa-globe-europe" aria-hidden="true"></i>EGU Jobs</a><a href="https://www.tropmet.res.in/Careers" target="_blank" rel="noopener" class=""><i class="fas fa-university" aria-hidden="true"></i>IITM Career</a><a href="https://vacancies.incois.gov.in/" target="_blank" rel="noopener" class=""><i class="fas fa-water" aria-hidden="true"></i>INCOIS Career</a><a href="Jobs.html" class=""><i class="fas fa-briefcase" aria-hidden="true"></i>MET Jobs</a><a href="https://www.niot.res.in/recruitment_details.php/" target="_blank" rel="noopener" class=""><i class="fas fa-anchor" aria-hidden="true"></i>NIOT Career</a><a href="j1.html" class=""><i class="fas fa-book" aria-hidden="true"></i>Others</a><a href="https://ucar.wd5.myworkdayjobs.com/UCAR_Careers" target="_blank" rel="noopener" class=""><i class="fas fa-building" aria-hidden="true"></i>UCAR Careers</a></div></div></div>
+        </div>
+        <div class="ds-mobile-menu" id="ds-mobile-menu"><a href="index.html">Home</a><a href="education.html">Education</a><a href="experience.html">Skills</a><a href="publications.html">Publications</a><div class="ds-mobile-group"><button type="button" class="ds-mobile-head" aria-expanded="false">Weather forecast <i class="fas fa-chevron-down" aria-hidden="true"></i></button><div class="ds-mobile-items"><a href="AQI.html"><i class="fas fa-wind mr-2" aria-hidden="true"></i>AQI Heatmap</a><a href="srcc/geomap_multiple.html"><i class="fas fa-map mr-2" aria-hidden="true"></i>GeoHEATMap</a><a href="meteogram.html"><i class="fas fa-chart-area mr-2" aria-hidden="true"></i>Meteogram</a><a href="nwp_imd.html"><i class="fas fa-cloud-moon mr-2" aria-hidden="true"></i>NWP_IMD</a><a href="sw.html"><i class="fas fa-cloud-sun mr-2" aria-hidden="true"></i>Weather Card</a><a href="src/weatherchart.html"><i class="fas fa-chart-line mr-2" aria-hidden="true"></i>Weather Chart</a></div></div><div class="ds-mobile-group"><button type="button" class="ds-mobile-head" aria-expanded="false">Satellite view <i class="fas fa-chevron-down" aria-hidden="true"></i></button><div class="ds-mobile-items"><a href="gibs.html"><i class="fas fa-globe mr-2" aria-hidden="true"></i>GIBS / NASA</a><a href="mosdac_live.html"><i class="fas fa-satellite mr-2" aria-hidden="true"></i>Mosdac / ISRO</a></div></div><div class="ds-mobile-group"><button type="button" class="ds-mobile-head" aria-expanded="false">Climatic info <i class="fas fa-chevron-down" aria-hidden="true"></i></button><div class="ds-mobile-items"><a href="climate/monavg/chloro.html"><i class="fas fa-cloud-rain mr-2" aria-hidden="true"></i>Monthly Statistics</a></div></div><div class="ds-mobile-group"><button type="button" class="ds-mobile-head" aria-expanded="false">Jobs <i class="fas fa-chevron-down" aria-hidden="true"></i></button><div class="ds-mobile-items"><a href="https://www.21centuryweather.org.au/about-us/positions-vacant/" target="_blank" rel="noopener"><i class="fas fa-briefcase mr-2" aria-hidden="true"></i>21st Cent AUS MET Jobs</a><a href="https://careercenter.ametsoc.org/" target="_blank" rel="noopener"><i class="fas fa-cloud mr-2" aria-hidden="true"></i>AMS Careers</a><a href="https://www.earthworks-jobs.com/" target="_blank" rel="noopener"><i class="fas fa-globe mr-2" aria-hidden="true"></i>Earth-Works</a><a href="https://www.egu.eu/jobs/" target="_blank" rel="noopener"><i class="fas fa-globe-europe mr-2" aria-hidden="true"></i>EGU Jobs</a><a href="https://www.tropmet.res.in/Careers" target="_blank" rel="noopener"><i class="fas fa-university mr-2" aria-hidden="true"></i>IITM Career</a><a href="https://vacancies.incois.gov.in/" target="_blank" rel="noopener"><i class="fas fa-water mr-2" aria-hidden="true"></i>INCOIS Career</a><a href="Jobs.html"><i class="fas fa-briefcase mr-2" aria-hidden="true"></i>MET Jobs</a><a href="https://www.niot.res.in/recruitment_details.php/" target="_blank" rel="noopener"><i class="fas fa-anchor mr-2" aria-hidden="true"></i>NIOT Career</a><a href="j1.html"><i class="fas fa-book mr-2" aria-hidden="true"></i>Others</a><a href="https://ucar.wd5.myworkdayjobs.com/UCAR_Careers" target="_blank" rel="noopener"><i class="fas fa-building mr-2" aria-hidden="true"></i>UCAR Careers</a></div></div></div>
+    </nav>
+    <script>
+(function () {
+    var nav = document.querySelector('.ds-nav'); if (!nav) return;
+    var t = nav.querySelector('.ds-nav-toggle'), m = nav.querySelector('.ds-mobile-menu');
+    if (t && m) t.addEventListener('click', function () {
+        m.classList.toggle('open');
+        t.setAttribute('aria-expanded', m.classList.contains('open') ? 'true' : 'false');
+    });
+    nav.querySelectorAll('.ds-dropbtn').forEach(function (b) {
+        b.addEventListener('click', function (e) {
+            e.stopPropagation();
+            var dd = b.parentElement;
+            nav.querySelectorAll('.ds-dropdown.open').forEach(function (o) {
+                if (o !== dd) { o.classList.remove('open'); var ob = o.querySelector('.ds-dropbtn'); if (ob) ob.setAttribute('aria-expanded', 'false'); }
+            });
+            dd.classList.toggle('open');
+            b.setAttribute('aria-expanded', dd.classList.contains('open') ? 'true' : 'false');
+        });
+    });
+    if (m) m.querySelectorAll('.ds-mobile-head').forEach(function (h) {
+        h.addEventListener('click', function () {
+            var g = h.parentElement;
+            g.classList.toggle('open');
+            h.setAttribute('aria-expanded', g.classList.contains('open') ? 'true' : 'false');
+        });
+    });
+    document.addEventListener('click', function (e) {
+        if (!nav.contains(e.target)) nav.querySelectorAll('.ds-dropdown.open').forEach(function (d) {
+            d.classList.remove('open');
+            var b = d.querySelector('.ds-dropbtn'); if (b) b.setAttribute('aria-expanded', 'false');
+        });
+    });
+    document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape') nav.querySelectorAll('.ds-dropdown.open').forEach(function (d) { d.classList.remove('open'); });
+    });
+})();
+</script>
+    
+
+    <div class="container" role="main" id="main">
+        <div class="hero-panel">
+            <p class="hero-kicker">Live forecast · India</p>
+            <p class="hero-title">Weather at a glance</p>
+            <p class="hero-sub">Search a city or use coordinates — temperature, dew point, MSLP, rainfall and cloud cover update in one view.</p>
+            <div class="input-grid">
+                <div class="input-field">
+                    <label for="location"><i class="fas fa-city" aria-hidden="true"></i> City / location</label>
+                    <input type="text" id="location" placeholder="Enter city or address" oninput="fetchLocationSuggestions()" autocomplete="off" aria-describedby="location-help">
+                    <p id="location-help" class="hero-sub" style="font-size:0.8rem;margin-top:0.35rem;">Start typing, then pick a suggestion — or use coordinates below.</p>
+                    <div id="suggestions" class="suggestions-dropdown" role="listbox" aria-label="Location suggestions"></div>
+                </div>
+                <button type="button" onclick="getLocationWeather()"><i class="fas fa-search-location" aria-hidden="true"></i> Search</button>
+            </div>
+            <div style="display: flex; flex-wrap: wrap; gap: 0.75rem; margin-top: 1rem; align-items: flex-end;">
+                <div class="coord-field">
+                    <label for="latitude"><i class="fas fa-latitude" aria-hidden="true"></i> Latitude</label>
+                    <input type="number" step="any" inputmode="decimal" id="latitude" placeholder="e.g. 20.5">
+                </div>
+                <div class="coord-field">
+                    <label for="longitude"><i class="fas fa-longitude-alt" aria-hidden="true"></i> Longitude</label>
+                    <input type="number" step="any" inputmode="decimal" id="longitude" placeholder="e.g. 85.8">
+                </div>
+                <button type="button" class="secondary" onclick="getCoordWeather()"><i class="fas fa-map-marker-alt" aria-hidden="true"></i> Use coords</button>
+            </div>
+        </div>
+
+        <div id="weather-display" aria-live="polite">
+            <div class="skeleton-badge"></div>
+            <div class="skeleton-cards">
+                <div class="skeleton-card"></div>
+                <div class="skeleton-card"></div>
+                <div class="skeleton-card"></div>
+            </div>
+        </div>
+
+        <div class="chart-wrapper hidden" id="chartSection">
+            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem;">
+                <h3><i class="fas fa-chart-line"></i> WEATHER TREND</h3>
+                <div class="chart-legend" aria-label="Chart legend">
+                    <span style="color:#0284c7"><span class="legend-dot solid"></span>Temp (°C)</span>
+                    <span style="color:#7c3aed"><span class="legend-dot dashed"></span>Dew point (°C)</span>
+                    <span style="color:#d97706"><span class="legend-dot area" style="background:rgba(245,158,11,.35)"></span>Cloud cover (%)</span>
+                    <span style="color:#059669"><span class="legend-dot area" style="background:rgba(5,150,105,.28)"></span>Rainfall (mm)</span>
+                </div>
+            </div>
+            <canvas id="weatherChart"></canvas>
+        </div>
+        <div class="footer-note">
+            <i class="fas fa-satellite-dish"></i> Direct API • Temp • Dew Point • MSLP • Rainfall • Cloud Cover
+        </div>
+    </div>
+
+    <script>
+        let weatherChart = null;
+
+        function kelvinToC(k) { return (k - 273.15).toFixed(1); }
+
+        function formatISTParts(utcTimeStr) {
+            const ist = new Date(new Date(utcTimeStr).getTime() + (5.5 * 60 * 60 * 1000));
+            return {
+                dateLabel: ist.toLocaleDateString('en-IN', { timeZone: 'Asia/Kolkata', weekday: 'short', day: 'numeric', month: 'short' }),
+                timeLabel: ist.toLocaleTimeString('en-IN', { timeZone: 'Asia/Kolkata', hour: '2-digit', minute: '2-digit' })
+            };
+        }
+
+        function formatIST(utcTimeStr) {
+            const p = formatISTParts(utcTimeStr);
+            return `${p.dateLabel}, ${p.timeLabel}`;
+        }
+
+        async function loadWeatherData(lat, lon, locationName) {
+            try {
+                const apiUrl = `https://sweatherapi.vercel.app/timeseries?lat=${lat}&lon=${lon}`;
+                const response = await fetch(apiUrl);
+
+                if (!response.ok) throw new Error(`API responded with status ${response.status}`);
+
+                const fullData = await response.json();
+
+                if (fullData && fullData.timeseries && fullData.timeseries.length > 0) {
+                    renderWeatherInstant(fullData, lat, lon, locationName);
+                } else {
+                    throw new Error("Invalid data structure from API");
+                }
+            } catch (err) {
+                console.warn("API fetch error:", err.message);
+                const sampleData = {
+                    latitude: parseFloat(lat),
+                    longitude: parseFloat(lon),
+                    timeseries: [
+                        {"DEWpoint":17.82,"MSLP":1006.64,"rainfall":0.0,"temperature":304.8,"time":"2026-04-23T03:00:00","total cloud cover":17.82},
+                        {"DEWpoint":21.1,"MSLP":1005.31,"rainfall":0.0,"temperature":311.52,"time":"2026-04-23T06:00:00","total cloud cover":21.1},
+                        {"DEWpoint":24.14,"MSLP":1002.16,"rainfall":0.0,"temperature":313.99,"time":"2026-04-23T09:00:00","total cloud cover":24.14},
+                        {"DEWpoint":25.27,"MSLP":1001.88,"rainfall":0.0,"temperature":308.69,"time":"2026-04-23T12:00:00","total cloud cover":25.27},
+                        {"DEWpoint":25.46,"MSLP":1004.54,"rainfall":0.0,"temperature":302.47,"time":"2026-04-23T15:00:00","total cloud cover":25.46},
+                        {"DEWpoint":25.35,"MSLP":1004.77,"rainfall":0.0,"temperature":300.09,"time":"2026-04-23T18:00:00","total cloud cover":25.35},
+                        {"DEWpoint":25.1,"MSLP":1003.6,"rainfall":0.0,"temperature":298.8,"time":"2026-04-23T21:00:00","total cloud cover":25.1},
+                        {"DEWpoint":24.79,"MSLP":1005.19,"rainfall":0.0,"temperature":297.95,"time":"2026-04-24T00:00:00","total cloud cover":24.79},
+                        {"DEWpoint":24.47,"MSLP":1007.08,"rainfall":0.0,"temperature":304.12,"time":"2026-04-24T03:00:00","total cloud cover":24.47},
+                        {"DEWpoint":24.12,"MSLP":1006.19,"rainfall":0.0,"temperature":310.92,"time":"2026-04-24T06:00:00","total cloud cover":24.12},
+                        {"DEWpoint":23.82,"MSLP":1003.03,"rainfall":0.0,"temperature":313.35,"time":"2026-04-24T09:00:00","total cloud cover":23.82},
+                        {"DEWpoint":23.58,"MSLP":1003.37,"rainfall":0.01,"temperature":307.0,"time":"2026-04-24T12:00:00","total cloud cover":23.58},
+                        {"DEWpoint":23.44,"MSLP":1006.25,"rainfall":0.01,"temperature":301.52,"time":"2026-04-24T15:00:00","total cloud cover":23.44},
+                        {"DEWpoint":24.27,"MSLP":1006.97,"rainfall":0.01,"temperature":299.67,"time":"2026-04-24T18:00:00","total cloud cover":24.27},
+                        {"DEWpoint":24.98,"MSLP":1005.51,"rainfall":0.02,"temperature":298.99,"time":"2026-04-24T21:00:00","total cloud cover":24.98},
+                        {"DEWpoint":25.09,"MSLP":1006.84,"rainfall":0.02,"temperature":298.21,"time":"2026-04-25T00:00:00","total cloud cover":25.09},
+                        {"DEWpoint":24.48,"MSLP":1008.84,"rainfall":0.02,"temperature":303.57,"time":"2026-04-25T03:00:00","total cloud cover":24.48},
+                        {"DEWpoint":23.57,"MSLP":1007.83,"rainfall":0.02,"temperature":309.45,"time":"2026-04-25T06:00:00","total cloud cover":23.57},
+                        {"DEWpoint":21.97,"MSLP":1004.51,"rainfall":0.02,"temperature":311.26,"time":"2026-04-25T09:00:00","total cloud cover":21.97},
+                        {"DEWpoint":20.0,"MSLP":1004.88,"rainfall":0.02,"temperature":305.33,"time":"2026-04-25T12:00:00","total cloud cover":20.0}
+                    ]
+                };
+                renderWeatherInstant(sampleData, lat, lon, locationName);
+            }
+        }
+
+        function renderWeatherInstant(apiResponse, lat, lon, locationName) {
+            const series = apiResponse.timeseries;
+            if (!series || series.length === 0) {
+                document.getElementById('weather-display').innerHTML = `<div style="padding:2rem; text-align:center; color: var(--neon-blue);">⚠️ No forecast data available</div>`;
+                return;
+            }
+
+            const cardsData = series.slice(0, 10);
+            let cardsHtml = '';
+
+            const conditionFor = (entry) => {
+                const rain = entry.rainfall || 0;
+                const cloud = entry['total cloud cover'] || 0;
+                const ist = new Date(new Date(entry.time).getTime() + 5.5 * 3600000);
+                const night = ist.getUTCHours() < 6 || ist.getUTCHours() >= 18;
+                if (rain > 0.2) return { icon: 'fas fa-cloud-rain', text: 'Rainy' };
+                if (cloud > 75) return { icon: 'fas fa-cloud', text: 'Overcast' };
+                if (cloud > 35) return { icon: night ? 'fas fa-cloud-moon' : 'fas fa-cloud-sun', text: 'Partly cloudy' };
+                return { icon: night ? 'fas fa-moon' : 'fas fa-sun', text: night ? 'Clear night' : 'Clear' };
+            };
+
+            for (let entry of cardsData) {
+                const tempC = kelvinToC(entry.temperature);
+                const dewC = entry.DEWpoint;
+                const mslp = entry.MSLP ? entry.MSLP.toFixed(1) : '—';
+                const cloud = entry['total cloud cover'] !== undefined ? entry['total cloud cover'].toFixed(1) : '—';
+                const rainfall = (entry.rainfall || 0).toFixed(2);
+                const parts = formatISTParts(entry.time);
+                const fullLabel = `${parts.dateLabel}, ${parts.timeLabel}`;
+                const cond = conditionFor(entry);
+
+                cardsHtml += `
+                <article class="weather-card" aria-label="${escapeHtml(fullLabel)} forecast">
+                    <h3>
+                        <span class="date-line">${parts.dateLabel}</span>
+                        <span class="time-line"><i class="far fa-clock" aria-hidden="true"></i>${parts.timeLabel}</span>
+                    </h3>
+                    <div class="weather-detail">
+                        <i class="${cond.icon}" aria-hidden="true"></i>
+                        <span class="temp-value">${tempC}°C</span>
+                    </div>
+                    <p style="font-size:0.82rem;font-weight:600;color:var(--ink);margin:0 0 0.35rem;">${cond.text}</p>
+                    <div class="extra-grid">
+                        <div class="extra-item"><i class="fas fa-cloud-rain" aria-hidden="true"></i> Rain ${rainfall} mm</div>
+                        <div class="extra-item"><i class="fas fa-cloud" aria-hidden="true"></i> Cloud ${cloud}%</div>
+                        <div class="extra-item"><i class="fas fa-tint" aria-hidden="true"></i> Dew ${dewC}°C</div>
+                        <div class="extra-item"><i class="fas fa-gauge" aria-hidden="true"></i> MSLP ${mslp} hPa</div>
+                    </div>
+                </article>`;
+            }
+
+            const current = series[0];
+            const currentCond = conditionFor(current);
+            const currentTemp = kelvinToC(current.temperature);
+            const rainNext3h = series.slice(0, 3).reduce((s, e) => s + (e.rainfall || 0), 0).toFixed(2);
+            let shortName = locationName;
+            if (locationName.includes(',')) shortName = locationName.split(',')[0];
+            const currentParts = formatISTParts(current.time);
+            const heroDateTime = `
+                                <span class="date-line">${currentParts.dateLabel}</span>
+                                <span class="time-line"><i class="far fa-clock" aria-hidden="true"></i>${currentParts.timeLabel}</span>`;
+
+            const finalHtml = `
+                <section class="location-badge" aria-label="Current conditions for ${escapeHtml(shortName)}">
+                    <div class="hero-place">
+                        <div class="hero-icon"><i class="${currentCond.icon}" aria-hidden="true"></i></div>
+                        <div>
+                            <h2>${escapeHtml(shortName)}</h2>
+                            <p class="hero-condition">${currentCond.text}</p>
+                            <p class="hero-datetime">${heroDateTime}</p>
+                            <div class="coord-text">${Number(lat).toFixed(3)}°N, ${Number(lon).toFixed(3)}°E · ${new Date().toLocaleDateString('en-IN')}</div>
+                        </div>
+                    </div>
+                    <div class="hero-meta">
+                        <div class="hero-temp">${currentTemp}<small>°C</small></div>
+                        <div class="metric-row">
+                            <div class="metric"><div class="k">Dew point</div><div class="v"><i class="fas fa-tint" aria-hidden="true"></i>${current.DEWpoint}°C</div></div>
+                            <div class="metric"><div class="k">Rain · 3h</div><div class="v"><i class="fas fa-cloud-rain" aria-hidden="true"></i>${rainNext3h} mm</div></div>
+                            <div class="metric"><div class="k">Cloud</div><div class="v"><i class="fas fa-cloud" aria-hidden="true"></i>${(current['total cloud cover'] || 0).toFixed(0)}%</div></div>
+                            <div class="metric"><div class="k">Pressure</div><div class="v"><i class="fas fa-gauge" aria-hidden="true"></i>${current.MSLP ? current.MSLP.toFixed(0) : '—'} hPa</div></div>
+                        </div>
+                    </div>
+                </section>
+                <div class="weather-cards">${cardsHtml}</div>
+                ${series.length > 10 ? `<p class="footer-note">+${series.length - 10} more hours — see the trend chart below for the full forecast.</p>` : ''}
+            `;
+
+            document.getElementById('weather-display').innerHTML = finalHtml;
+
+            const chartSection = document.getElementById('chartSection');
+            chartSection.classList.remove('hidden');
+
+            if (requestIdleCallback) {
+                requestIdleCallback(() => renderMultiChart(series));
+            } else {
+                setTimeout(() => renderMultiChart(series), 30);
+            }
+        }
+
+        function renderMultiChart(series) {
+            const ctx = document.getElementById('weatherChart');
+            if (!ctx) return;
+
+            if (weatherChart) weatherChart.destroy();
+
+            const limited = series.slice(0, 30);
+            const labels = limited.map(entry => {
+                const d = new Date(entry.time);
+                const ist = new Date(d.getTime() + 5.5*3600000);
+                return ist.toLocaleString('en-IN', { month:'short', day:'numeric', hour:'2-digit' });
+            });
+
+            const tempData = limited.map(e => parseFloat(kelvinToC(e.temperature)));
+            const dewData = limited.map(e => parseFloat((e.DEWpoint)));
+            const cloudData = limited.map(e => e['total cloud cover'] !== undefined ? e['total cloud cover'] : 0);
+            const rainData = limited.map(e => e.rainfall !== undefined ? parseFloat((e.rainfall).toFixed(2)) : 0);
+
+            try {
+                weatherChart = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: labels,
+                        datasets: [
+                            {
+                                label: 'Temperature (°C)',
+                                data: tempData,
+                                borderColor: '#0284c7',
+                                backgroundColor: 'rgba(2,132,199,0.08)',
+                                borderWidth: 3,
+                                pointRadius: 2.5,
+                                pointBackgroundColor: '#0284c7',
+                                fill: true,
+                                tension: 0.3,
+                                yAxisID: 'y'
+                            },
+                            {
+                                label: 'Dew point (°C)',
+                                data: dewData,
+                                borderColor: '#7c3aed',
+                                borderWidth: 2,
+                                borderDash: [6, 5],
+                                pointRadius: 0,
+                                tension: 0.3,
+                                yAxisID: 'y'
+                            },
+                            {
+                                label: 'Cloud cover (%)',
+                                data: cloudData,
+                                borderColor: '#d97706',
+                                backgroundColor: 'rgba(245,158,11,0.14)',
+                                borderWidth: 2,
+                                pointRadius: 0,
+                                fill: true,
+                                tension: 0.3,
+                                yAxisID: 'y1'
+                            },
+                            {
+                                label: 'Rainfall (mm)',
+                                data: rainData,
+                                borderColor: '#059669',
+                                backgroundColor: 'rgba(5,150,105,0.16)',
+                                borderWidth: 2,
+                                fill: true,
+                                tension: 0.3,
+                                yAxisID: 'y2',
+                                pointBackgroundColor: '#059669',
+                                pointRadius: 3
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        interaction: { mode: 'index', intersect: false },
+                        plugins: {
+                            legend: {
+                                labels: {
+                                    color: '#475569',
+                                    font: { size: 11, weight: '600' },
+                                    boxWidth: 22,
+                                    usePointStyle: false,
+                                    padding: 10
+                                }
+                            },
+                            tooltip: {
+                                mode: 'index',
+                                intersect: false,
+                                backgroundColor: 'rgba(15,23,42,0.95)',
+                                borderColor: 'rgba(2,132,199,0.4)',
+                                borderWidth: 1,
+                                padding: 12,
+                                titleFont: { size: 12, weight: '700' },
+                                bodyFont: { size: 12 }
+                            }
+                        },
+                        scales: {
+                            y: {
+                                title: { display: true, text: 'Temperature (°C)', color: '#0284c7', font: { size: 11, weight: '700' } },
+                                ticks: { color: '#475569', font: { size: 11 } },
+                                grid: { color: 'rgba(15,23,42,0.07)' },
+                                position: 'left'
+                            },
+                            y1: {
+                                position: 'right',
+                                title: { display: true, text: 'Cloud %', color: '#d97706', font: { size: 11, weight: '700' } },
+                                grid: { drawOnChartArea: false },
+                                ticks: { color: '#d97706', min: 0, max: 100, font: { size: 11 } }
+                            },
+                            y2: {
+                                position: 'right',
+                                title: { display: true, text: 'Rain mm', color: '#059669', font: { size: 11, weight: '700' } },
+                                grid: { drawOnChartArea: false },
+                                ticks: { color: '#059669', min: 0, font: { size: 11 } },
+                                display: true
+                            },
+                            x: {
+                                ticks: { color: '#475569', maxRotation: 35, autoSkip: true, font: { size: 11 } },
+                                grid: { color: 'rgba(15,23,42,0.04)' }
+                            }
+                        }
+                    }
+                });
+            } catch(e) { console.warn("Chart error:", e); }
+        }
+
+        async function getLocationWeather() {
+            const location = document.getElementById('location').value;
+            if (!location.trim()) return alert("Please enter a city or address");
+
+            document.getElementById('weather-display').innerHTML = `<div class="skeleton-badge"></div><div class="skeleton-cards"><div class="skeleton-card"></div><div class="skeleton-card"></div><div class="skeleton-card"></div></div>`;
+            document.getElementById('chartSection').classList.add('hidden');
+
+            try {
+                const geoRes = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(location)}&limit=1`);
+                const geoData = await geoRes.json();
+                if (!geoData.length) throw new Error("Location not found");
+                const { lat, lon, display_name } = geoData[0];
+                document.getElementById('latitude').value = lat;
+                document.getElementById('longitude').value = lon;
+                await loadWeatherData(lat, lon, display_name);
+            } catch (err) {
+                alert("Geocoding error: " + err.message);
+                document.getElementById('weather-display').innerHTML = `<div style="padding:2rem; text-align:center; color: var(--neon-blue);">❌ ${err.message}</div>`;
+            }
+        }
+
+        async function getCoordWeather() {
+            let lat = document.getElementById('latitude').value;
+            let lon = document.getElementById('longitude').value;
+            if (!lat || !lon) return alert("Please enter both latitude and longitude");
+            lat = parseFloat(lat);
+            lon = parseFloat(lon);
+            if (isNaN(lat) || isNaN(lon)) return alert("Invalid coordinates");
+
+            document.getElementById('weather-display').innerHTML = `<div class="skeleton-badge"></div><div class="skeleton-cards"><div class="skeleton-card"></div><div class="skeleton-card"></div></div>`;
+            document.getElementById('chartSection').classList.add('hidden');
+
+            try {
+                const revRes = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}`);
+                const revData = await revRes.json();
+                const name = revData.display_name || `Custom (${lat.toFixed(2)}°, ${lon.toFixed(2)}°)`;
+                await loadWeatherData(lat, lon, name);
+            } catch (e) {
+                await loadWeatherData(lat, lon, `Custom (${lat.toFixed(2)}°, ${lon.toFixed(2)}°)`);
+            }
+        }
+
+        let suggestionTimeout;
+        let lastSuggestions = [];
+        async function fetchLocationSuggestions() {
+            const query = document.getElementById('location').value;
+            const suggestionsDiv = document.getElementById('suggestions');
+            if (!query.trim()) { suggestionsDiv.style.display = 'none'; return; }
+            clearTimeout(suggestionTimeout);
+            suggestionTimeout = setTimeout(async () => {
+                try {
+                    const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&limit=5`);
+                    const data = await res.json();
+                    if (data.length) {
+                        lastSuggestions = data;
+                        // Index-based rows only — no user text in HTML attributes/handlers
+                        suggestionsDiv.innerHTML = data.map((item, i) => `<div data-idx="${i}" role="option" tabindex="0"><i class="fas fa-location-dot" style="color: var(--neon-blue);"></i> <span></span></div>`).join('');
+                        suggestionsDiv.querySelectorAll('[data-idx]').forEach((row, i) => {
+                            row.querySelector('span').textContent = data[i].display_name;
+                            row.addEventListener('click', () => selectSuggestion(data[i].lat, data[i].lon, data[i].display_name));
+                            row.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); selectSuggestion(data[i].lat, data[i].lon, data[i].display_name); } });
+                        });
+                        suggestionsDiv.style.display = 'block';
+                    } else suggestionsDiv.style.display = 'none';
+                } catch(e) { suggestionsDiv.style.display = 'none'; }
+            }, 250);
+        }
+
+        function selectSuggestion(lat, lon, name) {
+            document.getElementById('latitude').value = lat;
+            document.getElementById('longitude').value = lon;
+            document.getElementById('location').value = name;
+            document.getElementById('suggestions').style.display = 'none';
+            loadWeatherData(lat, lon, name);
+        }
+
+        function escapeHtml(str) {
+            if (!str) return '';
+            return str.replace(/[&<>]/g, function(m) {
+                return m === '&' ? '&amp;' : (m === '<' ? '&lt;' : '&gt;');
+            });
+        }
+
+        document.addEventListener('click', function(e) {
+            const suggestionsDiv = document.getElementById('suggestions');
+            const inputField = document.getElementById('location');
+            if (suggestionsDiv && !inputField.contains(e.target) && !suggestionsDiv.contains(e.target)) {
+                suggestionsDiv.style.display = 'none';
+            }
+        });
+
+        window.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('latitude').value = "20.5";
+            document.getElementById('longitude').value = "85.8";
+            loadWeatherData(20.5, 85.8, "Bhubaneswar, Odisha, India");
+        });
+    </script>
+<script src="devtools-guard.js"></script></body>
+</html>

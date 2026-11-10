@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+        <link rel="icon" type="image/jpg" href="subhrajit.JPEG">
+<meta name="description" content="Education and academic background of Subhrajit Rath - atmospheric science and radiation research.">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Education - Subhrajit Rath</title>
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Fontsource Inter -->
+    <link href="https://fontsource.org/inter/index.css" rel="stylesheet">
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            scroll-behavior: smooth;
+        }
+
+        .hero-bg {
+            background-image: url('assets/hero.png');
+            background-size: cover;
+            background-position: center;
+        }
+
+        .gradient-text {
+            background: linear-gradient(135deg, #3b82f6, #06b6d4);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .glass-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .reveal {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.8s ease-out;
+        }
+        .reveal.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .nav-link {
+            position: relative;
+        }
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: -4px;
+            left: 50%;
+            background: #3b82f6;
+            transition: all 0.3s ease;
+            transform: translateX(-50%);
+        }
+        .nav-link:hover::after {
+            width: 70%;
+        }
+
+        /* Timeline Styles */
+        .timeline-item {
+            position: relative;
+            padding-left: 3rem;
+        }
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #3b82f6;
+            border: 3px solid #fff;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+        }
+        .timeline-item::after {
+            content: '';
+            position: absolute;
+            left: 5px;
+            top: 12px;
+            width: 2px;
+            height: calc(100% + 2rem);
+            background: linear-gradient(to bottom, #3b82f6, #e2e8f0);
+        }
+        .timeline-item:last-child::after {
+            display: none;
+        }
+
+        /* Tab Styles */
+        .tab-btn {
+            transition: all 0.3s ease;
+        }
+        .tab-btn.active {
+            background: linear-gradient(135deg, #3b82f6, #06b6d4);
+            color: white;
+            transform: scale(1.05);
+        }
+    
+/* === UX-MAX baseline (focus + reduced motion) === */
+:focus-visible { outline: 2px solid var(--accent, #38bdf8); outline-offset: 2px; }
+@media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; scroll-behavior: auto !important; }
+}
+
+.skip-link { position: absolute; left: -9999px; top: 0; z-index: 10000; padding: 10px 18px; background: var(--accent, #38bdf8); color: #081018; font-weight: 700; border-radius: 0 0 8px 0; text-decoration: none; }
+.skip-link:focus { left: 0; }
+</style>
+
+    <!-- design system (reference: index.html) -->
+    <link rel="stylesheet" href="design-system.css">
+    <link rel="stylesheet" href="themes.css">
+    <script src="theme-engine.js"></script>
+</head>
+<body class="bg-slate-50 text-slate-800 antialiased ds-base">
+    <a class="skip-link" href="#main">Skip to content</a>
+
+    <!-- Navigation -->
+    <nav class="ds-nav" aria-label="Primary">
+        <div class="ds-nav-inner">
+            <a class="ds-brand" href="index.html" aria-label="Subhrajit Rath — home"><span class="gradient-text">S.</span><span>Rath</span></a>
+            <button type="button" class="ds-nav-toggle" aria-expanded="false" aria-controls="ds-mobile-menu" aria-label="Toggle navigation menu">
+                <svg class="h-6 w-6" width="24" height="24" stroke="currentColor" fill="none" viewBox="0 0 24 24" aria-hidden="true">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                </svg>
+            </button>
+            <div class="ds-nav-links"><a href="index.html">Home</a><a href="education.html" class="active" aria-current="page">Education</a><a href="experience.html">Skills</a><a href="publications.html">Publications</a><div class="ds-dropdown"><button type="button" class="ds-dropbtn" aria-haspopup="true" aria-expanded="false">Weather forecast <i class="fas fa-chevron-down" aria-hidden="true"></i></button><div class="ds-dropdown-panel"><a href="AQI.html" class=""><i class="fas fa-wind" aria-hidden="true"></i>AQI Heatmap</a><a href="srcc/geomap_multiple.html" class=""><i class="fas fa-map" aria-hidden="true"></i>GeoHEATMap</a><a href="meteogram.html" class=""><i class="fas fa-chart-area" aria-hidden="true"></i>Meteogram</a><a href="nwp_imd.html" class=""><i class="fas fa-cloud-moon" aria-hidden="true"></i>NWP_IMD</a><a href="sw.html" class=""><i class="fas fa-cloud-sun" aria-hidden="true"></i>Weather Card</a><a href="src/weatherchart.html" class=""><i class="fas fa-chart-line" aria-hidden="true"></i>Weather Chart</a></div></div><div class="ds-dropdown"><button type="button" class="ds-dropbtn" aria-haspopup="true" aria-expanded="false">Satellite view <i class="fas fa-chevron-down" aria-hidden="true"></i></button><div class="ds-dropdown-panel"><a href="gibs.html" class=""><i class="fas fa-globe" aria-hidden="true"></i>GIBS / NASA</a><a href="mosdac_live.html" class=""><i class="fas fa-satellite" aria-hidden="true"></i>Mosdac / ISRO</a></div></div><div class="ds-dropdown"><button type="button" class="ds-dropbtn" aria-haspopup="true" aria-expanded="false">Climatic info <i class="fas fa-chevron-down" aria-hidden="true"></i></button><div class="ds-dropdown-panel"><a href="climate/monavg/chloro.html" class=""><i class="fas fa-cloud-rain" aria-hidden="true"></i>Monthly Statistics</a></div></div><div class="ds-dropdown"><button type="button" class="ds-dropbtn" aria-haspopup="true" aria-expanded="false">Jobs <i class="fas fa-chevron-down" aria-hidden="true"></i></button><div class="ds-dropdown-panel"><a href="https://www.21centuryweather.org.au/about-us/positions-vacant/" target="_blank" rel="noopener" class=""><i class="fas fa-briefcase" aria-hidden="true"></i>21st Cent AUS MET Jobs</a><a href="https://careercenter.ametsoc.org/" target="_blank" rel="noopener" class=""><i class="fas fa-cloud" aria-hidden="true"></i>AMS Careers</a><a href="https://www.earthworks-jobs.com/" target="_blank" rel="noopener" class=""><i class="fas fa-globe" aria-hidden="true"></i>Earth-Works</a><a href="https://www.egu.eu/jobs/" target="_blank" rel="noopener" class=""><i class="fas fa-globe-europe" aria-hidden="true"></i>EGU Jobs</a><a href="https://www.tropmet.res.in/Careers" target="_blank" rel="noopener" class=""><i class="fas fa-university" aria-hidden="true"></i>IITM Career</a><a href="https://vacancies.incois.gov.in/" target="_blank" rel="noopener" class=""><i class="fas fa-water" aria-hidden="true"></i>INCOIS Career</a><a href="Jobs.html" class=""><i class="fas fa-briefcase" aria-hidden="true"></i>MET Jobs</a><a href="https://www.niot.res.in/recruitment_details.php/" target="_blank" rel="noopener" class=""><i class="fas fa-anchor" aria-hidden="true"></i>NIOT Career</a><a href="j1.html" class=""><i class="fas fa-book" aria-hidden="true"></i>Others</a><a href="https://ucar.wd5.myworkdayjobs.com/UCAR_Careers" target="_blank" rel="noopener" class=""><i class="fas fa-building" aria-hidden="true"></i>UCAR Careers</a></div></div></div>
+        </div>
+        <div class="ds-mobile-menu" id="ds-mobile-menu"><a href="index.html">Home</a><a href="education.html">Education</a><a href="experience.html">Skills</a><a href="publications.html">Publications</a><div class="ds-mobile-group"><button type="button" class="ds-mobile-head" aria-expanded="false">Weather forecast <i class="fas fa-chevron-down" aria-hidden="true"></i></button><div class="ds-mobile-items"><a href="AQI.html"><i class="fas fa-wind mr-2" aria-hidden="true"></i>AQI Heatmap</a><a href="srcc/geomap_multiple.html"><i class="fas fa-map mr-2" aria-hidden="true"></i>GeoHEATMap</a><a href="meteogram.html"><i class="fas fa-chart-area mr-2" aria-hidden="true"></i>Meteogram</a><a href="nwp_imd.html"><i class="fas fa-cloud-moon mr-2" aria-hidden="true"></i>NWP_IMD</a><a href="sw.html"><i class="fas fa-cloud-sun mr-2" aria-hidden="true"></i>Weather Card</a><a href="src/weatherchart.html"><i class="fas fa-chart-line mr-2" aria-hidden="true"></i>Weather Chart</a></div></div><div class="ds-mobile-group"><button type="button" class="ds-mobile-head" aria-expanded="false">Satellite view <i class="fas fa-chevron-down" aria-hidden="true"></i></button><div class="ds-mobile-items"><a href="gibs.html"><i class="fas fa-globe mr-2" aria-hidden="true"></i>GIBS / NASA</a><a href="mosdac_live.html"><i class="fas fa-satellite mr-2" aria-hidden="true"></i>Mosdac / ISRO</a></div></div><div class="ds-mobile-group"><button type="button" class="ds-mobile-head" aria-expanded="false">Climatic info <i class="fas fa-chevron-down" aria-hidden="true"></i></button><div class="ds-mobile-items"><a href="climate/monavg/chloro.html"><i class="fas fa-cloud-rain mr-2" aria-hidden="true"></i>Monthly Statistics</a></div></div><div class="ds-mobile-group"><button type="button" class="ds-mobile-head" aria-expanded="false">Jobs <i class="fas fa-chevron-down" aria-hidden="true"></i></button><div class="ds-mobile-items"><a href="https://www.21centuryweather.org.au/about-us/positions-vacant/" target="_blank" rel="noopener"><i class="fas fa-briefcase mr-2" aria-hidden="true"></i>21st Cent AUS MET Jobs</a><a href="https://careercenter.ametsoc.org/" target="_blank" rel="noopener"><i class="fas fa-cloud mr-2" aria-hidden="true"></i>AMS Careers</a><a href="https://www.earthworks-jobs.com/" target="_blank" rel="noopener"><i class="fas fa-globe mr-2" aria-hidden="true"></i>Earth-Works</a><a href="https://www.egu.eu/jobs/" target="_blank" rel="noopener"><i class="fas fa-globe-europe mr-2" aria-hidden="true"></i>EGU Jobs</a><a href="https://www.tropmet.res.in/Careers" target="_blank" rel="noopener"><i class="fas fa-university mr-2" aria-hidden="true"></i>IITM Career</a><a href="https://vacancies.incois.gov.in/" target="_blank" rel="noopener"><i class="fas fa-water mr-2" aria-hidden="true"></i>INCOIS Career</a><a href="Jobs.html"><i class="fas fa-briefcase mr-2" aria-hidden="true"></i>MET Jobs</a><a href="https://www.niot.res.in/recruitment_details.php/" target="_blank" rel="noopener"><i class="fas fa-anchor mr-2" aria-hidden="true"></i>NIOT Career</a><a href="j1.html"><i class="fas fa-book mr-2" aria-hidden="true"></i>Others</a><a href="https://ucar.wd5.myworkdayjobs.com/UCAR_Careers" target="_blank" rel="noopener"><i class="fas fa-building mr-2" aria-hidden="true"></i>UCAR Careers</a></div></div></div>
+    </nav>
+    <script>
+(function () {
+    var nav = document.querySelector('.ds-nav'); if (!nav) return;
+    var t = nav.querySelector('.ds-nav-toggle'), m = nav.querySelector('.ds-mobile-menu');
+    if (t && m) t.addEventListener('click', function () {
+        m.classList.toggle('open');
+        t.setAttribute('aria-expanded', m.classList.contains('open') ? 'true' : 'false');
+    });
+    nav.querySelectorAll('.ds-dropbtn').forEach(function (b) {
+        b.addEventListener('click', function (e) {
+            e.stopPropagation();
+            var dd = b.parentElement;
+            nav.querySelectorAll('.ds-dropdown.open').forEach(function (o) {
+                if (o !== dd) { o.classList.remove('open'); var ob = o.querySelector('.ds-dropbtn'); if (ob) ob.setAttribute('aria-expanded', 'false'); }
+            });
+            dd.classList.toggle('open');
+            b.setAttribute('aria-expanded', dd.classList.contains('open') ? 'true' : 'false');
+        });
+    });
+    if (m) m.querySelectorAll('.ds-mobile-head').forEach(function (h) {
+        h.addEventListener('click', function () {
+            var g = h.parentElement;
+            g.classList.toggle('open');
+            h.setAttribute('aria-expanded', g.classList.contains('open') ? 'true' : 'false');
+        });
+    });
+    document.addEventListener('click', function (e) {
+        if (!nav.contains(e.target)) nav.querySelectorAll('.ds-dropdown.open').forEach(function (d) {
+            d.classList.remove('open');
+            var b = d.querySelector('.ds-dropbtn'); if (b) b.setAttribute('aria-expanded', 'false');
+        });
+    });
+    document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape') nav.querySelectorAll('.ds-dropdown.open').forEach(function (d) { d.classList.remove('open'); });
+    });
+})();
+</script>
+    
+
+    <!-- Hero Section -->
+    <section class="relative pt-32 pb-20 flex items-center justify-center hero-bg" role="main" id="main">
+        <div class="absolute inset-0 bg-gradient-to-b from-slate-900/70 via-slate-900/60 to-slate-900/80"></div>
+        <div class="relative z-10 text-center px-4 max-w-4xl mx-auto reveal active">
+            <div class="mb-6 inline-block">
+                <span class="bg-blue-500/20 text-blue-100 border border-blue-400/30 px-5 py-2 rounded-full text-sm font-semibold tracking-wide uppercase backdrop-blur-sm">
+                    <i class="fas fa-graduation-cap mr-2"></i>Academic Journey
+                </span>
+            </div>
+            <h1 class="text-5xl md:text-6xl font-extrabold text-white mb-6 tracking-tight leading-tight">
+                Education <span class="gradient-text">Background</span>
+            </h1>
+            <p class="text-xl text-slate-200 max-w-2xl mx-auto font-light">
+                A comprehensive academic foundation in Atmospheric Science, from undergraduate studies to ongoing doctoral research.
+            </p>
+        </div>
+    </section>
+
+    <!-- Education Timeline Section -->
+    <section class="py-20 bg-white">
+        <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+
+            <!-- Tab Buttons -->
+            <div class="flex flex-wrap justify-center gap-3 mb-12 reveal">
+                <button onclick="openTab('phd')" class="tab-btn active px-6 py-3 rounded-full text-sm font-semibold bg-gradient-to-r from-blue-600 to-cyan-500 text-white shadow-lg">
+                    <i class="fas fa-user-graduate mr-2"></i>Ph.D
+                </button>
+                <button onclick="openTab('msc')" class="tab-btn px-6 py-3 rounded-full text-sm font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200 shadow">
+                    <i class="fas fa-book mr-2"></i>M.Sc
+                </button>
+                <button onclick="openTab('bsc')" class="tab-btn px-6 py-3 rounded-full text-sm font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200 shadow">
+                    <i class="fas fa-atom mr-2"></i>B.Sc
+                </button>
+                <button onclick="openTab('chse')" class="tab-btn px-6 py-3 rounded-full text-sm font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200 shadow">
+                    <i class="fas fa-calculator mr-2"></i>CHSE
+                </button>
+                <button onclick="openTab('matric')" class="tab-btn px-6 py-3 rounded-full text-sm font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200 shadow">
+                    <i class="fas fa-school mr-2"></i>Matriculation
+                </button>
+            </div>
+
+            <!-- Tab Content -->
+            <div class="relative">
+                <!-- Ph.D Content -->
+                <div id="phd" class="tab-content reveal active">
+                    <div class="bg-gradient-to-br from-blue-50 to-cyan-50 rounded-3xl p-8 md:p-12 border border-blue-100 shadow-xl">
+                        <div class="flex flex-col md:flex-row gap-8 items-start">
+                            <div class="flex-shrink-0">
+                                <div class="w-24 h-24 bg-gradient-to-br from-blue-600 to-cyan-500 rounded-2xl flex items-center justify-center shadow-lg">
+                                    <i class="fas fa-user-graduate text-white text-4xl"></i>
+                                </div>
+                            </div>
+                            <div class="flex-1">
+                                <div class="inline-block mb-4">
+                                    <span class="bg-blue-600 text-white px-4 py-1.5 rounded-full text-xs font-semibold uppercase tracking-wide">Current</span>
+                                </div>
+                                <h2 class="text-3xl font-bold text-slate-900 mb-2">Ph.D in Atmospheric Science</h2>
+                                <h3 class="text-xl text-blue-600 font-semibold mb-4">Earth and Space Sciences</h3>
+                                <div class="space-y-3">
+                                    <div class="flex items-center gap-3 text-slate-600">
+                                        <i class="fas fa-university text-blue-500 w-6"></i>
+                                        <span class="font-medium">Indian Institute of Space Science and Technology</span>
+                                    </div>
+                                    <div class="flex items-center gap-3 text-slate-600">
+                                        <i class="fas fa-calendar-alt text-blue-500 w-6"></i>
+                                        <span>January 2019 - June 2026</span>
+                                    </div>
+                                    <div class="flex items-center gap-3 text-slate-600">
+                                        <i class="fas fa-map-marker-alt text-blue-500 w-6"></i>
+                                        <span>Thiruvananthapuram, Kerala, India</span>
+                                    </div>
+                                </div>
+                                <div class="mt-6 pt-6 border-t border-blue-200">
+                                    <p class="text-slate-600 leading-relaxed">
+                                        Conducting advanced research in atmospheric science with focus on radiation modeling, HITRAN data curation, and numerical weather prediction. Contributing to the understanding of atmospheric processes through computational modeling and data analysis.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- M.Sc Content -->
+                <div id="msc" class="tab-content hidden reveal">
+                    <div class="bg-gradient-to-br from-purple-50 to-blue-50 rounded-3xl p-8 md:p-12 border border-purple-100 shadow-xl">
+                        <div class="flex flex-col md:flex-row gap-8 items-start">
+                            <div class="flex-shrink-0">
+                                <div class="w-24 h-24 bg-gradient-to-br from-purple-600 to-blue-500 rounded-2xl flex items-center justify-center shadow-lg">
+                                    <i class="fas fa-book text-white text-4xl"></i>
+                                </div>
+                            </div>
+                            <div class="flex-1">
+                                <div class="inline-block mb-4">
+                                    <span class="bg-purple-600 text-white px-4 py-1.5 rounded-full text-xs font-semibold uppercase tracking-wide">Completed</span>
+                                </div>
+                                <h2 class="text-3xl font-bold text-slate-900 mb-2">Master of Science</h2>
+                                <h3 class="text-xl text-purple-600 font-semibold mb-4">Atmospheric and Ocean Sciences</h3>
+                                <div class="space-y-3">
+                                    <div class="flex items-center gap-3 text-slate-600">
+                                        <i class="fas fa-university text-purple-500 w-6"></i>
+                                        <span class="font-medium">Indian Institute of Technology Bhubaneswar</span>
+                                    </div>
+                                    <div class="flex items-center gap-3 text-slate-600">
+                                        <i class="fas fa-calendar-alt text-purple-500 w-6"></i>
+                                        <span>July 2016 - June 2018</span>
+                                    </div>
+                                    <div class="flex items-center gap-3 text-slate-600">
+                                        <i class="fas fa-award text-purple-500 w-6"></i>
+                                        <span>CGPA: 7.91 | Percentage: 79.1%</span>
+                                    </div>
+                                </div>
+                                <div class="mt-6 pt-6 border-t border-purple-200">
+                                    <p class="text-slate-600 leading-relaxed">
+                                        Specialized in atmospheric and ocean sciences with comprehensive coursework in meteorology, oceanography, and climate modeling. Developed strong foundation in numerical methods and data analysis for atmospheric research.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- B.Sc Content -->
+                <div id="bsc" class="tab-content hidden reveal">
+                    <div class="bg-gradient-to-br from-green-50 to-teal-50 rounded-3xl p-8 md:p-12 border border-green-100 shadow-xl">
+                        <div class="flex flex-col md:flex-row gap-8 items-start">
+                            <div class="flex-shrink-0">
+                                <div class="w-24 h-24 bg-gradient-to-br from-green-600 to-teal-500 rounded-2xl flex items-center justify-center shadow-lg">
+                                    <i class="fas fa-atom text-white text-4xl"></i>
+                                </div>
+                            </div>
+                            <div class="flex-1">
+                                <div class="inline-block mb-4">
+                                    <span class="bg-green-600 text-white px-4 py-1.5 rounded-full text-xs font-semibold uppercase tracking-wide">Completed</span>
+                                </div>
+                                <h2 class="text-3xl font-bold text-slate-900 mb-2">Bachelor of Science</h2>
+                                <h3 class="text-xl text-green-600 font-semibold mb-4">Geology</h3>
+                                <div class="space-y-3">
+                                    <div class="flex items-center gap-3 text-slate-600">
+                                        <i class="fas fa-university text-green-500 w-6"></i>
+                                        <span class="font-medium">Utkal University, Odisha</span>
+                                    </div>
+                                    <div class="flex items-center gap-3 text-slate-600">
+                                        <i class="fas fa-calendar-alt text-green-500 w-6"></i>
+                                        <span>June 2013 - May 2016</span>
+                                    </div>
+                                    <div class="flex items-center gap-3 text-slate-600">
+                                        <i class="fas fa-award text-green-500 w-6"></i>
+                                        <span>Percentage: 72%</span>
+                                    </div>
+                                </div>
+                                <div class="mt-6 pt-6 border-t border-green-200">
+                                    <p class="text-slate-600 leading-relaxed">
+                                        Built foundational knowledge in earth sciences through comprehensive study of geology, mineralogy, and earth processes. This background provides unique perspective on atmospheric-earth interactions in current research.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- CHSE Content -->
+                <div id="chse" class="tab-content hidden reveal">
+                    <div class="bg-gradient-to-br from-orange-50 to-yellow-50 rounded-3xl p-8 md:p-12 border border-orange-100 shadow-xl">
+                        <div class="flex flex-col md:flex-row gap-8 items-start">
+                            <div class="flex-shrink-0">
+                                <div class="w-24 h-24 bg-gradient-to-br from-orange-600 to-yellow-500 rounded-2xl flex items-center justify-center shadow-lg">
+                                    <i class="fas fa-calculator text-white text-4xl"></i>
+                                </div>
+                            </div>
+                            <div class="flex-1">
+                                <div class="inline-block mb-4">
+                                    <span class="bg-orange-600 text-white px-4 py-1.5 rounded-full text-xs font-semibold uppercase tracking-wide">Completed</span>
+                                </div>
+                                <h2 class="text-3xl font-bold text-slate-900 mb-2">CHSE (+2)</h2>
+                                <h3 class="text-xl text-orange-600 font-semibold mb-4">Mathematics, Physics, Chemistry & Computer Science</h3>
+                                <div class="space-y-3">
+                                    <div class="flex items-center gap-3 text-slate-600">
+                                        <i class="fas fa-school text-orange-500 w-6"></i>
+                                        <span class="font-medium">Council of Higher Secondary Education, Odisha</span>
+                                    </div>
+                                    <div class="flex items-center gap-3 text-slate-600">
+                                        <i class="fas fa-calendar-alt text-orange-500 w-6"></i>
+                                        <span>July 2011 - June 2013</span>
+                                    </div>
+                                    <div class="flex items-center gap-3 text-slate-600">
+                                        <i class="fas fa-award text-orange-500 w-6"></i>
+                                        <span>Percentage: 77%</span>
+                                    </div>
+                                </div>
+                                <div class="mt-6 pt-6 border-t border-orange-200">
+                                    <p class="text-slate-600 leading-relaxed">
+                                        Completed higher secondary education with focus on science subjects. Strong foundation in mathematics and physics provided essential groundwork for advanced studies in atmospheric sciences.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Matriculation Content -->
+                <div id="matric" class="tab-content hidden reveal">
+                    <div class="bg-gradient-to-br from-red-50 to-pink-50 rounded-3xl p-8 md:p-12 border border-red-100 shadow-xl">
+                        <div class="flex flex-col md:flex-row gap-8 items-start">
+                            <div class="flex-shrink-0">
+                                <div class="w-24 h-24 bg-gradient-to-br from-red-600 to-pink-500 rounded-2xl flex items-center justify-center shadow-lg">
+                                    <i class="fas fa-school text-white text-4xl"></i>
+                                </div>
+                            </div>
+                            <div class="flex-1">
+                                <div class="inline-block mb-4">
+                                    <span class="bg-red-600 text-white px-4 py-1.5 rounded-full text-xs font-semibold uppercase tracking-wide">Completed</span>
+                                </div>
+                                <h2 class="text-3xl font-bold text-slate-900 mb-2">Matriculation (10th)</h2>
+                                <h3 class="text-xl text-red-600 font-semibold mb-4">Secondary Education</h3>
+                                <div class="space-y-3">
+                                    <div class="flex items-center gap-3 text-slate-600">
+                                        <i class="fas fa-school text-red-500 w-6"></i>
+                                        <span class="font-medium">Ravenshaw Collegiate School, </span>
+                                        <span class="font-medium">Board of Secondary Education, Odisha</span>
+                                        
+                                    </div>
+                                    <div class="flex items-center gap-3 text-slate-600">
+                                        <i class="fas fa-calendar-alt text-red-500 w-6"></i>
+                                        <span>June 2008 - May 2011</span>
+                                    </div>
+                                    <div class="flex items-center gap-3 text-slate-600">
+                                        <i class="fas fa-award text-red-500 w-6"></i>
+                                        <span>Percentage: 78%</span>
+                                    </div>
+                                </div>
+                                <div class="mt-6 pt-6 border-t border-red-200">
+                                    <p class="text-slate-600 leading-relaxed">
+                                        Completed secondary education at one of Odisha's premier institutions. Developed strong academic foundation and critical thinking skills that supported subsequent higher education pursuits.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Education Stats -->
+            <div class="mt-16 grid grid-cols-2 md:grid-cols-4 gap-6 reveal">
+                <div class="bg-white rounded-2xl p-6 shadow-lg border border-slate-100 text-center">
+                    <div class="text-4xl font-bold gradient-text mb-2">5+</div>
+                    <div class="text-sm text-slate-600">Years of Research</div>
+                </div>
+                <div class="bg-white rounded-2xl p-6 shadow-lg border border-slate-100 text-center">
+                    <div class="text-4xl font-bold gradient-text mb-2">3</div>
+                    <div class="text-sm text-slate-600">Degrees Pursued</div>
+                </div>
+                <div class="bg-white rounded-2xl p-6 shadow-lg border border-slate-100 text-center">
+                    <div class="text-4xl font-bold gradient-text mb-2">79%</div>
+                    <div class="text-sm text-slate-600">M.Sc CGPA</div>
+                </div>
+                <div class="bg-white rounded-2xl p-6 shadow-lg border border-slate-100 text-center">
+                    <div class="text-4xl font-bold gradient-text mb-2">IIST</div>
+                    <div class="text-sm text-slate-600">Ph.D Institution</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-slate-900 py-12 border-t border-slate-800">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <h3 class="text-2xl font-bold gradient-text mb-4">S.<span class="text-white">Rath</span></h3>
+            <p class="text-slate-400 mb-8">Personal & Research Portfolio</p>
+            <div class="flex justify-center space-x-6 mb-8">
+                <a href="index.html" class="text-slate-400 hover:text-white transition-colors">Home</a>
+                <a href="contact.html" class="text-slate-400 hover:text-white transition-colors">Contact</a>
+                <a href="publications.html" class="text-slate-400 hover:text-white transition-colors">Publications</a>
+            </div>
+            <p class="text-slate-600 text-sm">
+                &copy; <script>document.write(new Date().getFullYear());</script> Subhrajit Rath. All rights reserved.
+            </p>
+        </div>
+    </footer>
+
+    <script>
+        // Tab Functionality
+        function openTab(tabId) {
+            // Hide all tab contents
+            var contents = document.getElementsByClassName('tab-content');
+            for (var i = 0; i < contents.length; i++) {
+                contents[i].classList.add('hidden');
+                contents[i].classList.remove('active');
+            }
+
+            // Remove active class from all buttons
+            var buttons = document.getElementsByClassName('tab-btn');
+            for (var i = 0; i < buttons.length; i++) {
+                buttons[i].classList.remove('active', 'bg-gradient-to-r', 'from-blue-600', 'to-cyan-500', 'text-white');
+                buttons[i].classList.add('bg-slate-100', 'text-slate-600');
+            }
+
+            // Show selected tab content
+            document.getElementById(tabId).classList.remove('hidden');
+            document.getElementById(tabId).classList.add('active');
+
+            // Add active class to clicked button
+            event.currentTarget.classList.remove('bg-slate-100', 'text-slate-600');
+            event.currentTarget.classList.add('active', 'bg-gradient-to-r', 'from-blue-600', 'to-cyan-500', 'text-white');
+
+            // Trigger reveal animation
+            setTimeout(() => {
+                document.getElementById(tabId).classList.add('active');
+            }, 100);
+        }
+
+        // Scroll Reveal Animation
+        function reveal() {
+            var reveals = document.querySelectorAll(".reveal");
+            for (var i = 0; i < reveals.length; i++) {
+                var windowHeight = window.innerHeight;
+                var elementTop = reveals[i].getBoundingClientRect().top;
+                var elementVisible = 100;
+                if (elementTop < windowHeight - elementVisible) {
+                    reveals[i].classList.add("active");
+                }
+            }
+        }
+        window.addEventListener("scroll", reveal);
+        reveal();
+
+        // Navbar blur effect on scroll
+        const navbar = document.getElementById('navbar');
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 20) {
+                navbar.classList.add('shadow-md');
+            } else {
+                navbar.classList.remove('shadow-md');
+            }
+        });
+    </script>
+<script src="devtools-guard.js"></script></body>
+</html>
+

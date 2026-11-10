@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+        <link rel="icon" type="image/jpg" href="subhrajit.JPEG">
+<meta name="description" content="Get in touch with Subhrajit Rath - atmospheric science researcher in radiation modeling, HITRAN curation and NWP.">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact - Subhrajit Rath</title>
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Fontsource Inter -->
+    <link href="https://fontsource.org/inter/index.css" rel="stylesheet">
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            scroll-behavior: smooth;
+        }
+
+        .hero-bg {
+            background-image: url('assets/hero.png');
+            background-size: cover;
+            background-position: center;
+        }
+
+        .gradient-text {
+            background: linear-gradient(135deg, #3b82f6, #06b6d4);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .glass-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .reveal {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.8s ease-out;
+        }
+        .reveal.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .nav-link {
+            position: relative;
+        }
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: -4px;
+            left: 50%;
+            background: #3b82f6;
+            transition: all 0.3s ease;
+            transform: translateX(-50%);
+        }
+        .nav-link:hover::after {
+            width: 70%;
+        }
+
+        .contact-card {
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .contact-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 25px 50px -12px rgba(59, 130, 246, 0.25);
+        }
+
+        .social-link {
+            transition: all 0.3s ease;
+        }
+        .social-link:hover {
+            transform: scale(1.1);
+        }
+    
+/* === UX-MAX baseline (focus + reduced motion) === */
+:focus-visible { outline: 2px solid var(--accent, #38bdf8); outline-offset: 2px; }
+@media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; scroll-behavior: auto !important; }
+}
+
+.skip-link { position: absolute; left: -9999px; top: 0; z-index: 10000; padding: 10px 18px; background: var(--accent, #38bdf8); color: #081018; font-weight: 700; border-radius: 0 0 8px 0; text-decoration: none; }
+.skip-link:focus { left: 0; }
+</style>
+
+    <!-- design system (reference: index.html) -->
+    <link rel="stylesheet" href="design-system.css">
+    <link rel="stylesheet" href="themes.css">
+    <script src="theme-engine.js"></script>
+</head>
+<body class="bg-slate-50 text-slate-800 antialiased ds-base">
+    <a class="skip-link" href="#main">Skip to content</a>
+
+    <!-- Navigation -->
+    <nav class="ds-nav" aria-label="Primary">
+        <div class="ds-nav-inner">
+            <a class="ds-brand" href="index.html" aria-label="Subhrajit Rath — home"><span class="gradient-text">S.</span><span>Rath</span></a>
+            <button type="button" class="ds-nav-toggle" aria-expanded="false" aria-controls="ds-mobile-menu" aria-label="Toggle navigation menu">
+                <svg class="h-6 w-6" width="24" height="24" stroke="currentColor" fill="none" viewBox="0 0 24 24" aria-hidden="true">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                </svg>
+            </button>
+            <div class="ds-nav-links"><a href="index.html">Home</a><a href="education.html">Education</a><a href="experience.html">Skills</a><a href="publications.html">Publications</a><div class="ds-dropdown"><button type="button" class="ds-dropbtn" aria-haspopup="true" aria-expanded="false">Weather forecast <i class="fas fa-chevron-down" aria-hidden="true"></i></button><div class="ds-dropdown-panel"><a href="AQI.html" class=""><i class="fas fa-wind" aria-hidden="true"></i>AQI Heatmap</a><a href="srcc/geomap_multiple.html" class=""><i class="fas fa-map" aria-hidden="true"></i>GeoHEATMap</a><a href="meteogram.html" class=""><i class="fas fa-chart-area" aria-hidden="true"></i>Meteogram</a><a href="nwp_imd.html" class=""><i class="fas fa-cloud-moon" aria-hidden="true"></i>NWP_IMD</a><a href="sw.html" class=""><i class="fas fa-cloud-sun" aria-hidden="true"></i>Weather Card</a><a href="src/weatherchart.html" class=""><i class="fas fa-chart-line" aria-hidden="true"></i>Weather Chart</a></div></div><div class="ds-dropdown"><button type="button" class="ds-dropbtn" aria-haspopup="true" aria-expanded="false">Satellite view <i class="fas fa-chevron-down" aria-hidden="true"></i></button><div class="ds-dropdown-panel"><a href="gibs.html" class=""><i class="fas fa-globe" aria-hidden="true"></i>GIBS / NASA</a><a href="mosdac_live.html" class=""><i class="fas fa-satellite" aria-hidden="true"></i>Mosdac / ISRO</a></div></div><div class="ds-dropdown"><button type="button" class="ds-dropbtn" aria-haspopup="true" aria-expanded="false">Climatic info <i class="fas fa-chevron-down" aria-hidden="true"></i></button><div class="ds-dropdown-panel"><a href="climate/monavg/chloro.html" class=""><i class="fas fa-cloud-rain" aria-hidden="true"></i>Monthly Statistics</a></div></div><div class="ds-dropdown"><button type="button" class="ds-dropbtn" aria-haspopup="true" aria-expanded="false">Jobs <i class="fas fa-chevron-down" aria-hidden="true"></i></button><div class="ds-dropdown-panel"><a href="https://www.21centuryweather.org.au/about-us/positions-vacant/" target="_blank" rel="noopener" class=""><i class="fas fa-briefcase" aria-hidden="true"></i>21st Cent AUS MET Jobs</a><a href="https://careercenter.ametsoc.org/" target="_blank" rel="noopener" class=""><i class="fas fa-cloud" aria-hidden="true"></i>AMS Careers</a><a href="https://www.earthworks-jobs.com/" target="_blank" rel="noopener" class=""><i class="fas fa-globe" aria-hidden="true"></i>Earth-Works</a><a href="https://www.egu.eu/jobs/" target="_blank" rel="noopener" class=""><i class="fas fa-globe-europe" aria-hidden="true"></i>EGU Jobs</a><a href="https://www.tropmet.res.in/Careers" target="_blank" rel="noopener" class=""><i class="fas fa-university" aria-hidden="true"></i>IITM Career</a><a href="https://vacancies.incois.gov.in/" target="_blank" rel="noopener" class=""><i class="fas fa-water" aria-hidden="true"></i>INCOIS Career</a><a href="Jobs.html" class=""><i class="fas fa-briefcase" aria-hidden="true"></i>MET Jobs</a><a href="https://www.niot.res.in/recruitment_details.php/" target="_blank" rel="noopener" class=""><i class="fas fa-anchor" aria-hidden="true"></i>NIOT Career</a><a href="j1.html" class=""><i class="fas fa-book" aria-hidden="true"></i>Others</a><a href="https://ucar.wd5.myworkdayjobs.com/UCAR_Careers" target="_blank" rel="noopener" class=""><i class="fas fa-building" aria-hidden="true"></i>UCAR Careers</a></div></div></div>
+        </div>
+        <div class="ds-mobile-menu" id="ds-mobile-menu"><a href="index.html">Home</a><a href="education.html">Education</a><a href="experience.html">Skills</a><a href="publications.html">Publications</a><div class="ds-mobile-group"><button type="button" class="ds-mobile-head" aria-expanded="false">Weather forecast <i class="fas fa-chevron-down" aria-hidden="true"></i></button><div class="ds-mobile-items"><a href="AQI.html"><i class="fas fa-wind mr-2" aria-hidden="true"></i>AQI Heatmap</a><a href="srcc/geomap_multiple.html"><i class="fas fa-map mr-2" aria-hidden="true"></i>GeoHEATMap</a><a href="meteogram.html"><i class="fas fa-chart-area mr-2" aria-hidden="true"></i>Meteogram</a><a href="nwp_imd.html"><i class="fas fa-cloud-moon mr-2" aria-hidden="true"></i>NWP_IMD</a><a href="sw.html"><i class="fas fa-cloud-sun mr-2" aria-hidden="true"></i>Weather Card</a><a href="src/weatherchart.html"><i class="fas fa-chart-line mr-2" aria-hidden="true"></i>Weather Chart</a></div></div><div class="ds-mobile-group"><button type="button" class="ds-mobile-head" aria-expanded="false">Satellite view <i class="fas fa-chevron-down" aria-hidden="true"></i></button><div class="ds-mobile-items"><a href="gibs.html"><i class="fas fa-globe mr-2" aria-hidden="true"></i>GIBS / NASA</a><a href="mosdac_live.html"><i class="fas fa-satellite mr-2" aria-hidden="true"></i>Mosdac / ISRO</a></div></div><div class="ds-mobile-group"><button type="button" class="ds-mobile-head" aria-expanded="false">Climatic info <i class="fas fa-chevron-down" aria-hidden="true"></i></button><div class="ds-mobile-items"><a href="climate/monavg/chloro.html"><i class="fas fa-cloud-rain mr-2" aria-hidden="true"></i>Monthly Statistics</a></div></div><div class="ds-mobile-group"><button type="button" class="ds-mobile-head" aria-expanded="false">Jobs <i class="fas fa-chevron-down" aria-hidden="true"></i></button><div class="ds-mobile-items"><a href="https://www.21centuryweather.org.au/about-us/positions-vacant/" target="_blank" rel="noopener"><i class="fas fa-briefcase mr-2" aria-hidden="true"></i>21st Cent AUS MET Jobs</a><a href="https://careercenter.ametsoc.org/" target="_blank" rel="noopener"><i class="fas fa-cloud mr-2" aria-hidden="true"></i>AMS Careers</a><a href="https://www.earthworks-jobs.com/" target="_blank" rel="noopener"><i class="fas fa-globe mr-2" aria-hidden="true"></i>Earth-Works</a><a href="https://www.egu.eu/jobs/" target="_blank" rel="noopener"><i class="fas fa-globe-europe mr-2" aria-hidden="true"></i>EGU Jobs</a><a href="https://www.tropmet.res.in/Careers" target="_blank" rel="noopener"><i class="fas fa-university mr-2" aria-hidden="true"></i>IITM Career</a><a href="https://vacancies.incois.gov.in/" target="_blank" rel="noopener"><i class="fas fa-water mr-2" aria-hidden="true"></i>INCOIS Career</a><a href="Jobs.html"><i class="fas fa-briefcase mr-2" aria-hidden="true"></i>MET Jobs</a><a href="https://www.niot.res.in/recruitment_details.php/" target="_blank" rel="noopener"><i class="fas fa-anchor mr-2" aria-hidden="true"></i>NIOT Career</a><a href="j1.html"><i class="fas fa-book mr-2" aria-hidden="true"></i>Others</a><a href="https://ucar.wd5.myworkdayjobs.com/UCAR_Careers" target="_blank" rel="noopener"><i class="fas fa-building mr-2" aria-hidden="true"></i>UCAR Careers</a></div></div></div>
+    </nav>
+    <script>
+(function () {
+    var nav = document.querySelector('.ds-nav'); if (!nav) return;
+    var t = nav.querySelector('.ds-nav-toggle'), m = nav.querySelector('.ds-mobile-menu');
+    if (t && m) t.addEventListener('click', function () {
+        m.classList.toggle('open');
+        t.setAttribute('aria-expanded', m.classList.contains('open') ? 'true' : 'false');
+    });
+    nav.querySelectorAll('.ds-dropbtn').forEach(function (b) {
+        b.addEventListener('click', function (e) {
+            e.stopPropagation();
+            var dd = b.parentElement;
+            nav.querySelectorAll('.ds-dropdown.open').forEach(function (o) {
+                if (o !== dd) { o.classList.remove('open'); var ob = o.querySelector('.ds-dropbtn'); if (ob) ob.setAttribute('aria-expanded', 'false'); }
+            });
+            dd.classList.toggle('open');
+            b.setAttribute('aria-expanded', dd.classList.contains('open') ? 'true' : 'false');
+        });
+    });
+    if (m) m.querySelectorAll('.ds-mobile-head').forEach(function (h) {
+        h.addEventListener('click', function () {
+            var g = h.parentElement;
+            g.classList.toggle('open');
+            h.setAttribute('aria-expanded', g.classList.contains('open') ? 'true' : 'false');
+        });
+    });
+    document.addEventListener('click', function (e) {
+        if (!nav.contains(e.target)) nav.querySelectorAll('.ds-dropdown.open').forEach(function (d) {
+            d.classList.remove('open');
+            var b = d.querySelector('.ds-dropbtn'); if (b) b.setAttribute('aria-expanded', 'false');
+        });
+    });
+    document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape') nav.querySelectorAll('.ds-dropdown.open').forEach(function (d) { d.classList.remove('open'); });
+    });
+})();
+</script>
+    
+
+    <!-- Hero Section -->
+    <section class="relative pt-32 pb-20 flex items-center justify-center hero-bg" role="main" id="main">
+        <div class="absolute inset-0 bg-gradient-to-b from-slate-900/70 via-slate-900/60 to-slate-900/80"></div>
+        <div class="relative z-10 text-center px-4 max-w-4xl mx-auto reveal active">
+            <div class="mb-6 inline-block">
+                <span class="bg-blue-500/20 text-blue-100 border border-blue-400/30 px-5 py-2 rounded-full text-sm font-semibold tracking-wide uppercase backdrop-blur-sm">
+                    <i class="fas fa-envelope mr-2"></i>Get In Touch
+                </span>
+            </div>
+            <h1 class="text-5xl md:text-6xl font-extrabold text-white mb-6 tracking-tight leading-tight">
+                Contact <span class="gradient-text">Me</span>
+            </h1>
+            <p class="text-xl text-slate-200 max-w-2xl mx-auto font-light">
+                Interested in collaboration, research opportunities, or have questions about atmospheric science? I'd love to hear from you.
+            </p>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section class="py-20 bg-gradient-to-br from-slate-50 via-blue-50 to-cyan-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-12">
+                <!-- Contact Information -->
+                <div class="reveal">
+                    <h2 class="text-3xl font-bold text-slate-900 mb-6">Let's Connect</h2>
+                    <p class="text-lg text-slate-600 mb-8 leading-relaxed">
+                        I'm always open to discussing new research collaborations, speaking opportunities, or just connecting with fellow atmospheric scientists. Feel free to reach out through any of the channels below.
+                    </p>
+
+                    <!-- Contact Cards -->
+                    <div class="space-y-6">
+                        <!-- Email Card -->
+                        <div class="contact-card bg-white rounded-2xl p-6 shadow-lg border border-slate-100 flex items-center gap-5">
+                            <div class="w-14 h-14 bg-gradient-to-br from-blue-600 to-cyan-500 rounded-xl flex items-center justify-center flex-shrink-0">
+                                <i class="fas fa-envelope text-white text-2xl"></i>
+                            </div>
+                            <div class="flex-1">
+                                <h3 class="text-sm font-semibold text-slate-500 uppercase tracking-wide mb-1">Email</h3>
+                                <a href="mailto:subhrajitrath17@gmail.com" class="text-lg font-medium text-slate-900 hover:text-blue-600 transition-colors">
+                                    subhrajitrath17@gmail.com
+                                </a>
+                            </div>
+                            <a href="mailto:subhrajitrath17@gmail.com" class="w-10 h-10 bg-blue-50 hover:bg-blue-100 rounded-lg flex items-center justify-center text-blue-600 transition-colors">
+                                <i class="fas fa-external-link-alt"></i>
+                            </a aria-label="Send email">
+                        </div>
+
+                        <!-- Phone Card -->
+                        <div class="contact-card bg-white rounded-2xl p-6 shadow-lg border border-slate-100 flex items-center gap-5">
+                            <div class="w-14 h-14 bg-gradient-to-br from-purple-600 to-blue-500 rounded-xl flex items-center justify-center flex-shrink-0">
+                                <i class="fas fa-phone text-white text-2xl"></i>
+                            </div>
+                            <div class="flex-1">
+                                <h3 class="text-sm font-semibold text-slate-500 uppercase tracking-wide mb-1">Phone</h3>
+                                <a href="tel:+91XXXXXXXXXX" class="text-lg font-medium text-slate-900 hover:text-blue-600 transition-colors">
+                                    +91 XXXXXXXXXX
+                                </a>
+                            </div>
+                            <a href="tel:+91XXXXXXXXXX" class="w-10 h-10 bg-purple-50 hover:bg-purple-100 rounded-lg flex items-center justify-center text-purple-600 transition-colors">
+                                <i class="fas fa-phone"></i>
+                            </a aria-label="Phone">
+                        </div>
+
+                        <!-- Location Card -->
+                        <div class="contact-card bg-white rounded-2xl p-6 shadow-lg border border-slate-100 flex items-center gap-5">
+                            <div class="w-14 h-14 bg-gradient-to-br from-green-600 to-teal-500 rounded-xl flex items-center justify-center flex-shrink-0">
+                                <i class="fas fa-map-marker-alt text-white text-2xl"></i>
+                            </div>
+                            <div class="flex-1">
+                                <h3 class="text-sm font-semibold text-slate-500 uppercase tracking-wide mb-1">Location</h3>
+                                <p class="text-lg font-medium text-slate-900">
+                                    Pune, Maharashtra, India
+                                </p>
+                            </div>
+                            <a href="https://maps.google.com/?q=Pune,Maharashtra,India" target="_blank" class="w-10 h-10 bg-green-50 hover:bg-green-100 rounded-lg flex items-center justify-center text-green-600 transition-colors">
+                                <i class="fas fa-map"></i>
+                            </a aria-label="Location on Google Maps — Pune, India">
+                        </div>
+
+                        <!-- Institution Card -->
+                        <div class="contact-card bg-white rounded-2xl p-6 shadow-lg border border-slate-100 flex items-center gap-5">
+                            <div class="w-14 h-14 bg-gradient-to-br from-orange-600 to-yellow-500 rounded-xl flex items-center justify-center flex-shrink-0">
+                                <i class="fas fa-university text-white text-2xl"></i>
+                            </div>
+                            <div class="flex-1">
+                                <h3 class="text-sm font-semibold text-slate-500 uppercase tracking-wide mb-1">Institution</h3>
+                                <p class="text-lg font-medium text-slate-900">
+                                    Indian Institute of Tropical Meteorology
+                                </p>
+                            </div>
+                            <a href="https://www.tropmet.res.in/" target="_blank" class="w-10 h-10 bg-orange-50 hover:bg-orange-100 rounded-lg flex items-center justify-center text-orange-600 transition-colors">
+                                <i class="fas fa-external-link-alt"></i>
+                            </a aria-label="TROPMET, IITM official website">
+                        </div>
+                    </div>
+
+                    <!-- Social Media Links -->
+                    <div class="mt-10">
+                        <h3 class="text-lg font-bold text-slate-900 mb-4">Connect on Social Media</h3>
+                        <div class="flex flex-wrap gap-4">
+                            <a href="https://scholar.google.com/citations?user=ORZunJoAAAAJ&hl=en" target="_blank" class="social-link w-12 h-12 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-xl flex items-center justify-center text-white shadow-lg hover:shadow-xl transition-all">
+                                <i class="fas fa-graduation-cap text-xl"></i>
+                            </a aria-label="Google Scholar">
+                            <a href="https://www.researchgate.net/profile/Subhrajit-Rath" target="_blank" class="social-link w-12 h-12 bg-gradient-to-br from-red-500 to-pink-500 rounded-xl flex items-center justify-center text-white shadow-lg hover:shadow-xl transition-all">
+                                <i class="fab fa-researchgate text-xl"></i>
+                            </a aria-label="ResearchGate">
+                            <a href="https://github.com/subhrajitjubu" target="_blank" class="social-link w-12 h-12 bg-gradient-to-br from-slate-700 to-slate-900 rounded-xl flex items-center justify-center text-white shadow-lg hover:shadow-xl transition-all">
+                                <i class="fab fa-github text-xl"></i>
+                            </a aria-label="GitHub">
+                            <a href="https://linkedin.com/in/subhrajit-rath" target="_blank" class="social-link w-12 h-12 bg-gradient-to-br from-blue-600 to-blue-800 rounded-xl flex items-center justify-center text-white shadow-lg hover:shadow-xl transition-all">
+                                <i class="fab fa-linkedin-in text-xl"></i>
+                            </a aria-label="LinkedIn">
+                            <a href="https://twitter.com/" target="_blank" class="social-link w-12 h-12 bg-gradient-to-br from-sky-400 to-sky-600 rounded-xl flex items-center justify-center text-white shadow-lg hover:shadow-xl transition-all">
+                                <i class="fab fa-twitter text-xl"></i>
+                            </a aria-label="Twitter">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Contact Form -->
+                <div class="reveal">
+                    <div class="bg-white rounded-3xl p-8 md:p-10 shadow-2xl border border-slate-100">
+                        <h2 class="text-2xl font-bold text-slate-900 mb-2">Send a Message</h2>
+                        <p class="text-slate-600 mb-8">Fill out the form below and I'll get back to you as soon as possible.</p>
+
+                        <form class="space-y-6" onsubmit="event.preventDefault(); alert('Thank you for your message! This is a demo form.');">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div>
+                                    <label for="name" class="block text-sm font-semibold text-slate-700 mb-2">Full Name</label>
+                                    <input type="text" id="name" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all" placeholder="John Doe" required>
+                                </div>
+                                <div>
+                                    <label for="email" class="block text-sm font-semibold text-slate-700 mb-2">Email Address</label>
+                                    <input type="email" id="email" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all" placeholder="john@example.com" required>
+                                </div>
+                            </div>
+
+                            <div>
+                                <label for="subject" class="block text-sm font-semibold text-slate-700 mb-2">Subject</label>
+                                <input type="text" id="subject" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all" placeholder="Research Collaboration" required>
+                            </div>
+
+                            <div>
+                                <label for="message" class="block text-sm font-semibold text-slate-700 mb-2">Message</label>
+                                <textarea id="message" rows="5" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all resize-none" placeholder="Your message here..." required></textarea>
+                            </div>
+
+                            <button type="submit" class="w-full py-4 bg-gradient-to-r from-blue-600 to-cyan-500 hover:from-blue-700 hover:to-cyan-600 text-white font-semibold rounded-xl transition-all transform hover:scale-[1.02] shadow-lg shadow-blue-500/30 hover:shadow-blue-500/50 flex items-center justify-center gap-2">
+                                <i class="fas fa-paper-plane"></i>
+                                <span>Send Message</span>
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Availability Status -->
+            <div class="mt-16 bg-white rounded-3xl p-8 shadow-xl border border-slate-100 reveal">
+                <div class="flex flex-col md:flex-row items-center justify-between gap-6">
+                    <div class="flex items-center gap-4">
+                        <div class="relative">
+                            <div class="w-16 h-16 bg-gradient-to-br from-green-500 to-emerald-600 rounded-full flex items-center justify-center">
+                                <i class="fas fa-user text-white text-2xl"></i>
+                            </div>
+                            <div class="absolute bottom-0 right-0 w-5 h-5 bg-green-500 border-4 border-white rounded-full"></div>
+                        </div>
+                        <div>
+                            <h3 class="text-xl font-bold text-slate-900">Currently Available</h3>
+                            <p class="text-slate-600">Open to research collaborations and speaking opportunities</p>
+                        </div>
+                    </div>
+                    <div class="flex flex-wrap gap-3">
+                        <span class="px-4 py-2 bg-green-100 text-green-700 rounded-full text-sm font-semibold">
+                            <i class="fas fa-check-circle mr-2"></i>Research Collaboration
+                        </span>
+                       
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Map Section (Optional) -->
+    <section class="py-20 bg-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-12 reveal">
+                <h2 class="text-3xl font-bold text-slate-900 mb-4">Location</h2>
+                <p class="text-lg text-slate-600">Based in Pune, Maharashtra, India</p>
+            </div>
+            <div class="rounded-3xl overflow-hidden shadow-2xl border border-slate-200 reveal">
+                <iframe
+                    src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d242895.8768366878!2d73.7390267421875!3d18.5236295!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3bc2bf2e67461101%3A0x828d43bf9d9ee343!2sPune%2C%20Maharashtra!5e0!3m2!1sen!2sin!4v1234567890"
+                    width="100%"
+                    height="450"
+                    style="border:0;"
+                    allowfullscreen=""
+                    loading="lazy"
+                    referrerpolicy="no-referrer-when-downgrade">
+                </iframe>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-slate-900 py-12 border-t border-slate-800">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-12 mb-12">
+                <!-- Brand -->
+                <div>
+                    <span class="text-2xl font-bold gradient-text tracking-tighter">S.<span class="text-white">Rath</span></span>
+                    <p class="text-slate-400 mt-4 text-sm leading-relaxed">
+                        Atmospheric Science Researcher specializing in radiation modeling, HITRAN data curation, and numerical weather prediction.
+                    </p>
+                </div>
+
+                <!-- Quick Links -->
+                <div>
+                    <h4 class="text-white font-semibold mb-4">Quick Links</h4>
+                    <ul class="space-y-3">
+                        <li><a href="index.html" class="text-slate-400 hover:text-blue-400 transition-colors text-sm">Home</a></li>
+                        <li><a href="education.html" class="text-slate-400 hover:text-blue-400 transition-colors text-sm">Education</a></li>
+                        <li><a href="experience.html" class="text-slate-400 hover:text-blue-400 transition-colors text-sm">Experience</a></li>
+                        <li><a href="publications.html" class="text-slate-400 hover:text-blue-400 transition-colors text-sm">Publications</a></li>
+                        <li><a href="contact.html" class="text-slate-400 hover:text-blue-400 transition-colors text-sm">Contact</a></li>
+                    </ul>
+                </div>
+
+                <!-- Social Links -->
+                <div>
+                    <h4 class="text-white font-semibold mb-4">Connect</h4>
+                    <div class="flex space-x-4">
+                        <a href="https://scholar.google.com/citations?user=ORZunJoAAAAJ&hl=en" target="_blank" class="w-10 h-10 bg-slate-800 hover:bg-blue-600 rounded-full flex items-center justify-center text-slate-400 hover:text-white transition-all">
+                            <i class="fas fa-graduation-cap"></i>
+                        </a aria-label="Google Scholar">
+                        <a href="https://www.researchgate.net/profile/Subhrajit-Rath" target="_blank" class="w-10 h-10 bg-slate-800 hover:bg-blue-600 rounded-full flex items-center justify-center text-slate-400 hover:text-white transition-all">
+                            <i class="fab fa-researchgate"></i>
+                        </a aria-label="ResearchGate">
+                        <a href="https://github.com/subhrajitjubu" target="_blank" class="w-10 h-10 bg-slate-800 hover:bg-blue-600 rounded-full flex items-center justify-center text-slate-400 hover:text-white transition-all">
+                            <i class="fab fa-github"></i>
+                        </a aria-label="GitHub">
+                        <a href="https://linkedin.com/in/subhrajit-rath" target="_blank" class="w-10 h-10 bg-slate-800 hover:bg-blue-600 rounded-full flex items-center justify-center text-slate-400 hover:text-white transition-all">
+                            <i class="fab fa-linkedin-in"></i>
+                        </a aria-label="LinkedIn">
+                    </div>
+                </div>
+            </div>
+
+            <div class="border-t border-slate-800 pt-8 text-center">
+                <p class="text-slate-500 text-sm">
+                    &copy; <script>document.write(new Date().getFullYear());</script> Subhrajit Rath. All rights reserved.
+                </p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Scroll Reveal Animation
+        function reveal() {
+            var reveals = document.querySelectorAll(".reveal");
+            for (var i = 0; i < reveals.length; i++) {
+                var windowHeight = window.innerHeight;
+                var elementTop = reveals[i].getBoundingClientRect().top;
+                var elementVisible = 100;
+                if (elementTop < windowHeight - elementVisible) {
+                    reveals[i].classList.add("active");
+                }
+            }
+        }
+        window.addEventListener("scroll", reveal);
+        reveal();
+
+        // Navbar blur effect on scroll
+        const navbar = document.getElementById('navbar');
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 20) {
+                navbar.classList.add('shadow-md');
+            } else {
+                navbar.classList.remove('shadow-md');
+            }
+        });
+    </script>
+<script src="devtools-guard.js"></script></body>
+</html>
+

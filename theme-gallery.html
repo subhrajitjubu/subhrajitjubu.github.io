@@ -1,0 +1,1134 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="Blueprint">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex,nofollow">
+<title>Theme Lab — 24 new directions</title>
+<meta name="description" content="Visual test sheet for 24 new accessible themes: colour, typography and components in context.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700&family=Bricolage+Grotesque:wght@400;500;600;700&family=Cormorant+Garamond:wght@400;500;600;700&family=DM+Sans:wght@400;500;600;700&family=Epilogue:wght@400;500;600;700&family=Fraunces:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&family=Karla:wght@400;500;600;700&family=Manrope:wght@400;500;600;700&family=Mulish:wght@400;500;600;700&family=Newsreader:wght@400;500;600;700&family=Outfit:wght@400;500;600;700&family=Playfair+Display:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Public+Sans:wght@400;500;600;700&family=Sora:wght@400;500;600;700&family=Source+Serif+4:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&family=Space+Mono:wght@400;500;600;700&family=Work+Sans:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="themes.css">
+<style>
+  :root {
+    --shell-bg:#0a0c11;
+    --shell-panel:#10141c;
+    --shell-line:#242a36;
+    --shell-text:#f2f0ea;
+    --shell-muted:#9aa3b2;
+    --shell-accent:#d7f36b;
+    --shell-serif:'Fraunces',Georgia,serif;
+    --shell-sans:'Inter',system-ui,sans-serif;
+    --shell-mono:'IBM Plex Mono',ui-monospace,monospace;
+    --wrap:min(1240px, calc(100vw - 40px));
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0;background:var(--shell-bg);color:var(--shell-text);font-family:var(--shell-sans);-webkit-font-smoothing:antialiased;}
+  body::before{content:"";position:fixed;inset:0;pointer-events:none;z-index:0;
+    background:linear-gradient(rgba(255,255,255,.035) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.035) 1px,transparent 1px);
+    background-size:64px 64px;mask-image:radial-gradient(80% 60% at 50% 0%,#000 20%,transparent 100%);}
+  a{color:inherit}
+  .wrap{width:var(--wrap);margin:0 auto;position:relative;z-index:1}
+  .lab-head{padding:30px 0 56px;border-bottom:1px solid var(--shell-line)}
+  .back{display:inline-flex;align-items:center;gap:8px;font-size:13px;color:var(--shell-muted);text-decoration:none;padding:8px 0;min-height:44px}
+  .back:hover{color:var(--shell-text)}
+  .eyebrow{font:600 11px/1.4 var(--shell-mono);letter-spacing:.16em;color:var(--shell-accent);margin:22px 0 18px}
+  .lab-head h1{font-family:var(--shell-serif);font-weight:600;font-size:clamp(2.4rem,6vw,4.6rem);line-height:.98;letter-spacing:-.035em;margin:0 0 20px;max-width:16ch}
+  .lab-head h1 em{font-style:italic;color:var(--shell-accent)}
+  .lede{max-width:62ch;color:var(--shell-muted);font-size:clamp(1rem,1.4vw,1.12rem);line-height:1.65;margin:0 0 28px}
+  .facts{display:flex;flex-wrap:wrap;gap:10px}
+  .fact{font:600 11px/1 var(--shell-mono);letter-spacing:.08em;text-transform:uppercase;padding:10px 12px;border:1px solid var(--shell-line);border-radius:999px;color:var(--shell-muted)}
+  .fact strong{color:var(--shell-text)}
+
+  .section{padding:64px 0 0}
+  .section-head{display:flex;align-items:end;justify-content:space-between;gap:24px;flex-wrap:wrap;margin-bottom:26px}
+  .section-head h2{font-family:var(--shell-serif);font-weight:600;font-size:clamp(1.6rem,3vw,2.3rem);letter-spacing:-.02em;margin:0}
+  .section-head p{margin:8px 0 0;color:var(--shell-muted);font-size:14px;max-width:60ch;line-height:1.6}
+  .section-num{font:600 11px/1 var(--shell-mono);letter-spacing:.14em;color:var(--shell-accent);white-space:nowrap}
+
+  /* full-page studies */
+  .studies{display:grid;grid-template-columns:1fr;gap:26px}
+  .study{border:1px solid var(--shell-line);border-radius:22px;overflow:hidden;background:var(--ds-page-bg,var(--ds-bg));color:var(--ds-text);font-family:var(--ds-body-font)}
+  .study-nav{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:16px 22px;border-bottom:1px solid var(--ds-border);font-size:12px;letter-spacing:.02em}
+  .study-brand{font-family:var(--ds-heading-font);font-weight:var(--ds-heading-weight);font-size:15px;letter-spacing:var(--ds-heading-spacing)}
+  .study-nav nav{display:flex;gap:18px;color:var(--ds-muted)}
+  .study-nav nav span{font-size:11px;text-transform:uppercase;letter-spacing:.1em}
+  .study-hero{display:grid;grid-template-columns:1.25fr .75fr;gap:28px;padding:34px 28px 28px;align-items:end}
+  .study-kicker{font:600 10px/1 var(--ds-mono);letter-spacing:.16em;color:var(--ds-accent-text,var(--ds-accent));text-transform:uppercase}
+  .study-hero h3{font-family:var(--ds-heading-font);font-weight:var(--ds-heading-weight);letter-spacing:var(--ds-heading-spacing);font-size:clamp(1.7rem,3vw,2.5rem);line-height:1.05;margin:12px 0 10px;max-width:14ch}
+  .study-hero p{margin:0;color:var(--ds-muted);font-size:13px;line-height:1.6;max-width:44ch}
+  .study-side{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .study-tile{background:var(--ds-surface);border:1px solid var(--ds-border);border-radius:12px;padding:14px}
+  .study-tile span{display:block;font:600 9px/1 var(--ds-mono);letter-spacing:.12em;color:var(--ds-muted);text-transform:uppercase;margin-bottom:8px}
+  .study-tile strong{font-family:var(--ds-heading-font);font-weight:var(--ds-heading-weight);font-size:22px;letter-spacing:var(--ds-heading-spacing)}
+  .study-body{display:grid;grid-template-columns:1.4fr .6fr;gap:18px;padding:0 28px 30px}
+  .study-chart{background:var(--ds-surface);border:1px solid var(--ds-border);border-radius:14px;padding:16px;display:flex;flex-direction:column;gap:12px}
+  .study-chart-head{display:flex;justify-content:space-between;align-items:center;font:600 9px/1 var(--ds-mono);letter-spacing:.12em;text-transform:uppercase;color:var(--ds-muted)}
+  .study-bars{display:flex;align-items:flex-end;gap:6px;height:98px}
+  .study-bars span{flex:1;border-radius:4px 4px 0 0;background:var(--ds-accent)}
+  .study-bars span:nth-child(3n){background:var(--ds-cyan);opacity:.6}
+  .study-list{background:var(--ds-surface);border:1px solid var(--ds-border);border-radius:14px;padding:14px 16px;display:flex;flex-direction:column;gap:0}
+  .study-row{display:flex;justify-content:space-between;gap:10px;padding:9px 0;border-bottom:1px solid var(--ds-border);font-size:11px}
+  .study-row:last-child{border-bottom:0}
+  .study-row span{color:var(--ds-muted)}
+  .study-row strong{font-family:var(--ds-mono);font-weight:500;font-size:10.5px}
+  .study-foot{display:flex;justify-content:space-between;align-items:center;gap:8px 14px;flex-wrap:wrap;padding:12px 22px;border-top:1px solid var(--ds-border);color:var(--ds-muted);font:500 10px/1.3 var(--ds-mono);letter-spacing:.08em;text-transform:uppercase}
+  .study-badge{display:inline-flex;align-items:center;gap:6px;color:var(--ds-accent-text,var(--ds-accent))}
+  .study-badge i{width:6px;height:6px;border-radius:50%;background:currentColor}
+  .study-btn{display:inline-flex;align-items:center;justify-content:center;min-height:38px;padding:0 16px;border-radius:8px;background:var(--ds-grad);color:var(--ds-on-accent);font:600 12px/1 var(--ds-body-font);letter-spacing:.01em;margin-top:16px}
+
+  /* gallery */
+  .grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:20px;grid-auto-flow:dense}
+  .tcard{display:flex;flex-direction:column;background:var(--shell-panel);border:1px solid var(--shell-line);border-radius:18px;overflow:hidden;min-width:0}
+  .tcard.featured{grid-column:span 2}
+  .tpreview{background:var(--ds-page-bg,var(--ds-bg));color:var(--ds-text);font-family:var(--ds-body-font);padding:12px;flex:1;display:flex;flex-direction:column;gap:10px;min-height:250px}
+  .tchrome{display:flex;align-items:center;gap:8px;padding:2px 2px 8px;border-bottom:1px solid var(--ds-border);font:500 9px/1 var(--ds-mono);letter-spacing:.08em;color:var(--ds-muted);text-transform:uppercase}
+  .tdot{width:8px;height:8px;border-radius:50%;flex:0 0 8px}
+  .turl{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex:1}
+  .tbadge{font-size:8px;padding:4px 6px;border:1px solid var(--ds-border);border-radius:999px;color:var(--ds-muted)}
+  .tspecimen{display:flex;flex-direction:column;gap:12px;flex:1}
+  .ttype{display:grid;grid-template-columns:64px 1fr;gap:12px;align-items:center;min-width:0}
+  .taa{font-family:var(--ds-heading-font);font-weight:var(--ds-heading-weight);letter-spacing:var(--ds-heading-spacing);font-size:54px;line-height:.9;color:var(--ds-heading)}
+  .tsample{display:flex;flex-direction:column;gap:3px;min-width:0}
+  .tsample-kicker{font:600 7.5px/1.2 var(--ds-mono);letter-spacing:.12em;color:var(--ds-accent-text,var(--ds-accent));text-transform:uppercase}
+  .tsample-head{font-family:var(--ds-heading-font);font-weight:var(--ds-heading-weight);letter-spacing:var(--ds-heading-spacing);font-size:19px;line-height:1.1}
+  .tsample-body{font-size:10.5px;line-height:1.45;color:var(--ds-muted);max-width:34ch}
+  .tswatches{display:flex;gap:5px}
+  .swatch{width:26px;height:16px;border-radius:4px;border:1px solid var(--ds-border)}
+  .tcontrols{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+  .tbtn{display:inline-flex;align-items:center;justify-content:center;min-height:28px;padding:0 11px;border-radius:6px;font:600 9.5px/1 var(--ds-body-font);letter-spacing:.01em}
+  .tbtn-primary{background:var(--ds-grad);color:var(--ds-on-accent)}
+  .tbtn-ghost{border:1px solid var(--ds-border);color:var(--ds-text)}
+  .tchip{margin-left:auto;font:600 8px/1 var(--ds-mono);letter-spacing:.1em;padding:5px 7px;border-radius:999px;background:var(--ds-accent-soft);color:var(--ds-text)}
+  .tchart{display:flex;align-items:flex-end;gap:4px;height:42px;padding-top:2px;border-top:1px solid var(--ds-border)}
+  .tchart span{flex:1;border-radius:2px 2px 0 0;min-height:3px}
+  .tmeta{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:13px 15px 8px;background:var(--shell-panel)}
+  .tmeta h3{font-family:var(--shell-sans);font-size:13.5px;font-weight:600;letter-spacing:-.01em;margin:0;color:var(--shell-text)}
+  .tgroup{font:500 9px/1.4 var(--shell-mono);letter-spacing:.08em;text-transform:uppercase;color:var(--shell-muted);margin:3px 0 0}
+  .tswatch-mini{width:24px;height:24px;border-radius:50%;flex:0 0 24px;border:1px solid var(--shell-line)}
+  .tfonts{padding:0 15px 13px;background:var(--shell-panel);font:500 9px/1.5 var(--shell-mono);letter-spacing:.02em;color:var(--shell-muted)}
+  .tfonts span{opacity:.45;padding:0 3px}
+
+  .closing{margin:72px 0 0;padding:34px 0 60px;border-top:1px solid var(--shell-line);display:flex;justify-content:space-between;gap:24px;flex-wrap:wrap;align-items:end}
+  .closing h2{font-family:var(--shell-serif);font-weight:600;font-size:clamp(1.5rem,2.5vw,2rem);margin:0;letter-spacing:-.02em}
+  .closing p{margin:8px 0 0;color:var(--shell-muted);font-size:13px;max-width:56ch;line-height:1.6}
+  .closing code{font-family:var(--shell-mono);font-size:11px;color:var(--shell-accent);border:1px solid var(--shell-line);padding:3px 6px;border-radius:5px}
+
+  @media (max-width:1080px){.grid{grid-template-columns:repeat(2,minmax(0,1fr))}.tcard.featured{grid-column:span 2}.study-hero{grid-template-columns:1fr}.study-side{grid-template-columns:repeat(4,1fr)}.study-body{grid-template-columns:1fr}}
+  @media (max-width:760px){.grid{grid-template-columns:1fr}.tcard.featured{grid-column:auto}.study-side{grid-template-columns:1fr 1fr}.study-nav nav{display:none}.study-hero{padding:26px 18px 22px}.study-body{padding:0 18px 22px}.lab-head{padding-bottom:38px}.section{padding-top:46px}}
+  @media (max-width:480px){.study-side{grid-template-columns:1fr}.tcontrols .tchip{margin-left:0}.facts{gap:7px}.fact{font-size:10px}}
+  @media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}.tcard,.study{transition:none}}
+</style>
+</head>
+<body>
+<header class="lab-head">
+  <div class="wrap">
+    <a class="back" href="index.html">← Back to site</a>
+    <p class="eyebrow">Theme Lab · 24 new directions</p>
+    <h1>Twenty-four ways to <em>read the sky.</em></h1>
+    <p class="lede">A test sheet for the new theme set: atmospheric dark palettes, editorial serif pairings, technical grids and quiet nature tones. Every theme carries its own colour tokens, type pairing, scale and component contrast — all checked at AA for body text.</p>
+    <div class="facts">
+      <span class="fact"><strong>24</strong> themes</span>
+      <span class="fact"><strong>AA</strong> contrast checked</span>
+      <span class="fact"><strong>24</strong> font pairings</span>
+      <span class="fact"><strong>0</strong> choosers</span>
+    </div>
+  </div>
+</header>
+
+<main>
+  <section class="section" aria-labelledby="studies-title">
+    <div class="wrap">
+      <div class="section-head">
+        <div>
+          <h2 id="studies-title">Full-page studies</h2>
+          <p>Three themes applied to the same dashboard composition. The layout stays fixed; only colour, type and surface treatment change.</p>
+        </div>
+        <span class="section-num">01 / IN CONTEXT</span>
+      </div>
+      <div class="studies">
+        <article class="study" data-theme="Aurora Drift" aria-label="Aurora Drift study">
+          <div class="study-nav"><span class="study-brand">Atmos / Lab</span><nav aria-hidden="true"><span>Forecast</span><span>Layers</span><span>Archive</span></nav><span style="color:var(--ds-accent-text,var(--ds-accent))">● Live</span></div>
+          <div class="study-hero">
+            <div>
+              <span class="study-kicker">Bay of Bengal · 00Z run</span>
+              <h3>Weather that reads like a chart.</h3>
+              <p>Aurora Drift pairs a deep navy canvas with cyan and violet light, so forecast layers glow without washing out the data.</p>
+              <span class="study-btn">Open forecast</span>
+            </div>
+            <div class="study-side">
+              <div class="study-tile"><span>Rainfall</span><strong>42 mm</strong></div>
+              <div class="study-tile"><span>MSLP</span><strong>1004</strong></div>
+              <div class="study-tile"><span>Wind</span><strong>14 kt</strong></div>
+              <div class="study-tile"><span>SST</span><strong>28.4°</strong></div>
+            </div>
+          </div>
+          <div class="study-body">
+            <div class="study-chart"><div class="study-chart-head"><span>24-hour precipitation</span><span>mm / 3h</span></div><div class="study-bars"><span style="height:26%"></span><span style="height:48%"></span><span style="height:34%"></span><span style="height:62%"></span><span style="height:44%"></span><span style="height:78%"></span><span style="height:56%"></span><span style="height:88%"></span><span style="height:64%"></span><span style="height:82%"></span><span style="height:52%"></span><span style="height:70%"></span></div></div>
+            <div class="study-list"><div class="study-row"><span>Kolkata</span><strong>31° / 78%</strong></div><div class="study-row"><span>Bhubaneswar</span><strong>29° / 84%</strong></div><div class="study-row"><span>Guwahati</span><strong>27° / 91%</strong></div><div class="study-row"><span>Chennai</span><strong>33° / 70%</strong></div></div>
+          </div>
+          <div class="study-foot"><span class="study-badge"><i></i>Model · ECMWF IFS 0.1°</span><span>Valid 08 Nov 2026 · 00Z</span></div>
+        </article>
+
+        <article class="study" data-theme="Monochrome Press" aria-label="Monochrome Press study">
+          <div class="study-nav"><span class="study-brand">Atmos / Lab</span><nav aria-hidden="true"><span>Forecast</span><span>Layers</span><span>Archive</span></nav><span style="color:var(--ds-accent-text,var(--ds-accent))">● Live</span></div>
+          <div class="study-hero">
+            <div>
+              <span class="study-kicker">Bay of Bengal · 00Z run</span>
+              <h3>Weather that reads like a chart.</h3>
+              <p>Monochrome Press uses a serif reading face with a mono data layer — quiet, editorial, and built for long forecast discussions.</p>
+              <span class="study-btn">Open forecast</span>
+            </div>
+            <div class="study-side">
+              <div class="study-tile"><span>Rainfall</span><strong>42 mm</strong></div>
+              <div class="study-tile"><span>MSLP</span><strong>1004</strong></div>
+              <div class="study-tile"><span>Wind</span><strong>14 kt</strong></div>
+              <div class="study-tile"><span>SST</span><strong>28.4°</strong></div>
+            </div>
+          </div>
+          <div class="study-body">
+            <div class="study-chart"><div class="study-chart-head"><span>24-hour precipitation</span><span>mm / 3h</span></div><div class="study-bars"><span style="height:20%"></span><span style="height:44%"></span><span style="height:30%"></span><span style="height:58%"></span><span style="height:40%"></span><span style="height:74%"></span><span style="height:52%"></span><span style="height:84%"></span><span style="height:60%"></span><span style="height:78%"></span><span style="height:48%"></span><span style="height:66%"></span></div></div>
+            <div class="study-list"><div class="study-row"><span>Kolkata</span><strong>31° / 78%</strong></div><div class="study-row"><span>Bhubaneswar</span><strong>29° / 84%</strong></div><div class="study-row"><span>Guwahati</span><strong>27° / 91%</strong></div><div class="study-row"><span>Chennai</span><strong>33° / 70%</strong></div></div>
+          </div>
+          <div class="study-foot"><span class="study-badge"><i></i>Model · ECMWF IFS 0.1°</span><span>Valid 08 Nov 2026 · 00Z</span></div>
+        </article>
+
+        <article class="study" data-theme="Obsidian Gold" aria-label="Obsidian Gold study">
+          <div class="study-nav"><span class="study-brand">Atmos / Lab</span><nav aria-hidden="true"><span>Forecast</span><span>Layers</span><span>Archive</span></nav><span style="color:var(--ds-accent-text,var(--ds-accent))">● Live</span></div>
+          <div class="study-hero">
+            <div>
+              <span class="study-kicker">Bay of Bengal · 00Z run</span>
+              <h3>Weather that reads like a chart.</h3>
+              <p>Obsidian Gold is the luxury variant: black paper, warm gold light, and a Playfair display face for headline moments.</p>
+              <span class="study-btn">Open forecast</span>
+            </div>
+            <div class="study-side">
+              <div class="study-tile"><span>Rainfall</span><strong>42 mm</strong></div>
+              <div class="study-tile"><span>MSLP</span><strong>1004</strong></div>
+              <div class="study-tile"><span>Wind</span><strong>14 kt</strong></div>
+              <div class="study-tile"><span>SST</span><strong>28.4°</strong></div>
+            </div>
+          </div>
+          <div class="study-body">
+            <div class="study-chart"><div class="study-chart-head"><span>24-hour precipitation</span><span>mm / 3h</span></div><div class="study-bars"><span style="height:22%"></span><span style="height:40%"></span><span style="height:28%"></span><span style="height:56%"></span><span style="height:38%"></span><span style="height:72%"></span><span style="height:50%"></span><span style="height:86%"></span><span style="height:58%"></span><span style="height:76%"></span><span style="height:46%"></span><span style="height:64%"></span></div></div>
+            <div class="study-list"><div class="study-row"><span>Kolkata</span><strong>31° / 78%</strong></div><div class="study-row"><span>Bhubaneswar</span><strong>29° / 84%</strong></div><div class="study-row"><span>Guwahati</span><strong>27° / 91%</strong></div><div class="study-row"><span>Chennai</span><strong>33° / 70%</strong></div></div>
+          </div>
+          <div class="study-foot"><span class="study-badge"><i></i>Model · ECMWF IFS 0.1°</span><span>Valid 08 Nov 2026 · 00Z</span></div>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" aria-labelledby="grid-title">
+    <div class="wrap">
+      <div class="section-head">
+        <div>
+          <h2 id="grid-title">The set, side by side</h2>
+          <p>Each card is rendered in its own theme: page wash, surfaces, type specimen, buttons, chips and chart. No switching, no saved preference — just the visual evidence.</p>
+        </div>
+        <span class="section-num">02 / SPECIMENS</span>
+      </div>
+      <div class="grid">
+
+      <article class="tcard featured" data-theme="Aurora Drift" aria-labelledby="t-Aurora-Drift">
+        <div class="tpreview" role="img" aria-label="Visual preview of the Aurora Drift theme">
+          <div class="tchrome">
+            <span class="tdot" style="background:#22d3ee"></span>
+            <span class="turl">forecast / aurora-drift</span>
+            <span class="tbadge">DARK</span>
+          </div>
+          <div class="tspecimen">
+            <div class="ttype">
+              <span class="taa">Aa</span>
+              <div class="tsample">
+                <span class="tsample-kicker">MARINE LAYER · 09:00 IST</span>
+                <span class="tsample-head">Signal over noise.</span>
+                <span class="tsample-body">Visibility 12 km, swell 1.4 m, wind 14 kt from 240°.</span>
+              </div>
+            </div>
+            <div class="tswatches" aria-hidden="true"><span class="swatch" style="background:#070b1a" title="Background"></span><span class="swatch" style="background:#0e1530" title="Surface"></span><span class="swatch" style="background:#22d3ee" title="Accent"></span><span class="swatch" style="background:#a78bfa" title="Secondary"></span><span class="swatch" style="background:#f8fafc" title="Ink"></span></div>
+            <div class="tcontrols" aria-hidden="true">
+              <span class="tbtn tbtn-primary">Run forecast</span>
+              <span class="tbtn tbtn-ghost">Details</span>
+              <span class="tchip">LIVE</span>
+            </div>
+            <div class="tchart" aria-hidden="true">
+              <span style="height:34%;background:#22d3ee;opacity:0.45"></span><span style="height:52%;background:#22d3ee;opacity:0.5"></span><span style="height:41%;background:#a78bfa;opacity:0.55"></span><span style="height:68%;background:#22d3ee;opacity:0.6"></span><span style="height:58%;background:#22d3ee;opacity:0.65"></span><span style="height:80%;background:#a78bfa;opacity:0.7"></span><span style="height:64%;background:#22d3ee;opacity:0.75"></span><span style="height:92%;background:#22d3ee;opacity:0.8"></span><span style="height:71%;background:#a78bfa;opacity:0.8500000000000001"></span><span style="height:86%;background:#22d3ee;opacity:0.9"></span>
+            </div>
+          </div>
+        </div>
+        <header class="tmeta">
+          <div>
+            <h3 id="t-Aurora-Drift">Aurora Drift</h3>
+            <p class="tgroup">Atmospheric · Dark</p>
+          </div>
+          <span class="tswatch-mini" style="background:linear-gradient(135deg,#22d3ee,#a78bfa)"></span>
+        </header>
+        <footer class="tfonts">Space Grotesk <span>/</span> Inter <span>/</span> JetBrains Mono</footer>
+      </article>
+
+      <article class="tcard" data-theme="Solar Flare" aria-labelledby="t-Solar-Flare">
+        <div class="tpreview" role="img" aria-label="Visual preview of the Solar Flare theme">
+          <div class="tchrome">
+            <span class="tdot" style="background:#f59e0b"></span>
+            <span class="turl">forecast / solar-flare</span>
+            <span class="tbadge">DARK</span>
+          </div>
+          <div class="tspecimen">
+            <div class="ttype">
+              <span class="taa">Aa</span>
+              <div class="tsample">
+                <span class="tsample-kicker">MARINE LAYER · 09:00 IST</span>
+                <span class="tsample-head">Signal over noise.</span>
+                <span class="tsample-body">Visibility 12 km, swell 1.4 m, wind 14 kt from 240°.</span>
+              </div>
+            </div>
+            <div class="tswatches" aria-hidden="true"><span class="swatch" style="background:#140d08" title="Background"></span><span class="swatch" style="background:#241812" title="Surface"></span><span class="swatch" style="background:#f59e0b" title="Accent"></span><span class="swatch" style="background:#fb7185" title="Secondary"></span><span class="swatch" style="background:#fef3e2" title="Ink"></span></div>
+            <div class="tcontrols" aria-hidden="true">
+              <span class="tbtn tbtn-primary">Run forecast</span>
+              <span class="tbtn tbtn-ghost">Details</span>
+              <span class="tchip">LIVE</span>
+            </div>
+            <div class="tchart" aria-hidden="true">
+              <span style="height:34%;background:#f59e0b;opacity:0.45"></span><span style="height:52%;background:#f59e0b;opacity:0.5"></span><span style="height:41%;background:#fb7185;opacity:0.55"></span><span style="height:68%;background:#f59e0b;opacity:0.6"></span><span style="height:58%;background:#f59e0b;opacity:0.65"></span><span style="height:80%;background:#fb7185;opacity:0.7"></span><span style="height:64%;background:#f59e0b;opacity:0.75"></span><span style="height:92%;background:#f59e0b;opacity:0.8"></span><span style="height:71%;background:#fb7185;opacity:0.8500000000000001"></span><span style="height:86%;background:#f59e0b;opacity:0.9"></span>
+            </div>
+          </div>
+        </div>
+        <header class="tmeta">
+          <div>
+            <h3 id="t-Solar-Flare">Solar Flare</h3>
+            <p class="tgroup">Atmospheric · Dark</p>
+          </div>
+          <span class="tswatch-mini" style="background:linear-gradient(135deg,#f59e0b,#fb7185)"></span>
+        </header>
+        <footer class="tfonts">Bricolage Grotesque <span>/</span> DM Sans <span>/</span> Space Mono</footer>
+      </article>
+
+      <article class="tcard featured" data-theme="Obsidian Gold" aria-labelledby="t-Obsidian-Gold">
+        <div class="tpreview" role="img" aria-label="Visual preview of the Obsidian Gold theme">
+          <div class="tchrome">
+            <span class="tdot" style="background:#d4af37"></span>
+            <span class="turl">forecast / obsidian-gold</span>
+            <span class="tbadge">DARK</span>
+          </div>
+          <div class="tspecimen">
+            <div class="ttype">
+              <span class="taa">Aa</span>
+              <div class="tsample">
+                <span class="tsample-kicker">MARINE LAYER · 09:00 IST</span>
+                <span class="tsample-head">Signal over noise.</span>
+                <span class="tsample-body">Visibility 12 km, swell 1.4 m, wind 14 kt from 240°.</span>
+              </div>
+            </div>
+            <div class="tswatches" aria-hidden="true"><span class="swatch" style="background:#0a0a0b" title="Background"></span><span class="swatch" style="background:#16161a" title="Surface"></span><span class="swatch" style="background:#d4af37" title="Accent"></span><span class="swatch" style="background:#f5e6b8" title="Secondary"></span><span class="swatch" style="background:#f5f2ea" title="Ink"></span></div>
+            <div class="tcontrols" aria-hidden="true">
+              <span class="tbtn tbtn-primary">Run forecast</span>
+              <span class="tbtn tbtn-ghost">Details</span>
+              <span class="tchip">LIVE</span>
+            </div>
+            <div class="tchart" aria-hidden="true">
+              <span style="height:34%;background:#d4af37;opacity:0.45"></span><span style="height:52%;background:#d4af37;opacity:0.5"></span><span style="height:41%;background:#f5e6b8;opacity:0.55"></span><span style="height:68%;background:#d4af37;opacity:0.6"></span><span style="height:58%;background:#d4af37;opacity:0.65"></span><span style="height:80%;background:#f5e6b8;opacity:0.7"></span><span style="height:64%;background:#d4af37;opacity:0.75"></span><span style="height:92%;background:#d4af37;opacity:0.8"></span><span style="height:71%;background:#f5e6b8;opacity:0.8500000000000001"></span><span style="height:86%;background:#d4af37;opacity:0.9"></span>
+            </div>
+          </div>
+        </div>
+        <header class="tmeta">
+          <div>
+            <h3 id="t-Obsidian-Gold">Obsidian Gold</h3>
+            <p class="tgroup">Luxury · Dark</p>
+          </div>
+          <span class="tswatch-mini" style="background:linear-gradient(135deg,#d4af37,#f5e6b8)"></span>
+        </header>
+        <footer class="tfonts">Playfair Display <span>/</span> Inter <span>/</span> IBM Plex Mono</footer>
+      </article>
+
+      <article class="tcard featured" data-theme="Neon Tokyo" aria-labelledby="t-Neon-Tokyo">
+        <div class="tpreview" role="img" aria-label="Visual preview of the Neon Tokyo theme">
+          <div class="tchrome">
+            <span class="tdot" style="background:#ff2d95"></span>
+            <span class="turl">forecast / neon-tokyo</span>
+            <span class="tbadge">DARK</span>
+          </div>
+          <div class="tspecimen">
+            <div class="ttype">
+              <span class="taa">Aa</span>
+              <div class="tsample">
+                <span class="tsample-kicker">MARINE LAYER · 09:00 IST</span>
+                <span class="tsample-head">Signal over noise.</span>
+                <span class="tsample-body">Visibility 12 km, swell 1.4 m, wind 14 kt from 240°.</span>
+              </div>
+            </div>
+            <div class="tswatches" aria-hidden="true"><span class="swatch" style="background:#0a0612" title="Background"></span><span class="swatch" style="background:#17102a" title="Surface"></span><span class="swatch" style="background:#ff2d95" title="Accent"></span><span class="swatch" style="background:#22d3ee" title="Secondary"></span><span class="swatch" style="background:#f8fafc" title="Ink"></span></div>
+            <div class="tcontrols" aria-hidden="true">
+              <span class="tbtn tbtn-primary">Run forecast</span>
+              <span class="tbtn tbtn-ghost">Details</span>
+              <span class="tchip">LIVE</span>
+            </div>
+            <div class="tchart" aria-hidden="true">
+              <span style="height:34%;background:#ff2d95;opacity:0.45"></span><span style="height:52%;background:#ff2d95;opacity:0.5"></span><span style="height:41%;background:#22d3ee;opacity:0.55"></span><span style="height:68%;background:#ff2d95;opacity:0.6"></span><span style="height:58%;background:#ff2d95;opacity:0.65"></span><span style="height:80%;background:#22d3ee;opacity:0.7"></span><span style="height:64%;background:#ff2d95;opacity:0.75"></span><span style="height:92%;background:#ff2d95;opacity:0.8"></span><span style="height:71%;background:#22d3ee;opacity:0.8500000000000001"></span><span style="height:86%;background:#ff2d95;opacity:0.9"></span>
+            </div>
+          </div>
+        </div>
+        <header class="tmeta">
+          <div>
+            <h3 id="t-Neon-Tokyo">Neon Tokyo</h3>
+            <p class="tgroup">Atmospheric · Dark</p>
+          </div>
+          <span class="tswatch-mini" style="background:linear-gradient(135deg,#ff2d95,#22d3ee)"></span>
+        </header>
+        <footer class="tfonts">Sora <span>/</span> Manrope <span>/</span> JetBrains Mono</footer>
+      </article>
+
+      <article class="tcard" data-theme="Midnight Orchard" aria-labelledby="t-Midnight-Orchard">
+        <div class="tpreview" role="img" aria-label="Visual preview of the Midnight Orchard theme">
+          <div class="tchrome">
+            <span class="tdot" style="background:#34d399"></span>
+            <span class="turl">forecast / midnight-orchard</span>
+            <span class="tbadge">DARK</span>
+          </div>
+          <div class="tspecimen">
+            <div class="ttype">
+              <span class="taa">Aa</span>
+              <div class="tsample">
+                <span class="tsample-kicker">MARINE LAYER · 09:00 IST</span>
+                <span class="tsample-head">Signal over noise.</span>
+                <span class="tsample-body">Visibility 12 km, swell 1.4 m, wind 14 kt from 240°.</span>
+              </div>
+            </div>
+            <div class="tswatches" aria-hidden="true"><span class="swatch" style="background:#06120d" title="Background"></span><span class="swatch" style="background:#0c2018" title="Surface"></span><span class="swatch" style="background:#34d399" title="Accent"></span><span class="swatch" style="background:#a3e635" title="Secondary"></span><span class="swatch" style="background:#f0fdf4" title="Ink"></span></div>
+            <div class="tcontrols" aria-hidden="true">
+              <span class="tbtn tbtn-primary">Run forecast</span>
+              <span class="tbtn tbtn-ghost">Details</span>
+              <span class="tchip">LIVE</span>
+            </div>
+            <div class="tchart" aria-hidden="true">
+              <span style="height:34%;background:#34d399;opacity:0.45"></span><span style="height:52%;background:#34d399;opacity:0.5"></span><span style="height:41%;background:#a3e635;opacity:0.55"></span><span style="height:68%;background:#34d399;opacity:0.6"></span><span style="height:58%;background:#34d399;opacity:0.65"></span><span style="height:80%;background:#a3e635;opacity:0.7"></span><span style="height:64%;background:#34d399;opacity:0.75"></span><span style="height:92%;background:#34d399;opacity:0.8"></span><span style="height:71%;background:#a3e635;opacity:0.8500000000000001"></span><span style="height:86%;background:#34d399;opacity:0.9"></span>
+            </div>
+          </div>
+        </div>
+        <header class="tmeta">
+          <div>
+            <h3 id="t-Midnight-Orchard">Midnight Orchard</h3>
+            <p class="tgroup">Nature · Dark</p>
+          </div>
+          <span class="tswatch-mini" style="background:linear-gradient(135deg,#34d399,#a3e635)"></span>
+        </header>
+        <footer class="tfonts">Fraunces <span>/</span> Karla <span>/</span> Space Mono</footer>
+      </article>
+
+      <article class="tcard" data-theme="Cobalt Depth" aria-labelledby="t-Cobalt-Depth">
+        <div class="tpreview" role="img" aria-label="Visual preview of the Cobalt Depth theme">
+          <div class="tchrome">
+            <span class="tdot" style="background:#38bdf8"></span>
+            <span class="turl">forecast / cobalt-depth</span>
+            <span class="tbadge">DARK</span>
+          </div>
+          <div class="tspecimen">
+            <div class="ttype">
+              <span class="taa">Aa</span>
+              <div class="tsample">
+                <span class="tsample-kicker">MARINE LAYER · 09:00 IST</span>
+                <span class="tsample-head">Signal over noise.</span>
+                <span class="tsample-body">Visibility 12 km, swell 1.4 m, wind 14 kt from 240°.</span>
+              </div>
+            </div>
+            <div class="tswatches" aria-hidden="true"><span class="swatch" style="background:#071426" title="Background"></span><span class="swatch" style="background:#0e2340" title="Surface"></span><span class="swatch" style="background:#38bdf8" title="Accent"></span><span class="swatch" style="background:#818cf8" title="Secondary"></span><span class="swatch" style="background:#f0f9ff" title="Ink"></span></div>
+            <div class="tcontrols" aria-hidden="true">
+              <span class="tbtn tbtn-primary">Run forecast</span>
+              <span class="tbtn tbtn-ghost">Details</span>
+              <span class="tchip">LIVE</span>
+            </div>
+            <div class="tchart" aria-hidden="true">
+              <span style="height:34%;background:#38bdf8;opacity:0.45"></span><span style="height:52%;background:#38bdf8;opacity:0.5"></span><span style="height:41%;background:#818cf8;opacity:0.55"></span><span style="height:68%;background:#38bdf8;opacity:0.6"></span><span style="height:58%;background:#38bdf8;opacity:0.65"></span><span style="height:80%;background:#818cf8;opacity:0.7"></span><span style="height:64%;background:#38bdf8;opacity:0.75"></span><span style="height:92%;background:#38bdf8;opacity:0.8"></span><span style="height:71%;background:#818cf8;opacity:0.8500000000000001"></span><span style="height:86%;background:#38bdf8;opacity:0.9"></span>
+            </div>
+          </div>
+        </div>
+        <header class="tmeta">
+          <div>
+            <h3 id="t-Cobalt-Depth">Cobalt Depth</h3>
+            <p class="tgroup">Technical · Dark</p>
+          </div>
+          <span class="tswatch-mini" style="background:linear-gradient(135deg,#38bdf8,#818cf8)"></span>
+        </header>
+        <footer class="tfonts">Archivo <span>/</span> Public Sans <span>/</span> JetBrains Mono</footer>
+      </article>
+
+      <article class="tcard" data-theme="Ember Noir" aria-labelledby="t-Ember-Noir">
+        <div class="tpreview" role="img" aria-label="Visual preview of the Ember Noir theme">
+          <div class="tchrome">
+            <span class="tdot" style="background:#fb7185"></span>
+            <span class="turl">forecast / ember-noir</span>
+            <span class="tbadge">DARK</span>
+          </div>
+          <div class="tspecimen">
+            <div class="ttype">
+              <span class="taa">Aa</span>
+              <div class="tsample">
+                <span class="tsample-kicker">MARINE LAYER · 09:00 IST</span>
+                <span class="tsample-head">Signal over noise.</span>
+                <span class="tsample-body">Visibility 12 km, swell 1.4 m, wind 14 kt from 240°.</span>
+              </div>
+            </div>
+            <div class="tswatches" aria-hidden="true"><span class="swatch" style="background:#120c0c" title="Background"></span><span class="swatch" style="background:#221414" title="Surface"></span><span class="swatch" style="background:#fb7185" title="Accent"></span><span class="swatch" style="background:#fbbf24" title="Secondary"></span><span class="swatch" style="background:#fdf4f4" title="Ink"></span></div>
+            <div class="tcontrols" aria-hidden="true">
+              <span class="tbtn tbtn-primary">Run forecast</span>
+              <span class="tbtn tbtn-ghost">Details</span>
+              <span class="tchip">LIVE</span>
+            </div>
+            <div class="tchart" aria-hidden="true">
+              <span style="height:34%;background:#fb7185;opacity:0.45"></span><span style="height:52%;background:#fb7185;opacity:0.5"></span><span style="height:41%;background:#fbbf24;opacity:0.55"></span><span style="height:68%;background:#fb7185;opacity:0.6"></span><span style="height:58%;background:#fb7185;opacity:0.65"></span><span style="height:80%;background:#fbbf24;opacity:0.7"></span><span style="height:64%;background:#fb7185;opacity:0.75"></span><span style="height:92%;background:#fb7185;opacity:0.8"></span><span style="height:71%;background:#fbbf24;opacity:0.8500000000000001"></span><span style="height:86%;background:#fb7185;opacity:0.9"></span>
+            </div>
+          </div>
+        </div>
+        <header class="tmeta">
+          <div>
+            <h3 id="t-Ember-Noir">Ember Noir</h3>
+            <p class="tgroup">Atmospheric · Dark</p>
+          </div>
+          <span class="tswatch-mini" style="background:linear-gradient(135deg,#fb7185,#fbbf24)"></span>
+        </header>
+        <footer class="tfonts">Epilogue <span>/</span> Inter <span>/</span> Space Mono</footer>
+      </article>
+
+      <article class="tcard" data-theme="Verdant Glass" aria-labelledby="t-Verdant-Glass">
+        <div class="tpreview" role="img" aria-label="Visual preview of the Verdant Glass theme">
+          <div class="tchrome">
+            <span class="tdot" style="background:#2dd4bf"></span>
+            <span class="turl">forecast / verdant-glass</span>
+            <span class="tbadge">DARK</span>
+          </div>
+          <div class="tspecimen">
+            <div class="ttype">
+              <span class="taa">Aa</span>
+              <div class="tsample">
+                <span class="tsample-kicker">MARINE LAYER · 09:00 IST</span>
+                <span class="tsample-head">Signal over noise.</span>
+                <span class="tsample-body">Visibility 12 km, swell 1.4 m, wind 14 kt from 240°.</span>
+              </div>
+            </div>
+            <div class="tswatches" aria-hidden="true"><span class="swatch" style="background:#071612" title="Background"></span><span class="swatch" style="background:#0d241d" title="Surface"></span><span class="swatch" style="background:#2dd4bf" title="Accent"></span><span class="swatch" style="background:#a3e635" title="Secondary"></span><span class="swatch" style="background:#ecfdf5" title="Ink"></span></div>
+            <div class="tcontrols" aria-hidden="true">
+              <span class="tbtn tbtn-primary">Run forecast</span>
+              <span class="tbtn tbtn-ghost">Details</span>
+              <span class="tchip">LIVE</span>
+            </div>
+            <div class="tchart" aria-hidden="true">
+              <span style="height:34%;background:#2dd4bf;opacity:0.45"></span><span style="height:52%;background:#2dd4bf;opacity:0.5"></span><span style="height:41%;background:#a3e635;opacity:0.55"></span><span style="height:68%;background:#2dd4bf;opacity:0.6"></span><span style="height:58%;background:#2dd4bf;opacity:0.65"></span><span style="height:80%;background:#a3e635;opacity:0.7"></span><span style="height:64%;background:#2dd4bf;opacity:0.75"></span><span style="height:92%;background:#2dd4bf;opacity:0.8"></span><span style="height:71%;background:#a3e635;opacity:0.8500000000000001"></span><span style="height:86%;background:#2dd4bf;opacity:0.9"></span>
+            </div>
+          </div>
+        </div>
+        <header class="tmeta">
+          <div>
+            <h3 id="t-Verdant-Glass">Verdant Glass</h3>
+            <p class="tgroup">Nature · Dark</p>
+          </div>
+          <span class="tswatch-mini" style="background:linear-gradient(135deg,#2dd4bf,#a3e635)"></span>
+        </header>
+        <footer class="tfonts">Outfit <span>/</span> Work Sans <span>/</span> JetBrains Mono</footer>
+      </article>
+
+      <article class="tcard" data-theme="Porcelain Blue" aria-labelledby="t-Porcelain-Blue">
+        <div class="tpreview" role="img" aria-label="Visual preview of the Porcelain Blue theme">
+          <div class="tchrome">
+            <span class="tdot" style="background:#2563eb"></span>
+            <span class="turl">forecast / porcelain-blue</span>
+            <span class="tbadge">LIGHT</span>
+          </div>
+          <div class="tspecimen">
+            <div class="ttype">
+              <span class="taa">Aa</span>
+              <div class="tsample">
+                <span class="tsample-kicker">MARINE LAYER · 09:00 IST</span>
+                <span class="tsample-head">Signal over noise.</span>
+                <span class="tsample-body">Visibility 12 km, swell 1.4 m, wind 14 kt from 240°.</span>
+              </div>
+            </div>
+            <div class="tswatches" aria-hidden="true"><span class="swatch" style="background:#f7fafc" title="Background"></span><span class="swatch" style="background:#ffffff" title="Surface"></span><span class="swatch" style="background:#2563eb" title="Accent"></span><span class="swatch" style="background:#0ea5e9" title="Secondary"></span><span class="swatch" style="background:#0f172a" title="Ink"></span></div>
+            <div class="tcontrols" aria-hidden="true">
+              <span class="tbtn tbtn-primary">Run forecast</span>
+              <span class="tbtn tbtn-ghost">Details</span>
+              <span class="tchip">LIVE</span>
+            </div>
+            <div class="tchart" aria-hidden="true">
+              <span style="height:34%;background:#2563eb;opacity:0.45"></span><span style="height:52%;background:#2563eb;opacity:0.5"></span><span style="height:41%;background:#0ea5e9;opacity:0.55"></span><span style="height:68%;background:#2563eb;opacity:0.6"></span><span style="height:58%;background:#2563eb;opacity:0.65"></span><span style="height:80%;background:#0ea5e9;opacity:0.7"></span><span style="height:64%;background:#2563eb;opacity:0.75"></span><span style="height:92%;background:#2563eb;opacity:0.8"></span><span style="height:71%;background:#0ea5e9;opacity:0.8500000000000001"></span><span style="height:86%;background:#2563eb;opacity:0.9"></span>
+            </div>
+          </div>
+        </div>
+        <header class="tmeta">
+          <div>
+            <h3 id="t-Porcelain-Blue">Porcelain Blue</h3>
+            <p class="tgroup">Editorial · Light</p>
+          </div>
+          <span class="tswatch-mini" style="background:linear-gradient(135deg,#2563eb,#0ea5e9)"></span>
+        </header>
+        <footer class="tfonts">Newsreader <span>/</span> Inter <span>/</span> IBM Plex Mono</footer>
+      </article>
+
+      <article class="tcard" data-theme="Japandi Linen" aria-labelledby="t-Japandi-Linen">
+        <div class="tpreview" role="img" aria-label="Visual preview of the Japandi Linen theme">
+          <div class="tchrome">
+            <span class="tdot" style="background:#6b5b45"></span>
+            <span class="turl">forecast / japandi-linen</span>
+            <span class="tbadge">LIGHT</span>
+          </div>
+          <div class="tspecimen">
+            <div class="ttype">
+              <span class="taa">Aa</span>
+              <div class="tsample">
+                <span class="tsample-kicker">MARINE LAYER · 09:00 IST</span>
+                <span class="tsample-head">Signal over noise.</span>
+                <span class="tsample-body">Visibility 12 km, swell 1.4 m, wind 14 kt from 240°.</span>
+              </div>
+            </div>
+            <div class="tswatches" aria-hidden="true"><span class="swatch" style="background:#f4f1ea" title="Background"></span><span class="swatch" style="background:#fbf9f4" title="Surface"></span><span class="swatch" style="background:#6b5b45" title="Accent"></span><span class="swatch" style="background:#a8927a" title="Secondary"></span><span class="swatch" style="background:#2a2622" title="Ink"></span></div>
+            <div class="tcontrols" aria-hidden="true">
+              <span class="tbtn tbtn-primary">Run forecast</span>
+              <span class="tbtn tbtn-ghost">Details</span>
+              <span class="tchip">LIVE</span>
+            </div>
+            <div class="tchart" aria-hidden="true">
+              <span style="height:34%;background:#6b5b45;opacity:0.45"></span><span style="height:52%;background:#6b5b45;opacity:0.5"></span><span style="height:41%;background:#a8927a;opacity:0.55"></span><span style="height:68%;background:#6b5b45;opacity:0.6"></span><span style="height:58%;background:#6b5b45;opacity:0.65"></span><span style="height:80%;background:#a8927a;opacity:0.7"></span><span style="height:64%;background:#6b5b45;opacity:0.75"></span><span style="height:92%;background:#6b5b45;opacity:0.8"></span><span style="height:71%;background:#a8927a;opacity:0.8500000000000001"></span><span style="height:86%;background:#6b5b45;opacity:0.9"></span>
+            </div>
+          </div>
+        </div>
+        <header class="tmeta">
+          <div>
+            <h3 id="t-Japandi-Linen">Japandi Linen</h3>
+            <p class="tgroup">Luxury · Light</p>
+          </div>
+          <span class="tswatch-mini" style="background:linear-gradient(135deg,#6b5b45,#a8927a)"></span>
+        </header>
+        <footer class="tfonts">Cormorant Garamond <span>/</span> Karla <span>/</span> IBM Plex Mono</footer>
+      </article>
+
+      <article class="tcard" data-theme="Solarpunk" aria-labelledby="t-Solarpunk">
+        <div class="tpreview" role="img" aria-label="Visual preview of the Solarpunk theme">
+          <div class="tchrome">
+            <span class="tdot" style="background:#4d7c0f"></span>
+            <span class="turl">forecast / solarpunk</span>
+            <span class="tbadge">LIGHT</span>
+          </div>
+          <div class="tspecimen">
+            <div class="ttype">
+              <span class="taa">Aa</span>
+              <div class="tsample">
+                <span class="tsample-kicker">MARINE LAYER · 09:00 IST</span>
+                <span class="tsample-head">Signal over noise.</span>
+                <span class="tsample-body">Visibility 12 km, swell 1.4 m, wind 14 kt from 240°.</span>
+              </div>
+            </div>
+            <div class="tswatches" aria-hidden="true"><span class="swatch" style="background:#f3f8e8" title="Background"></span><span class="swatch" style="background:#ffffff" title="Surface"></span><span class="swatch" style="background:#4d7c0f" title="Accent"></span><span class="swatch" style="background:#ca8a04" title="Secondary"></span><span class="swatch" style="background:#1a2e05" title="Ink"></span></div>
+            <div class="tcontrols" aria-hidden="true">
+              <span class="tbtn tbtn-primary">Run forecast</span>
+              <span class="tbtn tbtn-ghost">Details</span>
+              <span class="tchip">LIVE</span>
+            </div>
+            <div class="tchart" aria-hidden="true">
+              <span style="height:34%;background:#4d7c0f;opacity:0.45"></span><span style="height:52%;background:#4d7c0f;opacity:0.5"></span><span style="height:41%;background:#ca8a04;opacity:0.55"></span><span style="height:68%;background:#4d7c0f;opacity:0.6"></span><span style="height:58%;background:#4d7c0f;opacity:0.65"></span><span style="height:80%;background:#ca8a04;opacity:0.7"></span><span style="height:64%;background:#4d7c0f;opacity:0.75"></span><span style="height:92%;background:#4d7c0f;opacity:0.8"></span><span style="height:71%;background:#ca8a04;opacity:0.8500000000000001"></span><span style="height:86%;background:#4d7c0f;opacity:0.9"></span>
+            </div>
+          </div>
+        </div>
+        <header class="tmeta">
+          <div>
+            <h3 id="t-Solarpunk">Solarpunk</h3>
+            <p class="tgroup">Nature · Light</p>
+          </div>
+          <span class="tswatch-mini" style="background:linear-gradient(135deg,#4d7c0f,#ca8a04)"></span>
+        </header>
+        <footer class="tfonts">Bricolage Grotesque <span>/</span> Mulish <span>/</span> Space Mono</footer>
+      </article>
+
+      <article class="tcard" data-theme="Terracotta Sun" aria-labelledby="t-Terracotta-Sun">
+        <div class="tpreview" role="img" aria-label="Visual preview of the Terracotta Sun theme">
+          <div class="tchrome">
+            <span class="tdot" style="background:#c2410c"></span>
+            <span class="turl">forecast / terracotta-sun</span>
+            <span class="tbadge">LIGHT</span>
+          </div>
+          <div class="tspecimen">
+            <div class="ttype">
+              <span class="taa">Aa</span>
+              <div class="tsample">
+                <span class="tsample-kicker">MARINE LAYER · 09:00 IST</span>
+                <span class="tsample-head">Signal over noise.</span>
+                <span class="tsample-body">Visibility 12 km, swell 1.4 m, wind 14 kt from 240°.</span>
+              </div>
+            </div>
+            <div class="tswatches" aria-hidden="true"><span class="swatch" style="background:#fbf1e8" title="Background"></span><span class="swatch" style="background:#fffaf5" title="Surface"></span><span class="swatch" style="background:#c2410c" title="Accent"></span><span class="swatch" style="background:#d97706" title="Secondary"></span><span class="swatch" style="background:#2b1206" title="Ink"></span></div>
+            <div class="tcontrols" aria-hidden="true">
+              <span class="tbtn tbtn-primary">Run forecast</span>
+              <span class="tbtn tbtn-ghost">Details</span>
+              <span class="tchip">LIVE</span>
+            </div>
+            <div class="tchart" aria-hidden="true">
+              <span style="height:34%;background:#c2410c;opacity:0.45"></span><span style="height:52%;background:#c2410c;opacity:0.5"></span><span style="height:41%;background:#d97706;opacity:0.55"></span><span style="height:68%;background:#c2410c;opacity:0.6"></span><span style="height:58%;background:#c2410c;opacity:0.65"></span><span style="height:80%;background:#d97706;opacity:0.7"></span><span style="height:64%;background:#c2410c;opacity:0.75"></span><span style="height:92%;background:#c2410c;opacity:0.8"></span><span style="height:71%;background:#d97706;opacity:0.8500000000000001"></span><span style="height:86%;background:#c2410c;opacity:0.9"></span>
+            </div>
+          </div>
+        </div>
+        <header class="tmeta">
+          <div>
+            <h3 id="t-Terracotta-Sun">Terracotta Sun</h3>
+            <p class="tgroup">Nature · Light</p>
+          </div>
+          <span class="tswatch-mini" style="background:linear-gradient(135deg,#c2410c,#d97706)"></span>
+        </header>
+        <footer class="tfonts">Fraunces <span>/</span> DM Sans <span>/</span> Space Mono</footer>
+      </article>
+
+      <article class="tcard" data-theme="Sakura Silk" aria-labelledby="t-Sakura-Silk">
+        <div class="tpreview" role="img" aria-label="Visual preview of the Sakura Silk theme">
+          <div class="tchrome">
+            <span class="tdot" style="background:#be185d"></span>
+            <span class="turl">forecast / sakura-silk</span>
+            <span class="tbadge">LIGHT</span>
+          </div>
+          <div class="tspecimen">
+            <div class="ttype">
+              <span class="taa">Aa</span>
+              <div class="tsample">
+                <span class="tsample-kicker">MARINE LAYER · 09:00 IST</span>
+                <span class="tsample-head">Signal over noise.</span>
+                <span class="tsample-body">Visibility 12 km, swell 1.4 m, wind 14 kt from 240°.</span>
+              </div>
+            </div>
+            <div class="tswatches" aria-hidden="true"><span class="swatch" style="background:#fdf2f6" title="Background"></span><span class="swatch" style="background:#ffffff" title="Surface"></span><span class="swatch" style="background:#be185d" title="Accent"></span><span class="swatch" style="background:#a78bfa" title="Secondary"></span><span class="swatch" style="background:#2a0a18" title="Ink"></span></div>
+            <div class="tcontrols" aria-hidden="true">
+              <span class="tbtn tbtn-primary">Run forecast</span>
+              <span class="tbtn tbtn-ghost">Details</span>
+              <span class="tchip">LIVE</span>
+            </div>
+            <div class="tchart" aria-hidden="true">
+              <span style="height:34%;background:#be185d;opacity:0.45"></span><span style="height:52%;background:#be185d;opacity:0.5"></span><span style="height:41%;background:#a78bfa;opacity:0.55"></span><span style="height:68%;background:#be185d;opacity:0.6"></span><span style="height:58%;background:#be185d;opacity:0.65"></span><span style="height:80%;background:#a78bfa;opacity:0.7"></span><span style="height:64%;background:#be185d;opacity:0.75"></span><span style="height:92%;background:#be185d;opacity:0.8"></span><span style="height:71%;background:#a78bfa;opacity:0.8500000000000001"></span><span style="height:86%;background:#be185d;opacity:0.9"></span>
+            </div>
+          </div>
+        </div>
+        <header class="tmeta">
+          <div>
+            <h3 id="t-Sakura-Silk">Sakura Silk</h3>
+            <p class="tgroup">Editorial · Light</p>
+          </div>
+          <span class="tswatch-mini" style="background:linear-gradient(135deg,#be185d,#a78bfa)"></span>
+        </header>
+        <footer class="tfonts">Playfair Display <span>/</span> Plus Jakarta Sans <span>/</span> JetBrains Mono</footer>
+      </article>
+
+      <article class="tcard" data-theme="Coastal Fog" aria-labelledby="t-Coastal-Fog">
+        <div class="tpreview" role="img" aria-label="Visual preview of the Coastal Fog theme">
+          <div class="tchrome">
+            <span class="tdot" style="background:#0f766e"></span>
+            <span class="turl">forecast / coastal-fog</span>
+            <span class="tbadge">LIGHT</span>
+          </div>
+          <div class="tspecimen">
+            <div class="ttype">
+              <span class="taa">Aa</span>
+              <div class="tsample">
+                <span class="tsample-kicker">MARINE LAYER · 09:00 IST</span>
+                <span class="tsample-head">Signal over noise.</span>
+                <span class="tsample-body">Visibility 12 km, swell 1.4 m, wind 14 kt from 240°.</span>
+              </div>
+            </div>
+            <div class="tswatches" aria-hidden="true"><span class="swatch" style="background:#eef4f4" title="Background"></span><span class="swatch" style="background:#ffffff" title="Surface"></span><span class="swatch" style="background:#0f766e" title="Accent"></span><span class="swatch" style="background:#38bdf8" title="Secondary"></span><span class="swatch" style="background:#0f172a" title="Ink"></span></div>
+            <div class="tcontrols" aria-hidden="true">
+              <span class="tbtn tbtn-primary">Run forecast</span>
+              <span class="tbtn tbtn-ghost">Details</span>
+              <span class="tchip">LIVE</span>
+            </div>
+            <div class="tchart" aria-hidden="true">
+              <span style="height:34%;background:#0f766e;opacity:0.45"></span><span style="height:52%;background:#0f766e;opacity:0.5"></span><span style="height:41%;background:#38bdf8;opacity:0.55"></span><span style="height:68%;background:#0f766e;opacity:0.6"></span><span style="height:58%;background:#0f766e;opacity:0.65"></span><span style="height:80%;background:#38bdf8;opacity:0.7"></span><span style="height:64%;background:#0f766e;opacity:0.75"></span><span style="height:92%;background:#0f766e;opacity:0.8"></span><span style="height:71%;background:#38bdf8;opacity:0.8500000000000001"></span><span style="height:86%;background:#0f766e;opacity:0.9"></span>
+            </div>
+          </div>
+        </div>
+        <header class="tmeta">
+          <div>
+            <h3 id="t-Coastal-Fog">Coastal Fog</h3>
+            <p class="tgroup">Editorial · Light</p>
+          </div>
+          <span class="tswatch-mini" style="background:linear-gradient(135deg,#0f766e,#38bdf8)"></span>
+        </header>
+        <footer class="tfonts">Newsreader <span>/</span> Public Sans <span>/</span> IBM Plex Mono</footer>
+      </article>
+
+      <article class="tcard" data-theme="Lilac Atelier" aria-labelledby="t-Lilac-Atelier">
+        <div class="tpreview" role="img" aria-label="Visual preview of the Lilac Atelier theme">
+          <div class="tchrome">
+            <span class="tdot" style="background:#6d28d9"></span>
+            <span class="turl">forecast / lilac-atelier</span>
+            <span class="tbadge">LIGHT</span>
+          </div>
+          <div class="tspecimen">
+            <div class="ttype">
+              <span class="taa">Aa</span>
+              <div class="tsample">
+                <span class="tsample-kicker">MARINE LAYER · 09:00 IST</span>
+                <span class="tsample-head">Signal over noise.</span>
+                <span class="tsample-body">Visibility 12 km, swell 1.4 m, wind 14 kt from 240°.</span>
+              </div>
+            </div>
+            <div class="tswatches" aria-hidden="true"><span class="swatch" style="background:#f6f3fb" title="Background"></span><span class="swatch" style="background:#ffffff" title="Surface"></span><span class="swatch" style="background:#6d28d9" title="Accent"></span><span class="swatch" style="background:#db2777" title="Secondary"></span><span class="swatch" style="background:#1f1233" title="Ink"></span></div>
+            <div class="tcontrols" aria-hidden="true">
+              <span class="tbtn tbtn-primary">Run forecast</span>
+              <span class="tbtn tbtn-ghost">Details</span>
+              <span class="tchip">LIVE</span>
+            </div>
+            <div class="tchart" aria-hidden="true">
+              <span style="height:34%;background:#6d28d9;opacity:0.45"></span><span style="height:52%;background:#6d28d9;opacity:0.5"></span><span style="height:41%;background:#db2777;opacity:0.55"></span><span style="height:68%;background:#6d28d9;opacity:0.6"></span><span style="height:58%;background:#6d28d9;opacity:0.65"></span><span style="height:80%;background:#db2777;opacity:0.7"></span><span style="height:64%;background:#6d28d9;opacity:0.75"></span><span style="height:92%;background:#6d28d9;opacity:0.8"></span><span style="height:71%;background:#db2777;opacity:0.8500000000000001"></span><span style="height:86%;background:#6d28d9;opacity:0.9"></span>
+            </div>
+          </div>
+        </div>
+        <header class="tmeta">
+          <div>
+            <h3 id="t-Lilac-Atelier">Lilac Atelier</h3>
+            <p class="tgroup">Editorial · Light</p>
+          </div>
+          <span class="tswatch-mini" style="background:linear-gradient(135deg,#6d28d9,#db2777)"></span>
+        </header>
+        <footer class="tfonts">Cormorant Garamond <span>/</span> Manrope <span>/</span> Space Mono</footer>
+      </article>
+
+      <article class="tcard" data-theme="Citrus Studio" aria-labelledby="t-Citrus-Studio">
+        <div class="tpreview" role="img" aria-label="Visual preview of the Citrus Studio theme">
+          <div class="tchrome">
+            <span class="tdot" style="background:#a16207"></span>
+            <span class="turl">forecast / citrus-studio</span>
+            <span class="tbadge">LIGHT</span>
+          </div>
+          <div class="tspecimen">
+            <div class="ttype">
+              <span class="taa">Aa</span>
+              <div class="tsample">
+                <span class="tsample-kicker">MARINE LAYER · 09:00 IST</span>
+                <span class="tsample-head">Signal over noise.</span>
+                <span class="tsample-body">Visibility 12 km, swell 1.4 m, wind 14 kt from 240°.</span>
+              </div>
+            </div>
+            <div class="tswatches" aria-hidden="true"><span class="swatch" style="background:#fdfbe8" title="Background"></span><span class="swatch" style="background:#ffffff" title="Surface"></span><span class="swatch" style="background:#a16207" title="Accent"></span><span class="swatch" style="background:#65a30d" title="Secondary"></span><span class="swatch" style="background:#1f1a05" title="Ink"></span></div>
+            <div class="tcontrols" aria-hidden="true">
+              <span class="tbtn tbtn-primary">Run forecast</span>
+              <span class="tbtn tbtn-ghost">Details</span>
+              <span class="tchip">LIVE</span>
+            </div>
+            <div class="tchart" aria-hidden="true">
+              <span style="height:34%;background:#a16207;opacity:0.45"></span><span style="height:52%;background:#a16207;opacity:0.5"></span><span style="height:41%;background:#65a30d;opacity:0.55"></span><span style="height:68%;background:#a16207;opacity:0.6"></span><span style="height:58%;background:#a16207;opacity:0.65"></span><span style="height:80%;background:#65a30d;opacity:0.7"></span><span style="height:64%;background:#a16207;opacity:0.75"></span><span style="height:92%;background:#a16207;opacity:0.8"></span><span style="height:71%;background:#65a30d;opacity:0.8500000000000001"></span><span style="height:86%;background:#a16207;opacity:0.9"></span>
+            </div>
+          </div>
+        </div>
+        <header class="tmeta">
+          <div>
+            <h3 id="t-Citrus-Studio">Citrus Studio</h3>
+            <p class="tgroup">Nature · Light</p>
+          </div>
+          <span class="tswatch-mini" style="background:linear-gradient(135deg,#a16207,#65a30d)"></span>
+        </header>
+        <footer class="tfonts">Bricolage Grotesque <span>/</span> Karla <span>/</span> Space Mono</footer>
+      </article>
+
+      <article class="tcard featured" data-theme="Monochrome Press" aria-labelledby="t-Monochrome-Press">
+        <div class="tpreview" role="img" aria-label="Visual preview of the Monochrome Press theme">
+          <div class="tchrome">
+            <span class="tdot" style="background:#111827"></span>
+            <span class="turl">forecast / monochrome-press</span>
+            <span class="tbadge">LIGHT</span>
+          </div>
+          <div class="tspecimen">
+            <div class="ttype">
+              <span class="taa">Aa</span>
+              <div class="tsample">
+                <span class="tsample-kicker">MARINE LAYER · 09:00 IST</span>
+                <span class="tsample-head">Signal over noise.</span>
+                <span class="tsample-body">Visibility 12 km, swell 1.4 m, wind 14 kt from 240°.</span>
+              </div>
+            </div>
+            <div class="tswatches" aria-hidden="true"><span class="swatch" style="background:#f7f7f5" title="Background"></span><span class="swatch" style="background:#ffffff" title="Surface"></span><span class="swatch" style="background:#111827" title="Accent"></span><span class="swatch" style="background:#6b7280" title="Secondary"></span><span class="swatch" style="background:#111111" title="Ink"></span></div>
+            <div class="tcontrols" aria-hidden="true">
+              <span class="tbtn tbtn-primary">Run forecast</span>
+              <span class="tbtn tbtn-ghost">Details</span>
+              <span class="tchip">LIVE</span>
+            </div>
+            <div class="tchart" aria-hidden="true">
+              <span style="height:34%;background:#111827;opacity:0.45"></span><span style="height:52%;background:#111827;opacity:0.5"></span><span style="height:41%;background:#6b7280;opacity:0.55"></span><span style="height:68%;background:#111827;opacity:0.6"></span><span style="height:58%;background:#111827;opacity:0.65"></span><span style="height:80%;background:#6b7280;opacity:0.7"></span><span style="height:64%;background:#111827;opacity:0.75"></span><span style="height:92%;background:#111827;opacity:0.8"></span><span style="height:71%;background:#6b7280;opacity:0.8500000000000001"></span><span style="height:86%;background:#111827;opacity:0.9"></span>
+            </div>
+          </div>
+        </div>
+        <header class="tmeta">
+          <div>
+            <h3 id="t-Monochrome-Press">Monochrome Press</h3>
+            <p class="tgroup">Editorial · Light</p>
+          </div>
+          <span class="tswatch-mini" style="background:linear-gradient(135deg,#111827,#6b7280)"></span>
+        </header>
+        <footer class="tfonts">Playfair Display <span>/</span> Source Serif 4 <span>/</span> JetBrains Mono</footer>
+      </article>
+
+      <article class="tcard" data-theme="Blueprint" aria-labelledby="t-Blueprint">
+        <div class="tpreview" role="img" aria-label="Visual preview of the Blueprint theme">
+          <div class="tchrome">
+            <span class="tdot" style="background:#1d4ed8"></span>
+            <span class="turl">forecast / blueprint</span>
+            <span class="tbadge">LIGHT</span>
+          </div>
+          <div class="tspecimen">
+            <div class="ttype">
+              <span class="taa">Aa</span>
+              <div class="tsample">
+                <span class="tsample-kicker">MARINE LAYER · 09:00 IST</span>
+                <span class="tsample-head">Signal over noise.</span>
+                <span class="tsample-body">Visibility 12 km, swell 1.4 m, wind 14 kt from 240°.</span>
+              </div>
+            </div>
+            <div class="tswatches" aria-hidden="true"><span class="swatch" style="background:#f1f5fb" title="Background"></span><span class="swatch" style="background:#ffffff" title="Surface"></span><span class="swatch" style="background:#1d4ed8" title="Accent"></span><span class="swatch" style="background:#0891b2" title="Secondary"></span><span class="swatch" style="background:#0f172a" title="Ink"></span></div>
+            <div class="tcontrols" aria-hidden="true">
+              <span class="tbtn tbtn-primary">Run forecast</span>
+              <span class="tbtn tbtn-ghost">Details</span>
+              <span class="tchip">LIVE</span>
+            </div>
+            <div class="tchart" aria-hidden="true">
+              <span style="height:34%;background:#1d4ed8;opacity:0.45"></span><span style="height:52%;background:#1d4ed8;opacity:0.5"></span><span style="height:41%;background:#0891b2;opacity:0.55"></span><span style="height:68%;background:#1d4ed8;opacity:0.6"></span><span style="height:58%;background:#1d4ed8;opacity:0.65"></span><span style="height:80%;background:#0891b2;opacity:0.7"></span><span style="height:64%;background:#1d4ed8;opacity:0.75"></span><span style="height:92%;background:#1d4ed8;opacity:0.8"></span><span style="height:71%;background:#0891b2;opacity:0.8500000000000001"></span><span style="height:86%;background:#1d4ed8;opacity:0.9"></span>
+            </div>
+          </div>
+        </div>
+        <header class="tmeta">
+          <div>
+            <h3 id="t-Blueprint">Blueprint</h3>
+            <p class="tgroup">Technical · Light</p>
+          </div>
+          <span class="tswatch-mini" style="background:linear-gradient(135deg,#1d4ed8,#0891b2)"></span>
+        </header>
+        <footer class="tfonts">IBM Plex Sans <span>/</span> IBM Plex Sans <span>/</span> IBM Plex Mono</footer>
+      </article>
+
+      <article class="tcard" data-theme="Desert Mirage" aria-labelledby="t-Desert-Mirage">
+        <div class="tpreview" role="img" aria-label="Visual preview of the Desert Mirage theme">
+          <div class="tchrome">
+            <span class="tdot" style="background:#9a3412"></span>
+            <span class="turl">forecast / desert-mirage</span>
+            <span class="tbadge">LIGHT</span>
+          </div>
+          <div class="tspecimen">
+            <div class="ttype">
+              <span class="taa">Aa</span>
+              <div class="tsample">
+                <span class="tsample-kicker">MARINE LAYER · 09:00 IST</span>
+                <span class="tsample-head">Signal over noise.</span>
+                <span class="tsample-body">Visibility 12 km, swell 1.4 m, wind 14 kt from 240°.</span>
+              </div>
+            </div>
+            <div class="tswatches" aria-hidden="true"><span class="swatch" style="background:#faf3e7" title="Background"></span><span class="swatch" style="background:#fffdf8" title="Surface"></span><span class="swatch" style="background:#9a3412" title="Accent"></span><span class="swatch" style="background:#0f766e" title="Secondary"></span><span class="swatch" style="background:#2a1608" title="Ink"></span></div>
+            <div class="tcontrols" aria-hidden="true">
+              <span class="tbtn tbtn-primary">Run forecast</span>
+              <span class="tbtn tbtn-ghost">Details</span>
+              <span class="tchip">LIVE</span>
+            </div>
+            <div class="tchart" aria-hidden="true">
+              <span style="height:34%;background:#9a3412;opacity:0.45"></span><span style="height:52%;background:#9a3412;opacity:0.5"></span><span style="height:41%;background:#0f766e;opacity:0.55"></span><span style="height:68%;background:#9a3412;opacity:0.6"></span><span style="height:58%;background:#9a3412;opacity:0.65"></span><span style="height:80%;background:#0f766e;opacity:0.7"></span><span style="height:64%;background:#9a3412;opacity:0.75"></span><span style="height:92%;background:#9a3412;opacity:0.8"></span><span style="height:71%;background:#0f766e;opacity:0.8500000000000001"></span><span style="height:86%;background:#9a3412;opacity:0.9"></span>
+            </div>
+          </div>
+        </div>
+        <header class="tmeta">
+          <div>
+            <h3 id="t-Desert-Mirage">Desert Mirage</h3>
+            <p class="tgroup">Nature · Light</p>
+          </div>
+          <span class="tswatch-mini" style="background:linear-gradient(135deg,#9a3412,#0f766e)"></span>
+        </header>
+        <footer class="tfonts">Fraunces <span>/</span> Work Sans <span>/</span> Space Mono</footer>
+      </article>
+
+      <article class="tcard" data-theme="Sea Glass" aria-labelledby="t-Sea-Glass">
+        <div class="tpreview" role="img" aria-label="Visual preview of the Sea Glass theme">
+          <div class="tchrome">
+            <span class="tdot" style="background:#0f766e"></span>
+            <span class="turl">forecast / sea-glass</span>
+            <span class="tbadge">LIGHT</span>
+          </div>
+          <div class="tspecimen">
+            <div class="ttype">
+              <span class="taa">Aa</span>
+              <div class="tsample">
+                <span class="tsample-kicker">MARINE LAYER · 09:00 IST</span>
+                <span class="tsample-head">Signal over noise.</span>
+                <span class="tsample-body">Visibility 12 km, swell 1.4 m, wind 14 kt from 240°.</span>
+              </div>
+            </div>
+            <div class="tswatches" aria-hidden="true"><span class="swatch" style="background:#edf7f4" title="Background"></span><span class="swatch" style="background:#ffffff" title="Surface"></span><span class="swatch" style="background:#0f766e" title="Accent"></span><span class="swatch" style="background:#06b6d4" title="Secondary"></span><span class="swatch" style="background:#0c2b28" title="Ink"></span></div>
+            <div class="tcontrols" aria-hidden="true">
+              <span class="tbtn tbtn-primary">Run forecast</span>
+              <span class="tbtn tbtn-ghost">Details</span>
+              <span class="tchip">LIVE</span>
+            </div>
+            <div class="tchart" aria-hidden="true">
+              <span style="height:34%;background:#0f766e;opacity:0.45"></span><span style="height:52%;background:#0f766e;opacity:0.5"></span><span style="height:41%;background:#06b6d4;opacity:0.55"></span><span style="height:68%;background:#0f766e;opacity:0.6"></span><span style="height:58%;background:#0f766e;opacity:0.65"></span><span style="height:80%;background:#06b6d4;opacity:0.7"></span><span style="height:64%;background:#0f766e;opacity:0.75"></span><span style="height:92%;background:#0f766e;opacity:0.8"></span><span style="height:71%;background:#06b6d4;opacity:0.8500000000000001"></span><span style="height:86%;background:#0f766e;opacity:0.9"></span>
+            </div>
+          </div>
+        </div>
+        <header class="tmeta">
+          <div>
+            <h3 id="t-Sea-Glass">Sea Glass</h3>
+            <p class="tgroup">Nature · Light</p>
+          </div>
+          <span class="tswatch-mini" style="background:linear-gradient(135deg,#0f766e,#06b6d4)"></span>
+        </header>
+        <footer class="tfonts">Outfit <span>/</span> Karla <span>/</span> JetBrains Mono</footer>
+      </article>
+
+      <article class="tcard" data-theme="Violet Circuit" aria-labelledby="t-Violet-Circuit">
+        <div class="tpreview" role="img" aria-label="Visual preview of the Violet Circuit theme">
+          <div class="tchrome">
+            <span class="tdot" style="background:#a78bfa"></span>
+            <span class="turl">forecast / violet-circuit</span>
+            <span class="tbadge">DARK</span>
+          </div>
+          <div class="tspecimen">
+            <div class="ttype">
+              <span class="taa">Aa</span>
+              <div class="tsample">
+                <span class="tsample-kicker">MARINE LAYER · 09:00 IST</span>
+                <span class="tsample-head">Signal over noise.</span>
+                <span class="tsample-body">Visibility 12 km, swell 1.4 m, wind 14 kt from 240°.</span>
+              </div>
+            </div>
+            <div class="tswatches" aria-hidden="true"><span class="swatch" style="background:#0d0818" title="Background"></span><span class="swatch" style="background:#191029" title="Surface"></span><span class="swatch" style="background:#a78bfa" title="Accent"></span><span class="swatch" style="background:#22d3ee" title="Secondary"></span><span class="swatch" style="background:#f5f3ff" title="Ink"></span></div>
+            <div class="tcontrols" aria-hidden="true">
+              <span class="tbtn tbtn-primary">Run forecast</span>
+              <span class="tbtn tbtn-ghost">Details</span>
+              <span class="tchip">LIVE</span>
+            </div>
+            <div class="tchart" aria-hidden="true">
+              <span style="height:34%;background:#a78bfa;opacity:0.45"></span><span style="height:52%;background:#a78bfa;opacity:0.5"></span><span style="height:41%;background:#22d3ee;opacity:0.55"></span><span style="height:68%;background:#a78bfa;opacity:0.6"></span><span style="height:58%;background:#a78bfa;opacity:0.65"></span><span style="height:80%;background:#22d3ee;opacity:0.7"></span><span style="height:64%;background:#a78bfa;opacity:0.75"></span><span style="height:92%;background:#a78bfa;opacity:0.8"></span><span style="height:71%;background:#22d3ee;opacity:0.8500000000000001"></span><span style="height:86%;background:#a78bfa;opacity:0.9"></span>
+            </div>
+          </div>
+        </div>
+        <header class="tmeta">
+          <div>
+            <h3 id="t-Violet-Circuit">Violet Circuit</h3>
+            <p class="tgroup">Technical · Dark</p>
+          </div>
+          <span class="tswatch-mini" style="background:linear-gradient(135deg,#a78bfa,#22d3ee)"></span>
+        </header>
+        <footer class="tfonts">Space Grotesk <span>/</span> Sora <span>/</span> Space Mono</footer>
+      </article>
+
+      <article class="tcard" data-theme="Rosewood" aria-labelledby="t-Rosewood">
+        <div class="tpreview" role="img" aria-label="Visual preview of the Rosewood theme">
+          <div class="tchrome">
+            <span class="tdot" style="background:#fda4af"></span>
+            <span class="turl">forecast / rosewood</span>
+            <span class="tbadge">DARK</span>
+          </div>
+          <div class="tspecimen">
+            <div class="ttype">
+              <span class="taa">Aa</span>
+              <div class="tsample">
+                <span class="tsample-kicker">MARINE LAYER · 09:00 IST</span>
+                <span class="tsample-head">Signal over noise.</span>
+                <span class="tsample-body">Visibility 12 km, swell 1.4 m, wind 14 kt from 240°.</span>
+              </div>
+            </div>
+            <div class="tswatches" aria-hidden="true"><span class="swatch" style="background:#160b0e" title="Background"></span><span class="swatch" style="background:#261318" title="Surface"></span><span class="swatch" style="background:#fda4af" title="Accent"></span><span class="swatch" style="background:#d4a373" title="Secondary"></span><span class="swatch" style="background:#fff1f2" title="Ink"></span></div>
+            <div class="tcontrols" aria-hidden="true">
+              <span class="tbtn tbtn-primary">Run forecast</span>
+              <span class="tbtn tbtn-ghost">Details</span>
+              <span class="tchip">LIVE</span>
+            </div>
+            <div class="tchart" aria-hidden="true">
+              <span style="height:34%;background:#fda4af;opacity:0.45"></span><span style="height:52%;background:#fda4af;opacity:0.5"></span><span style="height:41%;background:#d4a373;opacity:0.55"></span><span style="height:68%;background:#fda4af;opacity:0.6"></span><span style="height:58%;background:#fda4af;opacity:0.65"></span><span style="height:80%;background:#d4a373;opacity:0.7"></span><span style="height:64%;background:#fda4af;opacity:0.75"></span><span style="height:92%;background:#fda4af;opacity:0.8"></span><span style="height:71%;background:#d4a373;opacity:0.8500000000000001"></span><span style="height:86%;background:#fda4af;opacity:0.9"></span>
+            </div>
+          </div>
+        </div>
+        <header class="tmeta">
+          <div>
+            <h3 id="t-Rosewood">Rosewood</h3>
+            <p class="tgroup">Luxury · Dark</p>
+          </div>
+          <span class="tswatch-mini" style="background:linear-gradient(135deg,#fda4af,#d4a373)"></span>
+        </header>
+        <footer class="tfonts">Cormorant Garamond <span>/</span> Inter <span>/</span> IBM Plex Mono</footer>
+      </article>
+
+      <article class="tcard" data-theme="Arctic Signal" aria-labelledby="t-Arctic-Signal">
+        <div class="tpreview" role="img" aria-label="Visual preview of the Arctic Signal theme">
+          <div class="tchrome">
+            <span class="tdot" style="background:#0369a1"></span>
+            <span class="turl">forecast / arctic-signal</span>
+            <span class="tbadge">LIGHT</span>
+          </div>
+          <div class="tspecimen">
+            <div class="ttype">
+              <span class="taa">Aa</span>
+              <div class="tsample">
+                <span class="tsample-kicker">MARINE LAYER · 09:00 IST</span>
+                <span class="tsample-head">Signal over noise.</span>
+                <span class="tsample-body">Visibility 12 km, swell 1.4 m, wind 14 kt from 240°.</span>
+              </div>
+            </div>
+            <div class="tswatches" aria-hidden="true"><span class="swatch" style="background:#eef6ff" title="Background"></span><span class="swatch" style="background:#ffffff" title="Surface"></span><span class="swatch" style="background:#0369a1" title="Accent"></span><span class="swatch" style="background:#7c3aed" title="Secondary"></span><span class="swatch" style="background:#0b1f33" title="Ink"></span></div>
+            <div class="tcontrols" aria-hidden="true">
+              <span class="tbtn tbtn-primary">Run forecast</span>
+              <span class="tbtn tbtn-ghost">Details</span>
+              <span class="tchip">LIVE</span>
+            </div>
+            <div class="tchart" aria-hidden="true">
+              <span style="height:34%;background:#0369a1;opacity:0.45"></span><span style="height:52%;background:#0369a1;opacity:0.5"></span><span style="height:41%;background:#7c3aed;opacity:0.55"></span><span style="height:68%;background:#0369a1;opacity:0.6"></span><span style="height:58%;background:#0369a1;opacity:0.65"></span><span style="height:80%;background:#7c3aed;opacity:0.7"></span><span style="height:64%;background:#0369a1;opacity:0.75"></span><span style="height:92%;background:#0369a1;opacity:0.8"></span><span style="height:71%;background:#7c3aed;opacity:0.8500000000000001"></span><span style="height:86%;background:#0369a1;opacity:0.9"></span>
+            </div>
+          </div>
+        </div>
+        <header class="tmeta">
+          <div>
+            <h3 id="t-Arctic-Signal">Arctic Signal</h3>
+            <p class="tgroup">Technical · Light</p>
+          </div>
+          <span class="tswatch-mini" style="background:linear-gradient(135deg,#0369a1,#7c3aed)"></span>
+        </header>
+        <footer class="tfonts">Sora <span>/</span> Inter <span>/</span> JetBrains Mono</footer>
+      </article>
+
+      <article class="tcard" data-theme="Rainforest" aria-labelledby="t-Rainforest">
+        <div class="tpreview" role="img" aria-label="Visual preview of the Rainforest theme">
+          <div class="tchrome">
+            <span class="tdot" style="background:#fbbf24"></span>
+            <span class="turl">forecast / rainforest</span>
+            <span class="tbadge">DARK</span>
+          </div>
+          <div class="tspecimen">
+            <div class="ttype">
+              <span class="taa">Aa</span>
+              <div class="tsample">
+                <span class="tsample-kicker">MARINE LAYER · 09:00 IST</span>
+                <span class="tsample-head">Signal over noise.</span>
+                <span class="tsample-body">Visibility 12 km, swell 1.4 m, wind 14 kt from 240°.</span>
+              </div>
+            </div>
+            <div class="tswatches" aria-hidden="true"><span class="swatch" style="background:#07130f" title="Background"></span><span class="swatch" style="background:#0e211a" title="Surface"></span><span class="swatch" style="background:#fbbf24" title="Accent"></span><span class="swatch" style="background:#34d399" title="Secondary"></span><span class="swatch" style="background:#f0fdf4" title="Ink"></span></div>
+            <div class="tcontrols" aria-hidden="true">
+              <span class="tbtn tbtn-primary">Run forecast</span>
+              <span class="tbtn tbtn-ghost">Details</span>
+              <span class="tchip">LIVE</span>
+            </div>
+            <div class="tchart" aria-hidden="true">
+              <span style="height:34%;background:#fbbf24;opacity:0.45"></span><span style="height:52%;background:#fbbf24;opacity:0.5"></span><span style="height:41%;background:#34d399;opacity:0.55"></span><span style="height:68%;background:#fbbf24;opacity:0.6"></span><span style="height:58%;background:#fbbf24;opacity:0.65"></span><span style="height:80%;background:#34d399;opacity:0.7"></span><span style="height:64%;background:#fbbf24;opacity:0.75"></span><span style="height:92%;background:#fbbf24;opacity:0.8"></span><span style="height:71%;background:#34d399;opacity:0.8500000000000001"></span><span style="height:86%;background:#fbbf24;opacity:0.9"></span>
+            </div>
+          </div>
+        </div>
+        <header class="tmeta">
+          <div>
+            <h3 id="t-Rainforest">Rainforest</h3>
+            <p class="tgroup">Nature · Dark</p>
+          </div>
+          <span class="tswatch-mini" style="background:linear-gradient(135deg,#fbbf24,#34d399)"></span>
+        </header>
+        <footer class="tfonts">Fraunces <span>/</span> DM Sans <span>/</span> Space Mono</footer>
+      </article>
+      </div>
+      <div class="closing">
+        <div>
+          <h2>Add them to the rotation.</h2>
+          <p>The live site picks a random theme per refresh from the full pool. These 24 are already merged into <code>themes.css</code> and <code>theme-engine.js</code>, so they will appear naturally — no chooser, no stored preference.</p>
+        </div>
+        <span class="section-num">END / 124 THEMES</span>
+      </div>
+    </div>
+  </section>
+</main>
+<script src="devtools-guard.js"></script></body>
+</html>

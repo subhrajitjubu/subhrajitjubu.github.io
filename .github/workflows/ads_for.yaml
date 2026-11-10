@@ -1,0 +1,71 @@
+name: Download and preprocess ADS__previous12UTC
+
+on:
+  schedule:
+    - cron: '0 0 * * *'  # This runs every day at 10:00 UTC
+  workflow_dispatch:  # Allows manual triggering
+env:
+  CDSAPI_KEY: ${{ secrets.CDSAPI_KEY }}
+jobs:
+  run-notebook:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+
+      - name: Cache Python packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
+
+      - name: Create virtual environment
+        run: |
+          python -m venv venv
+          source venv/bin/activate
+          pip install --upgrade pip
+          pip install jupyter nbconvert
+          pip install -r requirements.txt  # Install your dependencies
+      - name: pull repo
+        run: |
+          git config --global --add safe.directory "$GITHUB_WORKSPACE"
+          git config --global user.name "subhrajitjubu"
+          git config --global user.email "66462700+subhrajitjubu@users.noreply.github.com"
+          git pull --no-rebase origin main
+          
+      - name: Run Jupyter Notebook
+        env:
+          CDSAPI_KEY: ${{ secrets.CDSAPI_KEY }}
+        run: |
+          source venv/bin/activate
+          find srcc -type f -name '*.json' ! -name 'IND.json' -exec rm {} +
+          ipython -c "%run srcc/plott_12.ipynb"
+          
+      - name: Commit and push changes
+        run: |
+          git config --global --add safe.directory "$GITHUB_WORKSPACE"
+          git config --global user.name "subhrajitjubu"
+          git config --global user.email "66462700+subhrajitjubu@users.noreply.github.com"
+          git pull --no-rebase origin main
+          # notebook writes only *_partNNofNN.json + *_manifest.json; a bare
+          # `mv *.json` also scoops up jobs_data.json from the Jobs workflow
+          for f in *_part*.json *_manifest.json; do [ -e "$f" ] && mv "$f" srcc/; done
+          git add -A srcc/
+          if [ -n "$(git status --porcelain)" ]; then
+            git commit -m "Update ECMWF JSON"
+            # keep history at one run's data (same discipline as UKMO/GFS)
+            bash purge_history.sh srcc
+            git push --force origin main
+          else
+            echo "No changes to commit."
+          fi

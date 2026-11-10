@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+        <link rel="icon" type="image/jpg" href="../subhrajit.JPEG">
+<meta name="description" content="GEoMAP - interactive geospatial heatmap of weather variables.">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GEoMAP</title>
+    <script src="ncar_colormaps.js?v=20261107a"></script>
+    <script src="heatmap.js?v=20261107c"></script>
+    <style>
+          body {
+            background: linear-gradient(135deg, #d1e8ff, #4a6a8f);
+            color: #1e293b;
+            line-height: 1.3;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            margin: 0;
+            padding: 0;
+            font-family: 'Roboto', sans-serif;
+        }
+
+        #wrapper {
+            display: flex; /* Use Flexbox for horizontal alignment */
+            justify-content: center; /* Center the content */
+            align-items: flex-start; /* Align items to the top */
+            margin-bottom: 20px; /* Space below the wrapper */
+        }
+
+        #selectors {
+            margin-top: 250px;
+            display: flex; /* Use Flexbox for stacking items vertically */
+            flex-direction: column; /* Stack selectors vertically */
+            justify-content: flex-start; /* Align items to the top */
+            width: 20%; /* Adjust width for selectors */
+            gap: 10px; /* Add 10px gap between selectors */
+            margin-right: 20px; /* Space between selectors and container */
+        }
+
+        #data-selector,
+        #time-selector {
+             /* Space below the wrapper */
+
+            padding: 10px;
+            font-size: 16px;
+        }
+
+        #container {
+            width: 70%; /* Adjust width for the container */
+            height: 800px;
+            margin-top: 50px; /* Space below the wrapper */
+
+        }
+
+        nav {
+            text-align: center;
+            padding: 1.5rem 0;
+            background-color: #2d3748;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+            z-index: 1000;
+        }
+        nav a {
+            color: #63b3ed;
+            margin: 0 1rem;
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            transition: color 0.3s ease, background-color 0.3s ease;
+        }
+        nav a:hover {
+            color: #fff;
+            background-color: rgba(99, 179, 237, 0.2);
+            border-radius: 5px;
+        }
+        footer {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            text-align: center;
+            padding: 1rem;
+            background-color: #2d3748;
+            color: #e2e8f0;
+            z-index: 1000;
+        }
+
+        .dropdown {
+            display: inline-flex;
+            position: relative;
+        }
+        .dropbtn {
+            padding: 14px 16px;
+            color: #63b3ed;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            top: 100%;
+            background-color: #f7fafc;
+            min-width: 160px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+            border-radius: 8px;
+            z-index: 1;
+        }
+        .dropdown-content a {
+            color: #1461e6;
+            padding: 10px 16px;
+            text-decoration: none;
+            display: block;
+            transition: background-color 0.3s ease;
+        }
+        .dropdown-content a:hover {
+            background-color: #c2192765;
+        }
+        .dropdown:hover .dropdown-content {
+            display: block;
+        }
+        .dropdown:hover .dropbtn {
+            color: #fff;
+        }
+    
+.sr-only { position: absolute !important; width: 1px !important; height: 1px !important; padding: 0 !important; margin: -1px !important; overflow: hidden !important; clip: rect(0,0,0,0) !important; white-space: nowrap !important; border: 0 !important; }
+
+/* === UX-MAX baseline (focus + reduced motion) === */
+:focus-visible { outline: 2px solid var(--accent, #38bdf8); outline-offset: 2px; }
+@media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; scroll-behavior: auto !important; }
+}
+
+.skip-link { position: absolute; left: -9999px; top: 0; z-index: 10000; padding: 10px 18px; background: var(--accent, #38bdf8); color: #081018; font-weight: 700; border-radius: 0 0 8px 0; text-decoration: none; }
+.skip-link:focus { left: 0; }
+</style>
+
+    <!-- design system (reference: index.html) -->
+    <link href="https://fontsource.org/inter/index.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="stylesheet" href="../design-system.css">
+</head>
+<body class="ds-app">
+    <a class="skip-link" href="#wrapper">Skip to content</a>
+    <h1 class="sr-only">GeoHeatmap — India Meteorological Fields</h1>
+
+    <nav class="ds-nav" aria-label="Primary">
+        <div class="ds-nav-inner">
+            <a class="ds-brand" href="../index.html" aria-label="Subhrajit Rath — home"><span class="gradient-text">S.</span><span>Rath</span></a>
+            <button type="button" class="ds-nav-toggle" aria-expanded="false" aria-controls="ds-mobile-menu" aria-label="Toggle navigation menu">
+                <svg class="h-6 w-6" width="24" height="24" stroke="currentColor" fill="none" viewBox="0 0 24 24" aria-hidden="true">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                </svg>
+            </button>
+            <div class="ds-nav-links"><a href="../index.html">Home</a><a href="../education.html">Education</a><a href="../experience.html">Skills</a><a href="../publications.html">Publications</a><div class="ds-dropdown"><button type="button" class="ds-dropbtn" aria-haspopup="true" aria-expanded="false">Weather forecast <i class="fas fa-chevron-down" aria-hidden="true"></i></button><div class="ds-dropdown-panel"><a href="../AQI.html" class=""><i class="fas fa-wind" aria-hidden="true"></i>AQI Heatmap</a><a href="../srcc/geomap_multiple.html" class=""><i class="fas fa-map" aria-hidden="true"></i>GeoHEATMap</a><a href="../meteogram.html" class=""><i class="fas fa-chart-area" aria-hidden="true"></i>Meteogram</a><a href="../nwp_imd.html" class=""><i class="fas fa-cloud-moon" aria-hidden="true"></i>NWP_IMD</a><a href="../sw.html" class=""><i class="fas fa-cloud-sun" aria-hidden="true"></i>Weather Card</a><a href="../src/weatherchart.html" class=""><i class="fas fa-chart-line" aria-hidden="true"></i>Weather Chart</a></div></div><div class="ds-dropdown"><button type="button" class="ds-dropbtn" aria-haspopup="true" aria-expanded="false">Satellite view <i class="fas fa-chevron-down" aria-hidden="true"></i></button><div class="ds-dropdown-panel"><a href="../gibs.html" class=""><i class="fas fa-globe" aria-hidden="true"></i>GIBS / NASA</a><a href="../mosdac_live.html" class=""><i class="fas fa-satellite" aria-hidden="true"></i>Mosdac / ISRO</a></div></div><div class="ds-dropdown"><button type="button" class="ds-dropbtn" aria-haspopup="true" aria-expanded="false">Climatic info <i class="fas fa-chevron-down" aria-hidden="true"></i></button><div class="ds-dropdown-panel"><a href="../climate/monavg/chloro.html" class=""><i class="fas fa-cloud-rain" aria-hidden="true"></i>Monthly Statistics</a></div></div><div class="ds-dropdown"><button type="button" class="ds-dropbtn" aria-haspopup="true" aria-expanded="false">Jobs <i class="fas fa-chevron-down" aria-hidden="true"></i></button><div class="ds-dropdown-panel"><a href="https://www.21centuryweather.org.au/about-us/positions-vacant/" target="_blank" rel="noopener" class=""><i class="fas fa-briefcase" aria-hidden="true"></i>21st Cent AUS MET Jobs</a><a href="https://careercenter.ametsoc.org/" target="_blank" rel="noopener" class=""><i class="fas fa-cloud" aria-hidden="true"></i>AMS Careers</a><a href="https://www.earthworks-jobs.com/" target="_blank" rel="noopener" class=""><i class="fas fa-globe" aria-hidden="true"></i>Earth-Works</a><a href="https://www.egu.eu/jobs/" target="_blank" rel="noopener" class=""><i class="fas fa-globe-europe" aria-hidden="true"></i>EGU Jobs</a><a href="https://www.tropmet.res.in/Careers" target="_blank" rel="noopener" class=""><i class="fas fa-university" aria-hidden="true"></i>IITM Career</a><a href="https://vacancies.incois.gov.in/" target="_blank" rel="noopener" class=""><i class="fas fa-water" aria-hidden="true"></i>INCOIS Career</a><a href="../Jobs.html" class=""><i class="fas fa-briefcase" aria-hidden="true"></i>MET Jobs</a><a href="https://www.niot.res.in/recruitment_details.php/" target="_blank" rel="noopener" class=""><i class="fas fa-anchor" aria-hidden="true"></i>NIOT Career</a><a href="../j1.html" class=""><i class="fas fa-book" aria-hidden="true"></i>Others</a><a href="https://ucar.wd5.myworkdayjobs.com/UCAR_Careers" target="_blank" rel="noopener" class=""><i class="fas fa-building" aria-hidden="true"></i>UCAR Careers</a></div></div></div>
+        </div>
+        <div class="ds-mobile-menu" id="ds-mobile-menu"><a href="../index.html">Home</a><a href="../education.html">Education</a><a href="../experience.html">Skills</a><a href="../publications.html">Publications</a><div class="ds-mobile-group"><button type="button" class="ds-mobile-head" aria-expanded="false">Weather forecast <i class="fas fa-chevron-down" aria-hidden="true"></i></button><div class="ds-mobile-items"><a href="../AQI.html"><i class="fas fa-wind mr-2" aria-hidden="true"></i>AQI Heatmap</a><a href="../srcc/geomap_multiple.html"><i class="fas fa-map mr-2" aria-hidden="true"></i>GeoHEATMap</a><a href="../meteogram.html"><i class="fas fa-chart-area mr-2" aria-hidden="true"></i>Meteogram</a><a href="../nwp_imd.html"><i class="fas fa-cloud-moon mr-2" aria-hidden="true"></i>NWP_IMD</a><a href="../sw.html"><i class="fas fa-cloud-sun mr-2" aria-hidden="true"></i>Weather Card</a><a href="../src/weatherchart.html"><i class="fas fa-chart-line mr-2" aria-hidden="true"></i>Weather Chart</a></div></div><div class="ds-mobile-group"><button type="button" class="ds-mobile-head" aria-expanded="false">Satellite view <i class="fas fa-chevron-down" aria-hidden="true"></i></button><div class="ds-mobile-items"><a href="../gibs.html"><i class="fas fa-globe mr-2" aria-hidden="true"></i>GIBS / NASA</a><a href="../mosdac_live.html"><i class="fas fa-satellite mr-2" aria-hidden="true"></i>Mosdac / ISRO</a></div></div><div class="ds-mobile-group"><button type="button" class="ds-mobile-head" aria-expanded="false">Climatic info <i class="fas fa-chevron-down" aria-hidden="true"></i></button><div class="ds-mobile-items"><a href="../climate/monavg/chloro.html"><i class="fas fa-cloud-rain mr-2" aria-hidden="true"></i>Monthly Statistics</a></div></div><div class="ds-mobile-group"><button type="button" class="ds-mobile-head" aria-expanded="false">Jobs <i class="fas fa-chevron-down" aria-hidden="true"></i></button><div class="ds-mobile-items"><a href="https://www.21centuryweather.org.au/about-us/positions-vacant/" target="_blank" rel="noopener"><i class="fas fa-briefcase mr-2" aria-hidden="true"></i>21st Cent AUS MET Jobs</a><a href="https://careercenter.ametsoc.org/" target="_blank" rel="noopener"><i class="fas fa-cloud mr-2" aria-hidden="true"></i>AMS Careers</a><a href="https://www.earthworks-jobs.com/" target="_blank" rel="noopener"><i class="fas fa-globe mr-2" aria-hidden="true"></i>Earth-Works</a><a href="https://www.egu.eu/jobs/" target="_blank" rel="noopener"><i class="fas fa-globe-europe mr-2" aria-hidden="true"></i>EGU Jobs</a><a href="https://www.tropmet.res.in/Careers" target="_blank" rel="noopener"><i class="fas fa-university mr-2" aria-hidden="true"></i>IITM Career</a><a href="https://vacancies.incois.gov.in/" target="_blank" rel="noopener"><i class="fas fa-water mr-2" aria-hidden="true"></i>INCOIS Career</a><a href="../Jobs.html"><i class="fas fa-briefcase mr-2" aria-hidden="true"></i>MET Jobs</a><a href="https://www.niot.res.in/recruitment_details.php/" target="_blank" rel="noopener"><i class="fas fa-anchor mr-2" aria-hidden="true"></i>NIOT Career</a><a href="../j1.html"><i class="fas fa-book mr-2" aria-hidden="true"></i>Others</a><a href="https://ucar.wd5.myworkdayjobs.com/UCAR_Careers" target="_blank" rel="noopener"><i class="fas fa-building mr-2" aria-hidden="true"></i>UCAR Careers</a></div></div></div>
+    </nav>
+    <script>
+(function () {
+    var nav = document.querySelector('.ds-nav'); if (!nav) return;
+    var t = nav.querySelector('.ds-nav-toggle'), m = nav.querySelector('.ds-mobile-menu');
+    if (t && m) t.addEventListener('click', function () {
+        m.classList.toggle('open');
+        t.setAttribute('aria-expanded', m.classList.contains('open') ? 'true' : 'false');
+    });
+    nav.querySelectorAll('.ds-dropbtn').forEach(function (b) {
+        b.addEventListener('click', function (e) {
+            e.stopPropagation();
+            var dd = b.parentElement;
+            nav.querySelectorAll('.ds-dropdown.open').forEach(function (o) {
+                if (o !== dd) { o.classList.remove('open'); var ob = o.querySelector('.ds-dropbtn'); if (ob) ob.setAttribute('aria-expanded', 'false'); }
+            });
+            dd.classList.toggle('open');
+            b.setAttribute('aria-expanded', dd.classList.contains('open') ? 'true' : 'false');
+        });
+    });
+    if (m) m.querySelectorAll('.ds-mobile-head').forEach(function (h) {
+        h.addEventListener('click', function () {
+            var g = h.parentElement;
+            g.classList.toggle('open');
+            h.setAttribute('aria-expanded', g.classList.contains('open') ? 'true' : 'false');
+        });
+    });
+    document.addEventListener('click', function (e) {
+        if (!nav.contains(e.target)) nav.querySelectorAll('.ds-dropdown.open').forEach(function (d) {
+            d.classList.remove('open');
+            var b = d.querySelector('.ds-dropbtn'); if (b) b.setAttribute('aria-expanded', 'false');
+        });
+    });
+    document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape') nav.querySelectorAll('.ds-dropdown.open').forEach(function (d) { d.classList.remove('open'); });
+    });
+})();
+</script>
+    
+
+    <div id="wrapper" role="main">
+        <!-- Selectors on the left -->
+        <div id="selectors">
+            <select id="data-selector">
+                <option value="../src/2m_temp">Temperature</option>
+                <option value="D2M">Dew point Temp.</option>
+                <option value="../src/rf">Rainfall</option>
+                <option value="CP">Convective Rainfall</option>
+                <option value="CAPE">CAPE</option>
+                <option value="CIN">Convective Inhibition</option>
+                <option value="../src/tcwv">TCWV</option>
+                <option value="../src/msl">Mean Sea Level</option>
+                <option value="../src/div850">850hPa Div.</option>
+                <option value="../src/rh850">850hPa R.H.</option>
+                <option value="../src/vo850">850hPa Vorticity.</option>
+                <option value="../src/gh850">850hPa GPT.Height</option>
+
+                <option value="../src/div500">500 hPa Div.</option>
+                <option value="../src/rh500">500 hPa R.H.</option>
+                <option value="../src/vo500">500 hPa Vorticity.</option>
+                <option value="../src/gh500">500 hPa GPT.Height</option>
+
+                <option value="LCC">Low Cloud cover</option>
+                <option value="MCC">Mid Cloud cover</option>
+                <option value="HCC">High Cloud cover</option>
+                <option value="TCC">Total Cloud cover</option>
+                <option value="PM25">PM 2.5</option>
+                <option value="PM10">PM 10</option>
+                <option value="AOD_TOT">Total AOD(550nm)</option>
+                <option value="AOD_DUST">Dust AOD(550nm)</option>
+                <option value="AOD_SEA">Sea Salt AOD(550nm)</option>
+                <option value="AOD_SUL">Sulphate AOD(550nm)</option>
+                <option value="AOD_NIT">Nitrate AOD(550nm)</option>
+
+            </select>
+            <select id="time-selector">
+                <option value="2">Select a time</option>
+            </select>
+        </div>
+
+        <!-- Chart container -->
+        <div id="container"></div>
+    </div>
+
+    <footer>
+        <h>&copy; 2024 Subhrajit Rath - Personal Blog</h>
+    </footer>
+
+    <script>
+      
+
+        // Frozen single gradient — the 5-second cycling was a visual distraction.
+        document.body.style.background = 'linear-gradient(135deg, #d1e8ff, #4a6a8f)';
+
+        let currentData = '../src/2m_temp'; // Default data
+        // Event listener for dataset selection
+        document.getElementById('data-selector').addEventListener('change', function() {
+            currentData = this.value; // Update current data type
+            loadData();
+        });
+
+        loadData();
+
+
+        // window.onload = function () {
+        //     document.addEventListener("contextmenu", function (e) {
+        //         e.preventDefault();
+        //     }, false);
+        //     document.addEventListener("keydown", function (e) {
+        //         // "I" key
+        //         if (e.ctrlKey && e.shiftKey && e.keyCode == 73) {
+        //             disabledEvent(e);
+        //         }
+        //         // "J" key
+        //         if (e.ctrlKey && e.shiftKey && e.keyCode == 74) {
+        //             disabledEvent(e);
+        //         }
+        //         // "S" key + macOS
+        //         if (e.keyCode == 83 && (navigator.platform.match("Mac") ? e.metaKey : e.ctrlKey)) {
+        //             disabledEvent(e);
+        //         }
+        //         // "U" key
+        //         if (e.ctrlKey && e.keyCode == 85) {
+        //             disabledEvent(e);
+        //         }
+        //         // "F12" key
+        //         if (e.keyCode == 123) {
+        //             disabledEvent(e);
+        //         }
+        //     }, false);
+        //     function disabledEvent(e) {
+        //         if (e.stopPropagation) {
+        //             e.stopPropagation();
+        //         } else if (window.event) {
+        //             window.event.cancelBubble = true;
+        //         }
+        //         e.preventDefault();
+        //         return false;
+        //     }
+        // }
+    </script>
+</body>
+</html>

@@ -1,0 +1,381 @@
+/* ==========================================================================
+   design-system.css — shared UI system for subhrajitjubu.github.io
+   Reference: index.html (light slate theme, Inter, blue-600 -> cyan-500).
+   Loaded last in <head> of every page so it wins on equal specificity.
+   Body classes: .ds-base (full reference theme) | .ds-app (tool pages that
+   keep their own surface/theme engine; they get tokens, components, focus
+   rings, form focus and accessibility — never forced light surfaces).
+   ========================================================================== */
+
+/* ---------- 1. Reference tokens (slate + blue/cyan) ---------- */
+:root {
+    --ds-bg:          #f8fafc;   /* slate-50  */
+    --ds-surface:     #ffffff;
+    --ds-surface-2:   #f1f5f9;   /* slate-100 */
+    --ds-text:        #1e293b;   /* slate-800 */
+    --ds-heading:     #0f172a;   /* slate-900 */
+    --ds-muted:       #64748b;   /* slate-500 */
+    --ds-faint:       #94a3b8;   /* slate-400 */
+    --ds-border:      #e2e8f0;   /* slate-200 */
+    --ds-border-2:    #cbd5e1;   /* slate-300 */
+    --ds-accent:      #2563eb;   /* blue-600  */
+    --ds-accent-hover:#1d4ed8;   /* blue-700  */
+    --ds-accent-soft: #eff6ff;   /* blue-50   */
+    --ds-cyan:        #06b6d4;   /* cyan-500  */
+    --ds-danger:      #dc2626;   /* red-600   */
+    --ds-success:     #059669;   /* emerald-600 */
+    --ds-gold:        #d97706;   /* amber-600 */
+    --ds-ring:        rgba(37, 99, 235, .35);
+    --ds-grad:        linear-gradient(135deg, #2563eb, #06b6d4);
+    --ds-grad-hover:  linear-gradient(135deg, #1d4ed8, #0891b2);
+    --ds-radius:      1rem;
+    --ds-radius-sm:   .5rem;
+    --ds-shadow:      0 20px 45px rgba(15, 23, 42, .08);
+    --ds-shadow-sm:   0 1px 2px rgba(15, 23, 42, .05), 0 4px 12px rgba(15, 23, 42, .05);
+    --ds-font:        'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
+    --ds-mono:        'Space Mono', 'JetBrains Mono', ui-monospace, SFMono-Regular, monospace;
+}
+
+/* ---------- 2. Universal (every page, any theme) ---------- */
+body.ds-base {
+    font-family: var(--ds-font);
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+}
+/* App pages keep their own theme engine; align interactive accents with the
+   reference blue/cyan only in light mode (dark dashboards keep bright sky). */
+html.light body.ds-app { --accent: #2563eb; --accent2: #0891b2; }
+::selection { background: rgba(37, 99, 235, .16); }
+
+:focus-visible { outline: 2px solid var(--ds-accent); outline-offset: 2px; }
+.skip-link {
+    position: absolute; left: -9999px; top: 0; z-index: 10000;
+    padding: 10px 18px; background: var(--ds-accent); color: var(--ds-on-accent, #fff) !important;
+    font: 700 .875rem var(--ds-font); border-radius: 0 0 8px 0; text-decoration: none;
+}
+.skip-link:focus { left: 0; }
+
+/* underline grow (index .nav-link) */
+body.ds-base .nav-link, body.ds-app .nav-link { position: relative; }
+body.ds-base .nav-link::after, body.ds-app .nav-link::after {
+    content: ''; position: absolute; width: 0; height: 2px;
+    bottom: -4px; left: 50%; background: var(--ds-accent);
+    transition: width .3s ease; transform: translateX(-50%);
+}
+body.ds-base .nav-link:hover::after, body.ds-app .nav-link:hover::after { width: 70%; }
+
+button { font-family: inherit; cursor: pointer; }
+
+/* form focus ring only (no surface change — dark pages keep their fields) */
+body.ds-app input:focus, body.ds-app select:focus, body.ds-app textarea:focus {
+    outline: none; border-color: var(--ds-accent);
+    box-shadow: 0 0 0 3px var(--ds-ring);
+}
+body.ds-app input[type="checkbox"], body.ds-app input[type="radio"] { accent-color: var(--ds-accent); }
+body.ds-app input[type="range"] { accent-color: var(--ds-accent); }
+
+/* ---------- 3. Base theme — reference light palette (content pages) ---------- */
+body.ds-base {
+    background: var(--ds-bg);
+    color: var(--ds-text);
+    line-height: 1.55;
+}
+body.ds-base a { color: var(--ds-accent-text, var(--ds-accent)); }
+body.ds-base a:hover { color: var(--ds-accent-text, var(--ds-accent)); text-decoration: underline; text-underline-offset: 2px; }
+body.ds-base h1, body.ds-base h2, body.ds-base h3, body.ds-base h4,
+body.ds-base h5, body.ds-base h6 {
+    color: var(--ds-heading);
+    letter-spacing: -0.01em;
+    line-height: 1.2;
+}
+body.ds-base img { max-width: 100%; height: auto; }
+
+/* ---------- 4. Navigation (glass, like index navbar) ---------- */
+body.ds-base nav {
+    background: var(--ds-surface) !important;
+    background: color-mix(in srgb, var(--ds-surface) 92%, transparent) !important;
+    border-bottom: 1px solid var(--ds-border);
+    box-shadow: var(--ds-shadow-sm);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+}
+body.ds-base nav a { color: var(--ds-text); }
+body.ds-base nav a:hover { color: var(--ds-accent-text, var(--ds-accent)); }
+
+/* dropdowns */
+body.ds-base .dropdown-content {
+    background: var(--ds-surface);
+    border: 1px solid var(--ds-border);
+    border-radius: .75rem;
+    box-shadow: 0 20px 45px rgba(15, 23, 42, .12);
+    padding: .375rem;
+}
+body.ds-base .dropdown-content a {
+    color: var(--ds-text); border-radius: .5rem; padding: .5rem .75rem;
+    transition: background-color .2s ease, color .2s ease;
+}
+body.ds-base .dropdown-content a:hover {
+    background: var(--ds-accent-soft); color: var(--ds-text);
+}
+
+/* ---------- 5. Buttons (gradient pill = primary, ghost = outline) ---------- */
+.btn, .ds-btn {
+    display: inline-flex; align-items: center; justify-content: center; gap: .5rem;
+    min-height: 44px; padding: .625rem 1.375rem;
+    border-radius: 9999px; border: 1px solid transparent;
+    font: 600 .875rem/1.2 var(--ds-font);
+    cursor: pointer; text-decoration: none; white-space: nowrap;
+    transition: transform .18s ease, box-shadow .18s ease, background-color .2s ease, color .2s ease;
+}
+.btn-primary, .ds-btn-primary {
+    background: var(--ds-grad); color: var(--ds-on-accent, #fff) !important;
+    box-shadow: 0 10px 24px rgba(37, 99, 235, .32);
+}
+.btn-primary:hover, .ds-btn-primary:hover {
+    background: var(--ds-grad-hover); color: var(--ds-on-accent, #fff) !important;
+    transform: translateY(-1px);
+    box-shadow: 0 14px 30px rgba(37, 99, 235, .42);
+}
+.btn:active, .ds-btn:active { transform: translateY(0); }
+.btn-ghost, .ds-btn-ghost {
+    background: var(--ds-surface); color: var(--ds-text);
+    border-color: var(--ds-border-2);
+}
+.btn-ghost:hover, .ds-btn-ghost:hover {
+    border-color: var(--ds-accent); color: var(--ds-text);
+    background: var(--ds-accent-soft);
+}
+.btn-danger, .ds-btn-danger { background: var(--ds-danger); color: #fff; }
+.btn:disabled, .ds-btn:disabled { opacity: .55; cursor: not-allowed; transform: none; }
+
+/* ---------- 6. Cards, badges, kickers ---------- */
+.card, .ds-card {
+    background: var(--ds-surface);
+    border: 1px solid var(--ds-border);
+    border-radius: var(--ds-radius);
+    box-shadow: var(--ds-shadow-sm);
+    padding: 1.25rem;
+}
+.card-elevated, .ds-card-elevated { box-shadow: var(--ds-shadow); }
+.glass-card {
+    background: var(--ds-surface);
+    background: color-mix(in srgb, var(--ds-surface) 92%, transparent);
+    backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+    border: 1px solid var(--ds-border);
+}
+.badge, .ds-badge {
+    display: inline-flex; align-items: center; gap: .375rem;
+    padding: .3rem .75rem; border-radius: 9999px;
+    font: 600 .75rem/1.2 var(--ds-font); letter-spacing: .02em;
+    background: var(--ds-surface-2); color: var(--ds-text);
+    border: 1px solid var(--ds-border);
+}
+.badge-accent, .ds-badge-accent {
+    background: var(--ds-accent-soft); color: var(--ds-text);
+    border-color: var(--ds-border);
+}
+.badge-success, .ds-badge-success { background: rgba(5, 150, 105, .1); color: var(--ds-success); border-color: rgba(5, 150, 105, .25); }
+.badge-danger, .ds-badge-danger { background: rgba(220, 38, 38, .1); color: var(--ds-danger); border-color: rgba(220, 38, 38, .25); }
+.kicker, .ds-kicker {
+    font: 700 .75rem/1 var(--ds-font);
+    text-transform: uppercase; letter-spacing: .12em; color: var(--ds-muted);
+}
+.mono, .ds-mono { font-family: var(--ds-mono); }
+
+/* ---------- 7. Forms (reference surfaces) ---------- */
+body.ds-base input[type="text"], body.ds-base input[type="email"], body.ds-base input[type="number"],
+body.ds-base input[type="date"], body.ds-base input[type="time"], body.ds-base input[type="search"],
+body.ds-base input[type="url"], body.ds-base input[type="tel"], body.ds-base input[type="password"],
+body.ds-base select, body.ds-base textarea {
+    min-height: 44px; padding: .625rem .875rem;
+    border: 1px solid var(--ds-border-2); border-radius: var(--ds-radius-sm);
+    background: var(--ds-surface); color: var(--ds-text);
+    font: 400 .9375rem/1.4 var(--ds-font);
+    transition: border-color .2s ease, box-shadow .2s ease;
+}
+body.ds-base input:focus, body.ds-base select:focus, body.ds-base textarea:focus {
+    outline: none; border-color: var(--ds-accent);
+    box-shadow: 0 0 0 3px var(--ds-ring);
+}
+body.ds-base input[type="checkbox"], body.ds-base input[type="radio"] { accent-color: var(--ds-accent); width: 18px; height: 18px; }
+body.ds-base input[type="range"] { accent-color: var(--ds-accent); }
+body.ds-base label { font-weight: 500; color: var(--ds-text); }
+
+/* ---------- 8. Tables ---------- */
+body.ds-base table {
+    width: 100%; border-collapse: collapse;
+    font-size: .875rem; color: var(--ds-text);
+    background: var(--ds-surface);
+}
+body.ds-base th, body.ds-base td {
+    padding: .625rem .875rem; text-align: left;
+    border-bottom: 1px solid var(--ds-border);
+}
+body.ds-base th {
+    font: 700 .75rem/1.2 var(--ds-font); text-transform: uppercase;
+    letter-spacing: .08em; color: var(--ds-muted);
+    background: var(--ds-surface-2);
+}
+
+/* ---------- 9. Figures / maps ---------- */
+.ds-map, .leaflet-container {
+    border: 1px solid var(--ds-border);
+    border-radius: var(--ds-radius);
+    box-shadow: var(--ds-shadow-sm);
+    font-family: var(--ds-font);
+}
+.leaflet-bar a, .leaflet-popup-content { font-family: var(--ds-font); }
+.ds-frame {
+    border: 1px solid var(--ds-border); border-radius: var(--ds-radius);
+    box-shadow: var(--ds-shadow-sm); background: var(--ds-surface);
+}
+.ds-canvas-frame { border-radius: var(--ds-radius); border: 1px solid var(--ds-border); }
+
+/* ---------- 10. Alerts ---------- */
+.alert, .ds-alert {
+    padding: .875rem 1rem; border-radius: var(--ds-radius-sm);
+    border: 1px solid var(--ds-border); font-size: .875rem;
+    background: var(--ds-surface-2); color: var(--ds-text);
+}
+.alert-success, .ds-alert-success { background: rgba(5, 150, 105, .08); border-color: rgba(5, 150, 105, .3); color: #065f46; }
+.alert-danger, .ds-alert-danger { background: rgba(220, 38, 38, .08); border-color: rgba(220, 38, 38, .3); color: #991b1b; }
+.alert-info, .ds-alert-info { background: rgba(37, 99, 235, .08); border-color: rgba(37, 99, 235, .3); color: #1e40af; }
+
+/* ---------- 11. Footer ---------- */
+body.ds-base footer {
+    border-top: 1px solid var(--ds-border);
+    background: var(--ds-surface); color: var(--ds-muted);
+    font-size: .875rem; padding: 1.5rem 1rem;
+}
+
+/* ---------- 12. Canonical navigation (refactor target, all pages) ---------- */
+.gradient-text {
+    background: var(--ds-grad);
+    -webkit-background-clip: text; background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+.ds-nav {
+    position: sticky; top: 0; z-index: 1200; /* above Leaflet panes (400-1000) so dropdowns float over maps */
+    background: var(--ds-surface);
+    background: color-mix(in srgb, var(--ds-surface) 92%, transparent);
+    backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--ds-border);
+    box-shadow: var(--ds-shadow-sm);
+    font-family: var(--ds-font);
+}
+.ds-nav-inner {
+    max-width: 80rem; margin: 0 auto; padding: 0 1rem;
+    height: 4rem; display: flex; align-items: center; gap: 1rem;
+}
+.ds-brand {
+    font-size: 1.25rem; font-weight: 800; letter-spacing: -.05em;
+    text-decoration: none; color: var(--ds-heading); white-space: nowrap;
+}
+.ds-brand span { color: var(--ds-heading); }
+.ds-brand:hover { color: var(--ds-accent-text, var(--ds-accent)); }
+.ds-nav-links { margin-left: auto; display: flex; align-items: center; gap: .125rem; }
+.ds-nav-links > a, .ds-dropbtn {
+    position: relative; display: inline-flex; align-items: center; gap: .375rem;
+    min-height: 44px; padding: .5rem .75rem;
+    font: 500 .875rem var(--ds-font); color: var(--ds-text);
+    text-decoration: none; border-radius: .5rem; background: none; border: 0; cursor: pointer;
+    transition: color .2s ease, background-color .2s ease;
+}
+.ds-nav-links > a:hover, .ds-dropbtn:hover { color: var(--ds-text); background: var(--ds-accent-soft); }
+.ds-nav-links > a::after, .ds-dropbtn::after {
+    content: ''; position: absolute; width: 0; height: 2px;
+    bottom: 4px; left: 50%; background: var(--ds-accent);
+    transform: translateX(-50%); transition: width .3s ease;
+}
+.ds-nav-links > a:hover::after, .ds-dropbtn:hover::after,
+.ds-nav-links > a.active::after, .ds-dropdown.open > .ds-dropbtn::after { width: 70%; }
+.ds-nav-links > a.active { color: var(--ds-text); font-weight: 600; }
+.ds-nav-links .fa-chevron-down { font-size: .625rem; transition: transform .2s ease; }
+.ds-dropdown { position: relative; }
+.ds-dropdown.open > .ds-dropbtn .fa-chevron-down,
+.ds-dropdown:hover > .ds-dropbtn .fa-chevron-down { transform: rotate(180deg); }
+.ds-dropdown-panel {
+    position: absolute; top: calc(100% + .5rem); left: 0; min-width: 15rem;
+    max-width: calc(100vw - 2rem);
+    max-height: 24rem; overflow-y: auto;
+    background: var(--ds-surface); border: 1px solid var(--ds-border);
+    border-radius: .75rem; box-shadow: 0 20px 45px rgba(15, 23, 42, .14);
+    padding: .375rem; opacity: 0; visibility: hidden;
+    transform: translateY(-4px); transform-origin: top left;
+    transition: opacity .2s ease, transform .2s ease, visibility .2s;
+    z-index: 60;
+}
+.ds-dropdown:last-child > .ds-dropdown-panel { left: auto; right: 0; transform-origin: top right; }
+.ds-dropdown:hover > .ds-dropdown-panel, .ds-dropdown.open > .ds-dropdown-panel {
+    opacity: 1; visibility: visible; transform: translateY(0);
+}
+.ds-dropdown-panel a {
+    display: flex; align-items: center; gap: .5rem;
+    padding: .625rem .75rem; border-radius: .5rem;
+    font: 400 .875rem var(--ds-font); color: var(--ds-text);
+    text-decoration: none; min-height: 44px;
+    transition: background-color .2s ease, color .2s ease;
+}
+.ds-dropdown-panel a i { color: var(--ds-cyan); width: 1rem; text-align: center; }
+.ds-dropdown-panel a:hover { background: var(--ds-accent-soft); color: var(--ds-text); }
+.ds-dropdown-panel a.active { color: var(--ds-text); font-weight: 600; background: var(--ds-accent-soft); }
+.ds-nav-toggle {
+    display: none; margin-left: auto; align-items: center; justify-content: center;
+    width: 44px; height: 44px; border-radius: .5rem; border: 0;
+    background: none; color: var(--ds-text); cursor: pointer;
+}
+.ds-nav-toggle:hover { background: var(--ds-surface-2); color: var(--ds-text); }
+.ds-mobile-menu {
+    display: none; margin: 0 .5rem .5rem;
+    border: 1px solid var(--ds-border); border-radius: .75rem;
+    background: var(--ds-surface); box-shadow: var(--ds-shadow);
+    padding: .5rem;
+    max-height: calc(100dvh - 4.5rem); overflow-y: auto; overscroll-behavior: contain;
+}
+.ds-mobile-menu.open { display: block; }
+.ds-mobile-menu a {
+    display: block; padding: .5rem .75rem; border-radius: .5rem;
+    font: 500 .9375rem var(--ds-font); color: var(--ds-text); text-decoration: none; min-height: 40px;
+}
+.ds-mobile-menu a:hover, .ds-mobile-menu a.active { color: var(--ds-text); background: var(--ds-accent-soft); }
+.ds-mobile-label {
+    padding: .75rem 1rem .25rem;
+    font: 700 .75rem var(--ds-font); text-transform: uppercase; letter-spacing: .12em; color: var(--ds-muted);
+}
+/* Collapsible mobile groups — main option folds, sub-links sit under it */
+.ds-mobile-group { border-radius: .5rem; }
+.ds-mobile-head {
+    display: flex; align-items: center; justify-content: space-between; gap: .5rem;
+    width: 100%; min-height: 40px; padding: .5rem .75rem;
+    font: 600 .9375rem var(--ds-font); color: var(--ds-text);
+    background: none; border: 0; cursor: pointer; text-align: left;
+    border-radius: .5rem; transition: background-color .2s ease, color .2s ease;
+}
+.ds-mobile-head:hover { background: var(--ds-accent-soft); color: var(--ds-text); }
+.ds-mobile-head .fa-chevron-down { font-size: .625rem; transition: transform .2s ease; }
+.ds-mobile-group.open > .ds-mobile-head .fa-chevron-down { transform: rotate(180deg); }
+.ds-mobile-items { display: none; padding-left: .5rem; }
+.ds-mobile-group.open > .ds-mobile-items { display: block; }
+.ds-mobile-items a { padding-left: 1.25rem; }
+@media (max-width: 1023px) {
+    .ds-nav-inner { height: 3.5rem; }
+    .ds-nav-links { display: none; }
+    .ds-nav-toggle { display: inline-flex; }
+    .ds-brand { margin-right: auto; }
+}
+@media (min-width: 1024px) {
+    .ds-mobile-menu { display: none !important; }
+}
+
+/* ---------- 12. Motion & scrollbars ---------- */
+@media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    *, *::before, *::after {
+        animation-duration: .01ms !important; animation-iteration-count: 1 !important;
+        transition-duration: .01ms !important; scroll-behavior: auto !important;
+    }
+}
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 6px; border: 2px solid transparent; background-clip: content-box; }
+::-webkit-scrollbar-thumb:hover { background: #94a3b8; background-clip: content-box; }

@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /
+Disallow: /movies.html
+Disallow: /movies_3.html
+Disallow: /test_series_3.html
+
+Sitemap: https://subhrajitjubu.github.io/sitemap.xml

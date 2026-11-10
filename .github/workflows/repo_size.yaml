@@ -1,0 +1,26 @@
+
+name: Check Repository Storage
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check available disk space
+        run: df -h /
+
+      - name: Checkout full Git history
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Measure Git storage
+        run: |
+          git count-objects -vH
+          du -sh .git
+          df -h /
