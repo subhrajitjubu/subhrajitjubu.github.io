@@ -53,19 +53,29 @@ jobs:
           
       - name: Commit and push changes
         run: |
+          set -euo pipefail
           git config --global --add safe.directory "$GITHUB_WORKSPACE"
           git config --global user.name "subhrajitjubu"
           git config --global user.email "66462700+subhrajitjubu@users.noreply.github.com"
           git pull --no-rebase origin main
+
           # notebook writes only *_partNNofNN.json + *_manifest.json; a bare
           # `mv *.json` also scoops up jobs_data.json from the Jobs workflow
-          for f in *_part*.json *_manifest.json; do [ -e "$f" ] && mv "$f" srcc/; done
+          shopt -s nullglob
+          for f in *_part*.json *_manifest.json; do mv "$f" srcc/; done
+
           git add -A srcc/
-          if [ -n "$(git status --porcelain)" ]; then
-            git commit -m "Update ECMWF JSON"
-            # keep history at one run's data (same discipline as UKMO/GFS)
-            bash purge_history.sh srcc
-            git push --force origin main
-          else
+          if [ -z "$(git diff --cached --name-only)" ]; then
             echo "No changes to commit."
+            exit 0
           fi
+
+          git commit -m "Update ECMWF JSON"
+
+          # no history rewrite here: a plain fast-forward push. If another
+          # workflow pushed while this run was downloading, rebase and retry.
+          git push origin main || {
+            echo "push rejected - rebasing on origin/main and retrying"
+            git pull --rebase --autostash origin main
+            git push origin main
+          }
