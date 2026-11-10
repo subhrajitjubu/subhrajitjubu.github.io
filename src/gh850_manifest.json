@@ -1,11 +1,12 @@
 {
     "fm": "gh850",
-    "count": 4,
+    "count": 5,
     "max_mb": 15.0,
     "parts": [
-        "gh850_part01of04.json",
-        "gh850_part02of04.json",
-        "gh850_part03of04.json",
-        "gh850_part04of04.json"
+        "gh850_part01of05.json",
+        "gh850_part02of05.json",
+        "gh850_part03of05.json",
+        "gh850_part04of05.json",
+        "gh850_part05of05.json"
     ]
 }
