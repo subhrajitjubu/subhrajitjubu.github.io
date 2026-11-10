@@ -40,8 +40,10 @@ jobs:
           git config --global --add safe.directory "$GITHUB_WORKSPACE"
           git config --global user.name "subhrajitjubu"
           git config --global user.email "66462700+subhrajitjubu@users.noreply.github.com"
-          git pull --no-rebase origin main
-           
+          # other data workflows still rewrite history, so a merge-style
+          # `git pull` aborts with exit 128 - just take the remote tip
+          git fetch origin main
+          git reset --hard FETCH_HEAD
       - name: Run Jupyter Notebook
         env:
           CDSAPI_KEY: ${{ secrets.CDSAPI_KEY }}
@@ -56,7 +58,12 @@ jobs:
           git config --global --add safe.directory "$GITHUB_WORKSPACE"
           git config --global user.name "subhrajitjubu"
           git config --global user.email "66462700+subhrajitjubu@users.noreply.github.com"
-          git pull --no-rebase origin main
+
+          # take the current remote tip (history may have been rewritten by the
+          # GFS/UKMO purge), then wipe srcc again so only this run's data stays
+          git fetch origin main
+          git reset --hard FETCH_HEAD
+          find srcc -type f -name '*.json' ! -name 'IND.json' -delete
 
           # notebook writes only *_partNNofNN.json + *_manifest.json; a bare
           # `mv *.json` also scoops up jobs_data.json from the Jobs workflow
