@@ -43,8 +43,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
-          # purge_history.sh rewrites history, so it needs the real history and
-          # not a depth-1 shallow clone
+          # full history: the commit step pulls and merges before pushing
           fetch-depth: 0
 
       - name: Set up Python
@@ -146,9 +145,13 @@ jobs:
 
           git commit -m "Update GFS JSON ($YMD ${CYCLE}z)"
 
-          # every earlier version of GFS/*.json is stripped out of history and
-          # garbage-collected, so .git stays the size of one run's data instead
-          # of growing by ~0.5 GB per run. This rewrites history - hence --force.
-          bash purge_history.sh GFS
-
-          git push --force origin main
+          # no history rewrite: a plain fast-forward push. If another workflow
+          # pushed while this run was downloading, rebase and retry.
+          git push origin main || {
+            echo "push rejected - retrying on top of origin/main"
+            MSG=$(git log -1 --pretty=%B)
+            git fetch origin main
+            git reset --soft FETCH_HEAD
+            git commit -qm "$MSG"
+            git push origin main
+          }

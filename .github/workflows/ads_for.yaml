@@ -82,7 +82,10 @@ jobs:
           # no history rewrite here: a plain fast-forward push. If another
           # workflow pushed while this run was downloading, rebase and retry.
           git push origin main || {
-            echo "push rejected - rebasing on origin/main and retrying"
-            git pull --rebase --autostash origin main
+            echo "push rejected - retrying on top of origin/main"
+            MSG=$(git log -1 --pretty=%B)
+            git fetch origin main
+            git reset --soft FETCH_HEAD
+            git commit -qm "$MSG"
             git push origin main
           }

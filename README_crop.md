@@ -186,7 +186,8 @@ content, not filenames, so every daily version stays in history. A 4.5 MB file
 rewritten 6 times adds ~9.9 MB to `.git`; deleting the file in a later commit
 frees nothing.
 
-`purge_history.sh` keeps only the current version:
+`purge_history.sh` keeps only the current version, but it is now a **manual**
+tool — no workflow calls it:
 
 ```bash
 git add -A UKMO/ && git commit -m "Update Met Office 06UTC JSON"
@@ -203,7 +204,8 @@ git push --force origin main   # history was rewritten
 
 It preserves the rest of the history (code commits are untouched) and replaces
 the data commit with exactly one. Because it rewrites history, anything cloned
-before the rewrite has to be re-cloned, and the branch needs `--force`.
+before the rewrite has to be re-cloned, and the branch needs `--force` — which
+is why the data workflows only commit and push normally.
 
 **Caveat:** this frees the space in *your* clone and on the CI runner. A remote
 keeps the superseded commits as dangling objects until it garbage-collects; a
@@ -214,7 +216,7 @@ that, so server-side storage is not guaranteed to shrink.
 ## Running in GitHub Actions
 
 `.github/workflows/UKMO_run.yml` runs every 6 hours, resolves the newest run,
-crops it into `UKMO/`, then commits, purges old data versions and force-pushes.
+crops it into `UKMO/`, then commits and pushes.
 
 Keep the `mo_crop.py` arguments in a bash array:
 

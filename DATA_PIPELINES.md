@@ -1,7 +1,7 @@
 # Data pipelines — one discipline for ECMWF, GFS and UKMO
 
-All weather data workflows follow the same rules so git history never grows
-with old forecast runs.
+All weather data workflows follow the same rules, so every run leaves the repo
+in the same shape and any workflow can safely read it.
 
 ## The rules
 
@@ -14,43 +14,44 @@ with old forecast runs.
    `<fm>.json` for a field that exceeds the budget.
 3. **Wipe before write.** Each run deletes the previous JSON first, so a
    changed part count can't leave stale files behind.
-4. **ECMWF/ADS: plain push, no history rewrite.** `ads_for.yaml` and
-   `ads_oo.yaml` commit and then do a normal fast-forward push (rebase and
-   retry if another workflow pushed first). They never run `purge_history.sh`
-   and never force-push — a rewritten history made their `git pull` abort with
-   exit 128 and lost the run's data.
-
-5. **UKMO / GFS: purge, then force-push.** After committing:
+4. **Plain push everywhere — no history rewriting.** Every data workflow
+   (`ads_for.yaml`, `ads_oo.yaml`, `gfs.yml`, `UKMO_run.yml`) commits and then
+   does a normal fast-forward push, rebasing and retrying once if another run
+   pushed first. Nothing runs `purge_history.sh` and nothing force-pushes.
 
    ```bash
-   bash purge_history.sh <folder>   # UKMO | GFS
-   git push --force origin main
+   git commit -m "Update … JSON"
+   git push origin main || {
+     git pull --rebase --autostash origin main
+     git push origin main
+   }
    ```
 
-   `purge_history.sh` drops every older version of that path from all
-   commits and garbage-collects, so `.git` stays the size of **one run's
-   data**, not the sum of all runs. `fetch-depth: 0` is required — the
-   rewrite needs full history. This is the only reason those workflows
-   rewrite history, so any workflow reading the repo must take the remote tip
-   with `git fetch origin main && git reset --hard FETCH_HEAD` instead of a
-   merge-style `git pull`.
+   Consequence: `.git` grows by one run's data per run (≈75 MB ECMWF,
+   ≈250 MB GFS, ≈1.7 GB UKMO). If pushes start getting rejected for size,
+   `purge_history.sh <folder>` is still available as a **manual** cleanup —
+   it rewrites history, so re-clone afterwards.
+
+   Workflows that only need the latest tree must take the remote tip with
+   `git fetch origin main && git reset --hard FETCH_HEAD`, never a merge-style
+   `git pull` on a checkout that may be stale.
 
 ## Workflows
 
 | Model  | Workflow             | Data output | Notes |
 |--------|----------------------|-------------|-------|
-| ECMWF  | `ads_for.yaml`, `ads_oo.yaml` | `srcc/*.json` | CDS notebooks `srcc/plott_*.ipynb`; needs `CDSAPI_KEY` secret; plain push (no purge) |
+| ECMWF  | `ads_for.yaml`, `ads_oo.yaml` | `srcc/*.json` | CDS notebooks `srcc/plott_*.ipynb`; needs `CDSAPI_KEY` secret |
 | GFS    | `gfs.yml`            | `GFS/*.json`  | `bash download_gfs_curl.sh` (hourly 0–72 h) → `gfs_download.py` |
 | UKMO   | `UKMO_run.yml`       | `UKMO/*.json` | `mo_crop.py --merge --to-json` from the Met Office S3 archive |
 
 ## Checking size
 
 ```bash
-du -sh .git        # should be ~one run's data, not growing over time
+du -sh .git        # grows by ~one run's data per run now that nothing purges
 ```
 
-If `.git` does grow (manual data commits, merges), re-run the purge
-locally and force-push:
+If `.git` (or the remote) grows too much, run the purge manually and
+force-push once:
 
 ```bash
 bash purge_history.sh GFS   # or UKMO
