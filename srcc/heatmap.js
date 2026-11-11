@@ -916,7 +916,7 @@ async function fetchData(dataType) {
 
 async function getTopology() {
     if (!_topologyPromise.p) {
-        _topologyPromise.p = fetchJson('IND_1.json');
+        _topologyPromise.p = fetchJson('IND.json');
     }
     return _topologyPromise.p;
 }
