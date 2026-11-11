@@ -1,0 +1,11 @@
+{
+    "fm": "gh200",
+    "count": 4,
+    "max_mb": 15.0,
+    "parts": [
+        "gh200_part01of04.json",
+        "gh200_part02of04.json",
+        "gh200_part03of04.json",
+        "gh200_part04of04.json"
+    ]
+}
