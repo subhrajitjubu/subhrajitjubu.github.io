@@ -1,11 +1,9 @@
 {
     "fm": "rh850",
-    "count": 4,
+    "count": 2,
     "max_mb": 15.0,
     "parts": [
-        "rh850_part01of04.json",
-        "rh850_part02of04.json",
-        "rh850_part03of04.json",
-        "rh850_part04of04.json"
+        "rh850_part01of02.json",
+        "rh850_part02of02.json"
     ]
 }

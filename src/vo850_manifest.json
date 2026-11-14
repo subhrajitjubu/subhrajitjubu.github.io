@@ -1,10 +1,9 @@
 {
     "fm": "vo850",
-    "count": 3,
+    "count": 2,
     "max_mb": 15.0,
     "parts": [
-        "vo850_part01of03.json",
-        "vo850_part02of03.json",
-        "vo850_part03of03.json"
+        "vo850_part01of02.json",
+        "vo850_part02of02.json"
     ]
 }
