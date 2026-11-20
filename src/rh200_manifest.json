@@ -1,0 +1,10 @@
+{
+    "fm": "rh200",
+    "count": 3,
+    "max_mb": 15.0,
+    "parts": [
+        "rh200_part01of03.json",
+        "rh200_part02of03.json",
+        "rh200_part03of03.json"
+    ]
+}
