@@ -1,9 +1,10 @@
 {
     "fm": "div850",
-    "count": 2,
+    "count": 3,
     "max_mb": 15.0,
     "parts": [
-        "div850_part01of02.json",
-        "div850_part02of02.json"
+        "div850_part01of03.json",
+        "div850_part02of03.json",
+        "div850_part03of03.json"
     ]
 }
